@@ -1,0 +1,12 @@
+<head>
+    <script type="text/javascript" src="https://chai.finance/js/payment-gateway.js">
+<!--    <script type="text/javascript" src="https://www.gmarket.co.kr/">-->
+    </script>
+    <script type="text/javascript">
+        console.log("Hello Payment");
+        var amount = Android.getMembershipAmount();
+        var intentUrl = Android.getIntentUrl();
+        Android.payment(amount, intentUrl);
+        IamportChai.payment(amount, intentUrl);
+    </script>
+</head>
