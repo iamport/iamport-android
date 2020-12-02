@@ -27,7 +27,7 @@ object Iamport {
 
     private lateinit var iamPortRequest: IamPortRequest
 
-    private val close = SingleLiveEvent<Unit>()
+    private var close = SingleLiveEvent<Unit>()
 
     private var activity: ComponentActivity? = null
     private var fragment: Fragment? = null
@@ -52,6 +52,7 @@ object Iamport {
             callback(it)
         }
 
+        close = SingleLiveEvent()
         activity = componentActivity
         iamportSdk = IamportSdk(activity = componentActivity, webViewLauncher = webViewLauncher, close = close)
         delayRun = DelayRun()
@@ -68,6 +69,7 @@ object Iamport {
             callback(it)
         }
 
+        close = SingleLiveEvent()
         this.fragment = fragment
         iamportSdk = IamportSdk(fragment = fragment, webViewLauncher = webViewLauncher, close = close)
         delayRun = DelayRun()

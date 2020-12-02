@@ -7,6 +7,7 @@ import android.net.Uri
 import android.net.UrlQuerySanitizer
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.*
 import com.google.gson.Gson
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.PG
@@ -162,6 +163,20 @@ object Util {
 
     fun getOrEmpty(value: String?): String {
         return value ?: CONST.EMPTY_STR
+    }
+
+    // LiveData 백그라운드 옵저빙
+    internal fun <T> LiveData<T>.observeAlways(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
+        val destoryObserver = object : LifecycleObserver {
+            @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+            fun onDestroy() {
+                lifecycleOwner.lifecycle.removeObserver(this)
+                removeObserver(observer)
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(destoryObserver)
+        observeForever { t -> observer.onChanged(t) }
     }
 
 
