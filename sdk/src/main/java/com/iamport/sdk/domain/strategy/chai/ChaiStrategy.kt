@@ -1,5 +1,8 @@
 package com.iamport.sdk.domain.strategy.chai
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.liveData
 import com.iamport.sdk.data.chai.request.OS
 import com.iamport.sdk.data.chai.request.PrepareRequest
 import com.iamport.sdk.data.chai.response.*
@@ -36,9 +39,11 @@ open class ChaiStrategy : BaseStrategy() {
     private val pollingDelay = CONST.POLLING_DELAY // 폴링 간격
     private var pollingId = AtomicInteger() // 폴링 중복호출 방지위한 아이디 인덱스
 
-    private var networkError: String? = null
+    // 폴링 타임아웃
     private var tryOut = false
     private var tryCount = 0
+
+    private var networkError: String? = null
 
     /**
      *  SDK init
@@ -65,6 +70,7 @@ open class ChaiStrategy : BaseStrategy() {
         prepareData = null
         pollingId = AtomicInteger()
         tryCount = 0
+        bus.isPolling.value = Event(false)
     }
 
     // #2 API
@@ -173,6 +179,9 @@ open class ChaiStrategy : BaseStrategy() {
                 return
             }
             tryCount++
+            withContext(Dispatchers.Main) {
+                bus.isPolling.value = Event(true)
+            }
 
             when (val response =
                 apiGetChaiStatus(data.idempotencyKey.toString(), data.publicAPIKey.toString(), data.paymentId.toString())) {
@@ -239,7 +248,10 @@ open class ChaiStrategy : BaseStrategy() {
         tryCount++
 
         when (ChaiPaymentStatus.from(chaiPayment.status)) {
-            approved -> requestApprovePayments(Pair(payment, data))
+            approved -> {
+                // TODO 최종 호출 전, 머천트 앱에게 알리기
+                requestApprovePayments(Pair(payment, data))
+            }
 
             confirmed -> successFinish(payment, "가맹점 측 결제 승인 완료 (결제 성공) ${chaiPayment.status}")
 

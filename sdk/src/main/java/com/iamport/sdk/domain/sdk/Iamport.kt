@@ -3,13 +3,17 @@ package com.iamport.sdk.domain.sdk
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.iamport.sdk.data.sdk.IamPortRequest
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.domain.utils.DelayRun
+import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.SingleLiveEvent
 import com.iamport.sdk.presentation.activity.IamportSdk
 import com.iamport.sdk.presentation.contract.WebViewActivityContract
+import com.orhanobut.logger.Logger.d
 import org.koin.core.component.KoinApiExtension
 
 
@@ -23,11 +27,11 @@ object Iamport {
 
     private lateinit var iamPortRequest: IamPortRequest
 
-    private val close = SingleLiveEvent<Boolean>()
+    private val close = SingleLiveEvent<Unit>()
 
     private var activity: ComponentActivity? = null
     private var fragment: Fragment? = null
-    private var delayRun : DelayRun? = null
+    private var delayRun: DelayRun? = null
 
 
     private fun clear() {
@@ -36,11 +40,13 @@ object Iamport {
         iamportSdk = null
     }
 
+
     /**
      * SDK Activity 열기 위한 Contract for Activity
      * @param componentActivity : Host Activity
      */
     fun init(componentActivity: ComponentActivity) {
+        d("init")
         clear()
         webViewLauncher = componentActivity.registerForActivityResult(WebViewActivityContract()) {
             callback(it)
@@ -56,6 +62,7 @@ object Iamport {
      * @param fragment : Host Fragment
      */
     fun init(fragment: Fragment) {
+        d("init")
         clear()
         webViewLauncher = fragment.registerForActivityResult(WebViewActivityContract()) {
             callback(it)
@@ -71,6 +78,10 @@ object Iamport {
      */
     fun close() {
         close.call()
+    }
+
+    fun isPolling(): LiveData<Event<Boolean>>? {
+        return iamportSdk?.isPolling()
     }
 
     private val callback = fun(iamPortResponse: IamPortResponse?) {

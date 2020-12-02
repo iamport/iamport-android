@@ -10,10 +10,7 @@ import com.google.gson.GsonBuilder
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.data.sdk.ProvidePgPkg
-import com.iamport.sdk.domain.utils.DelayRun
-import com.iamport.sdk.domain.utils.HostHelper
-import com.iamport.sdk.domain.utils.MODE
-import com.iamport.sdk.domain.utils.Util
+import com.iamport.sdk.domain.utils.*
 import com.iamport.sdk.presentation.contract.ChaiContract
 import com.iamport.sdk.presentation.viewmodel.MainViewModel
 import com.iamport.sdk.presentation.viewmodel.MainViewModelFactory
@@ -28,7 +25,7 @@ internal class IamportSdk(
     val activity: ComponentActivity? = null,
     val fragment: Fragment? = null,
     val webViewLauncher: ActivityResultLauncher<Payment>?,
-    val close: LiveData<Boolean>
+    val close: LiveData<Unit>
 ) : KoinComponent {
 
     private val hostHelper: HostHelper = HostHelper(activity, fragment)
@@ -39,6 +36,8 @@ internal class IamportSdk(
     private val delayRun = DelayRun() // 딜레이 호출
     private var paymentCallBack: ((IamPortResponse?) -> Unit)? = null // 콜백함수
     private var preventBackpress: Boolean = false // 종료버튼 막기
+
+    private val isPolling = MutableLiveData<Event<Boolean>>()
 
     init {
         viewModel = ViewModelProvider(hostHelper.viewModelStoreOwner, MainViewModelFactory(get(), get())).get(MainViewModel::class.java)
@@ -80,6 +79,9 @@ internal class IamportSdk(
 
         hostHelper.lifecycle.addObserver(lifecycleObserver)
         observeViewModel(payment) // 관찰할 LiveData
+        // 외부에서 종료
+        close.observe(hostHelper.lifecycleOwner, Observer { clearData() })
+
     }
 
     /**
@@ -89,26 +91,31 @@ internal class IamportSdk(
         d(GsonBuilder().setPrettyPrinting().create().toJson(payment))
         payment?.let { pay: Payment ->
 
-            // 외부에서 종료
-            close.observe(hostHelper.lifecycleOwner, Observer { clearData() })
-
             // 결제결과 옵저빙
-            viewModel.impResponse().observe(hostHelper.lifecycleOwner, Observer {
-                run { it.getContentIfNotHandled()?.let(this::sdkFinish) }
-            })// 로직상 종료
+            viewModel.impResponse().observe(hostHelper.lifecycleOwner, EventObserver(this::sdkFinish))
+
             // 웹뷰앱 열기
-            viewModel.webViewPayment().observe(hostHelper.lifecycleOwner, Observer {
-                run { it.getContentIfNotHandled()?.let(this::requestWebViewPayment) }
-            })
+            viewModel.webViewPayment().observe(hostHelper.lifecycleOwner, EventObserver(this::requestWebViewPayment))
+
             // 차이앱 열기
-            viewModel.chaiUri().observe(hostHelper.lifecycleOwner, Observer {
-                run { it.getContentIfNotHandled()?.let(this::openChaiApp) }
-            })
+            viewModel.chaiUri().observe(hostHelper.lifecycleOwner, EventObserver(this::openChaiApp))
+
+            // 차이폴링여부
+            viewModel.isPolling().observe(hostHelper.lifecycleOwner, EventObserver(this::updatePolling))
 
             // 결제 시작
             delayRun.launch { requestPayment(pay) }
         }
     }
+
+    fun isPolling(): LiveData<Event<Boolean>> {
+        return isPolling
+    }
+
+    private fun updatePolling(it: Boolean) {
+        isPolling.value = Event(it)
+    }
+
 
     // 차이 앱 종료 콜백 감지
     private fun resultCallback() {

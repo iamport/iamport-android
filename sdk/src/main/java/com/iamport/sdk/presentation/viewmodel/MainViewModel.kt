@@ -55,6 +55,13 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
     }
 
     /**
+     * 외부 노출용 폴링여부
+     */
+    fun isPolling(): LiveData<Event<Boolean>> {
+        return bus.isPolling
+    }
+
+    /**
      * 결제 요청
      */
     fun judgePayment(payment: Payment) {

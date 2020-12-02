@@ -16,4 +16,7 @@ open class NativeLiveDataEventBus {
 
     // 웹뷰 결제 시작
     val webViewPayment = MutableLiveData<Event<Payment>>()
+
+    // 폴링 여부
+    val isPolling = MutableLiveData<Event<Boolean>>()
 }

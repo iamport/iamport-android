@@ -17,6 +17,7 @@ import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.data.sdk.PayMethod
 import com.iamport.sdk.domain.sdk.ICallbackPaymentResult
 import com.iamport.sdk.domain.sdk.Iamport
+import com.iamport.sdk.domain.utils.EventObserver
 import com.iamport.sdk.domain.utils.Util
 import com.orhanobut.logger.Logger.d
 import com.orhanobut.logger.Logger.i
@@ -33,7 +34,6 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-
         requireActivity().onBackPressedDispatcher.addCallback(this, backPressCallback)
     }
 
@@ -74,13 +74,11 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
 
     override fun onStart() {
         super.onStart()
-
         viewDataBinding.merchantUid.setText(getRandomMerchantUid())
-    }
-
-
-    private fun getRandomMerchantUid(): String {
-        return "muid_aos_${Date().time}"
+        // 차이 결제 상태체크 폴링 여부를 확인하실 수 있습니다.
+        Iamport.isPolling()?.observe(this, EventObserver {
+            i("차이 폴링? :: $it")
+        })
     }
 
     // 결제 버튼 클릭
@@ -107,9 +105,6 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
 
         d(GsonBuilder().setPrettyPrinting().create().toJson(request))
 
-        // imp96304110 이거 빙봉 userCode 입니다
-        // imp55870459 이거는 테스트 사이트(kicc) userCode 임
-        // imp60029475 모빌리언스용 유저코드
         val userCode = Util.DevUserCode.values()[viewDataBinding.userCode.selectedItemPosition].name
 
         /**
@@ -121,6 +116,10 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
          * 결제요청 Type#2 함수 호출을 통한 결제결과 callbck
          */
         Iamport.payment(userCode, request) { callBackListener.result(it) }
+    }
+
+    private fun getRandomMerchantUid(): String {
+        return "muid_aos_${Date().time}"
     }
 
     private val callBackListener = object : ICallbackPaymentResult {
