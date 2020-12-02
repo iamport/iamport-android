@@ -69,7 +69,7 @@ open class ChaiStrategy : BaseStrategy() {
 
     // #2 API
     private suspend fun apiPostPrepare(request: PrepareRequest): ResultWrapper<Prepare> {
-        i("try apiGetUapiPostPreparesers")
+        i("try apiPostPrepare")
         return ApiHelper.safeApiCall(Dispatchers.IO) { iamportApi.postPrepare(request) }
     }
 
