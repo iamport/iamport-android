@@ -11,15 +11,16 @@ buildscript {
         classpath 'com.android.tools.build:gradle:4.1.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.koin:koin-gradle-plugin:$koin_version"
-
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+//        classpath 'com.novoda:bintray-release:0.9.2'
+//        classpath 'com.github.panpf.bintray-publish:bintray-publish:1.0.0'
         // andorid-maven-gradle-plugin 추가
+
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
 }
-
 apply plugin: 'koin'
 
 allprojects {

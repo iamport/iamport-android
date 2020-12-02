@@ -1,13 +1,25 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+//apply plugin: 'com.github.panpf.bintray-publish'
+//
+//publish {
+//    userOrg = 'bingbong'
+//    groupId = 'com.iamport.sdk'
+//    artifactId = 'iamport-android'
+//    publishVersion = '0.1'
+//    desc = 'Iamport Android Library'
+//    website = 'http://blog.iamport.kr/'
+//    issueTracker = "https://github.com/iamport/iamport-android/issues"
+//    repository = "https://github.com/iamport/iamport-android.git"
+//}
 
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -106,6 +118,7 @@ dependencies {
     // loading animation
     implementation 'com.github.ybq:Android-SpinKit:1.4.0'
 
-    implementation 'com.readystatesoftware.chuck:library:1.1.0'
+    debugImplementation 'com.readystatesoftware.chuck:library:1.1.0'
     releaseImplementation 'com.readystatesoftware.chuck:library-no-op:1.1.0'
+
 }
