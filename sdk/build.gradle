@@ -1,6 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-parcelize'
 
 android {
     compileSdkVersion 30
@@ -39,10 +39,6 @@ android {
         dataBinding = true
     }
 
-    androidExtensions {
-        experimental = true
-    }
-
     lintOptions {
         abortOnError false
     }
@@ -50,8 +46,8 @@ android {
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
-
 }
+
 
 dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'

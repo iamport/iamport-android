@@ -1,7 +1,7 @@
 package com.iamport.sdk.data.sdk
 
 import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 /**
 https://docs.iamport.kr/tech/imp?lang=ko#param

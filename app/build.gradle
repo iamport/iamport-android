@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-parcelize'
 
 android {
     compileSdkVersion 30
@@ -32,10 +32,6 @@ android {
         dataBinding = true
     }
 
-    androidExtensions {
-        experimental = true
-    }
-
     lintOptions {
         abortOnError false
     }
@@ -48,6 +44,7 @@ android {
         resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
     }
 }
+
 
 dependencies {
 //    implementation fileTree(dir: "libs", include: ["*.jar"])

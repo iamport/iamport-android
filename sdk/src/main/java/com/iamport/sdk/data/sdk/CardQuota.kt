@@ -1,7 +1,7 @@
 package com.iamport.sdk.data.sdk
 
 import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class CardQuota(val card_quota : List<Int>?) : Parcelable
