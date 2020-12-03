@@ -5,4 +5,4 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    app:SpinKit_Color="@color/colorPrimary" />
+    app:SpinKit_Color="#6066FF" />
