@@ -1,8 +1,5 @@
 package com.iamport.sdk.domain.strategy.chai
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.liveData
 import com.iamport.sdk.data.chai.request.OS
 import com.iamport.sdk.data.chai.request.PrepareRequest
 import com.iamport.sdk.data.chai.response.*
@@ -221,19 +218,56 @@ open class ChaiStrategy : BaseStrategy() {
         }
     }
 
+    private suspend fun confirmMerchant(payment: Payment, data: PrepareData) {
+        withContext(Dispatchers.Default) {
+            IamPortApprove(payment = payment, prepareData = data).run {
+                bus.chaiApprove.postValue(Event(this))
+            }
+        }
+    }
+
+
+    // TODO: 12/3/20 타임아웃 (5초 정도) & 최종결제 취소(이건 폴링 아이디처럼 가면 될 듯)
     /**
      * * 5. if(내앱 포그라운드 && 차이폴링 인증완료) IMP 최종승인 요청
      */
-    private suspend fun requestApprovePayments(approvedData: Pair<Payment, PrepareData>) {
-        i("결제 최종 승인 요청~")
-        val payment = approvedData.first
-        val data = approvedData.second
+    suspend fun requestApprovePayments(approve: IamPortApprove) {
+        i("결제 최종 승인 요청전 한번 더 상태체크")
+        approve.run {
+            when (val response =
+                apiGetChaiStatus(prepareData.idempotencyKey.toString(), prepareData.publicAPIKey.toString(), prepareData.paymentId.toString())) {
+                is NetworkError -> failureFinish(payment, "NetworkError ${response.error}")
+                is GenericError -> failureFinish(payment, "GenericError ${response.code} ${response.error}")
+                is Success -> {
+                    val status = ChaiPaymentStatus.from(response.value.status)
+                    if (status == approved) {
+                        processApprovePayments(approve)
+                    } else {
+                        i("최종결제 진행하지 않습니다. $status")
+                        d("상세정보 $response.value")
+                    }
+                }
+            }
+        }
+    }
 
-        when (val response = apiApprovePayment(payment.userCode, data.idempotencyKey.toString(), data.paymentId, data.idempotencyKey, approved, OS.aos.name)) {
-            is NetworkError -> failureFinish(payment, "최종결제 요청 실패 NetworkError ${response.error}")
-            is GenericError -> failureFinish(payment, "GenericError ${response.code} ${response.error}")
+    private suspend fun processApprovePayments(approve: IamPortApprove) {
+        i("결제 최종 승인 요청~~~")
+        approve.run {
+            when (val response =
+                apiApprovePayment(
+                    payment.userCode,
+                    prepareData.idempotencyKey.toString(),
+                    prepareData.paymentId,
+                    prepareData.idempotencyKey,
+                    approved,
+                    OS.aos.name
+                )) {
+                is NetworkError -> failureFinish(payment, "최종결제 요청 실패 NetworkError ${response.error}")
+                is GenericError -> failureFinish(payment, "GenericError ${response.code} ${response.error}")
 
-            is Success -> processApprove(response.value)
+                is Success -> processApprove(response.value)
+            }
         }
     }
 
@@ -248,10 +282,7 @@ open class ChaiStrategy : BaseStrategy() {
         tryCount++
 
         when (ChaiPaymentStatus.from(chaiPayment.status)) {
-            approved -> {
-                // TODO 최종 호출 전, 머천트 앱에게 알리기
-                requestApprovePayments(Pair(payment, data))
-            }
+            approved -> confirmMerchant(payment, data)
 
             confirmed -> successFinish(payment, "가맹점 측 결제 승인 완료 (결제 성공) ${chaiPayment.status}")
 

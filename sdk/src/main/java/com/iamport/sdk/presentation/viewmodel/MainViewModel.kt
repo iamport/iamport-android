@@ -1,7 +1,7 @@
 package com.iamport.sdk.presentation.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.domain.repository.StrategyRepository
@@ -31,7 +31,6 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
         super.onCleared()
     }
 
-
     /**
      * 결제 데이터
      */
@@ -44,6 +43,14 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
      */
     fun chaiUri(): LiveData<Event<String>> {
         return bus.chaiUri
+    }
+
+
+    /**
+     * 차이 결제 상태 approve
+     */
+    fun chaiApprove(): LiveData<Event<IamPortApprove>> {
+        return bus.chaiApprove
     }
 
 
@@ -86,6 +93,16 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
         job.cancel()
     }
 
+
+    /**
+     * 차이 최종 결제 요청
+     */
+    fun requestApprovePayments(approve: IamPortApprove) {
+        viewModelScope.launch(job) {
+            i("차이 최종 결제 요청")
+            repository.chaiStrategy.requestApprovePayments(approve)
+        }
+    }
 
     /**
      * 차이 결제 스테이터스 확인 with 폴링

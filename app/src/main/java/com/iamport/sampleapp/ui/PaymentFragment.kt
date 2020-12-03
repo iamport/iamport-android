@@ -11,16 +11,16 @@ import com.google.gson.GsonBuilder
 import com.iamport.sampleapp.PaymentResultData.result
 import com.iamport.sampleapp.R
 import com.iamport.sampleapp.databinding.PaymentFragmentBinding
-import com.iamport.sdk.data.sdk.IamPortRequest
-import com.iamport.sdk.data.sdk.IamPortResponse
-import com.iamport.sdk.data.sdk.PG
-import com.iamport.sdk.data.sdk.PayMethod
+import com.iamport.sdk.data.sdk.*
 import com.iamport.sdk.domain.sdk.ICallbackPaymentResult
 import com.iamport.sdk.domain.sdk.Iamport
 import com.iamport.sdk.domain.utils.EventObserver
 import com.iamport.sdk.domain.utils.Util
 import com.orhanobut.logger.Logger.d
 import com.orhanobut.logger.Logger.i
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.*
 
 class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
@@ -75,10 +75,18 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
     override fun onStart() {
         super.onStart()
         viewDataBinding.merchantUid.setText(getRandomMerchantUid())
+
+    }
+
+
+    private fun onPolling() {
         // 차이 결제 상태체크 폴링 여부를 확인하실 수 있습니다.
         Iamport.isPolling()?.observe(this, EventObserver {
             i("차이 폴링? :: $it")
         })
+
+        // 또는, 폴링 상태를 보고 싶을때 명시적으로 호출
+        i("${Iamport.isPolling()?.value?.peekContent()}")
     }
 
     // 결제 버튼 클릭
@@ -110,16 +118,28 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
         /**
          * 결제요청 Type#1 ICallbackPaymentResult 구현을 통한 결제결과 callback
          */
-//        IMP.payment(userCode, request, callBackListener)
+//        Iamport.payment(userCode, request, callback = callBackListener)
 
         /**
          * 결제요청 Type#2 함수 호출을 통한 결제결과 callbck
          */
-        Iamport.payment(userCode, request) { callBackListener.result(it) }
+//        Iamport.payment(userCode, request) { callBackListener.result(it) }
+        Iamport.payment(userCode, request, approveCallback = { approveCallback(it) }) { callBackListener.result(it) }
     }
 
     private fun getRandomMerchantUid(): String {
         return "muid_aos_${Date().time}"
+    }
+
+    private fun approveCallback(iamPortApprove: IamPortApprove) {
+        val secUnit = 1000L
+        val sec = 10
+        // TODO 재고확인 등 최종결제를 위한 처리를 해주세요
+        GlobalScope.launch {
+            i("재고확인 합니다~~")
+            delay(sec * secUnit) // sec 초 간 재고확인 프로세스를 가정함
+            Iamport.chaiPayment(iamPortApprove) // 확인 후 SDK 에 최종결제 요청
+        }
     }
 
     private val callBackListener = object : ICallbackPaymentResult {

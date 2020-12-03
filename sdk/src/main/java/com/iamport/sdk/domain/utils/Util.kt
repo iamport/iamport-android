@@ -14,6 +14,7 @@ import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.data.sdk.PG.*
 import com.iamport.sdk.data.sdk.PayMethod
 import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.domain.utils.Util.observeAlways
 import com.orhanobut.logger.Logger
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
@@ -166,18 +167,18 @@ object Util {
     }
 
     // LiveData 백그라운드 옵저빙
+
     internal fun <T> LiveData<T>.observeAlways(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
-        val destoryObserver = object : LifecycleObserver {
+        val lifecycleObserver = object : LifecycleObserver {
             @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
             fun onDestroy() {
-                lifecycleOwner.lifecycle.removeObserver(this)
                 removeObserver(observer)
+                lifecycleOwner.lifecycle.removeObserver(this)
             }
         }
 
-        lifecycleOwner.lifecycle.addObserver(destoryObserver)
-        observeForever { t -> observer.onChanged(t) }
+        lifecycleOwner.lifecycle.addObserver(lifecycleObserver)
+        observeForever(observer)
     }
-
 
 }
