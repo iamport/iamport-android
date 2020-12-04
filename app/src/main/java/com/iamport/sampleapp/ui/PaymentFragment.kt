@@ -12,8 +12,8 @@ import com.iamport.sampleapp.PaymentResultData.result
 import com.iamport.sampleapp.R
 import com.iamport.sampleapp.databinding.PaymentFragmentBinding
 import com.iamport.sdk.data.sdk.*
-import com.iamport.sdk.domain.sdk.ICallbackPaymentResult
-import com.iamport.sdk.domain.sdk.Iamport
+import com.iamport.sdk.domain.core.ICallbackPaymentResult
+import com.iamport.sdk.domain.core.Iamport
 import com.iamport.sdk.domain.utils.EventObserver
 import com.iamport.sdk.domain.utils.Util
 import com.orhanobut.logger.Logger.i
