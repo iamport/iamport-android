@@ -107,10 +107,10 @@ object Iamport {
      * @param ICallbackPaymentResult? : 결제결과 callback type#1 ICallbackPaymentResult 구현
      */
     fun payment(
-        userCode: String, iamPortRequest: IamPortRequest, approveCallback: ((IamPortApprove) -> Unit)? = null, callback: ICallbackPaymentResult?,
+        userCode: String, iamPortRequest: IamPortRequest, approveCallback: ((IamPortApprove) -> Unit)? = null, paymentResultCallback: ICallbackPaymentResult?,
     ) {
         delayRun?.launch {
-            corePayment(userCode, iamPortRequest, approveCallback) { callback?.result(it) }
+            corePayment(userCode, iamPortRequest, approveCallback) { paymentResultCallback?.result(it) }
         }
     }
 
@@ -119,10 +119,10 @@ object Iamport {
      * @param (IamPortResponse?) -> Unit: ICallbackPaymentResult? : 결제결과 callbck type#2 함수 호출
      */
     fun payment(
-        userCode: String, iamPortRequest: IamPortRequest, approveCallback: ((IamPortApprove) -> Unit)? = null, callback: (IamPortResponse?) -> Unit
+        userCode: String, iamPortRequest: IamPortRequest, approveCallback: ((IamPortApprove) -> Unit)? = null, paymentResultCallback: (IamPortResponse?) -> Unit
     ) {
         delayRun?.launch {
-            corePayment(userCode, iamPortRequest, approveCallback, callback)
+            corePayment(userCode, iamPortRequest, approveCallback, paymentResultCallback)
         }
     }
 
@@ -131,11 +131,11 @@ object Iamport {
         userCode: String,
         iamPortRequest: IamPortRequest,
         approveCallback: ((IamPortApprove) -> Unit)?,
-        callback: ((IamPortResponse?) -> Unit)?
+        paymentResultCallback: ((IamPortResponse?) -> Unit)?
     ) {
         this.approveCallback = approveCallback
-        this.impCallbackFunction = callback
+        this.impCallbackFunction = paymentResultCallback
 
-        iamportSdk?.initStart(Payment(userCode, iamPortRequest), approveCallback, callback)
+        iamportSdk?.initStart(Payment(userCode, iamPortRequest), approveCallback, paymentResultCallback)
     }
 }

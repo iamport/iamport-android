@@ -46,7 +46,7 @@ open class ChaiStrategy : BaseStrategy() {
      *  SDK init
      */
     override fun init() {
-        i("나 init야")
+        d("나 init야")
         tryOut = false
         networkError = null
         clearData()
@@ -117,8 +117,8 @@ open class ChaiStrategy : BaseStrategy() {
         d("doWork! $payment")
 //        * 2. IMP 서버에 결제시작 요청 (+ chai id)
         when (val response = apiPostPrepare(PrepareRequest.make(chaiId, payment))) {
-            is NetworkError -> failureFinish(payment, "NetworkError ${response.error}")
-            is GenericError -> failureFinish(payment, "GenericError ${response.code} ${response.error}")
+            is NetworkError -> failureFinish(payment, prepareData, "NetworkError ${response.error}")
+            is GenericError -> failureFinish(payment, prepareData, "GenericError ${response.code} ${response.error}")
 
             is Success -> processPrepare(response.value)
         }
@@ -153,12 +153,12 @@ open class ChaiStrategy : BaseStrategy() {
      */
     suspend fun requestCheckChaiStatus() {
         if (tryOut) { // 타임아웃
-            failureFinish(payment, "${CONST.TRY_OUT_MIN} 분 이상 결제되지 않아 결제취소 처리합니다. 결제를 재시도 해주세요.")
+            failureFinish(payment, prepareData, "${CONST.TRY_OUT_MIN} 분 이상 결제되지 않아 결제취소 처리합니다. 결제를 재시도 해주세요.")
             return
         }
 
         if (networkError != null) { // 네트워크 에러
-            failureFinish(payment, "결제 실패 NetworkError $networkError")
+            failureFinish(payment, prepareData, "결제 실패 NetworkError $networkError")
             return
         }
 
@@ -204,7 +204,7 @@ open class ChaiStrategy : BaseStrategy() {
 
                 is GenericError -> {
                     networkError = null
-                    failureFinish(payment, "GenericError ${response.code} ${response.error}")
+                    failureFinish(payment, prepareData, "GenericError ${response.code} ${response.error}")
                 }
 
                 is Success -> {
@@ -220,34 +220,56 @@ open class ChaiStrategy : BaseStrategy() {
 
     private suspend fun confirmMerchant(payment: Payment, data: PrepareData) {
         withContext(Dispatchers.Default) {
-            IamPortApprove(payment = payment, prepareData = data).run {
+            IamPortApprove.make(payment, data).run {
                 bus.chaiApprove.postValue(Event(this))
+            }
+
+            delay(CONST.CHAI_FINAL_PAYMENT_TIME_OUT_SEC)
+            withContext(Dispatchers.Main) {
+                i("최종 결제 타임아웃! ${CONST.CHAI_FINAL_PAYMENT_TIME_OUT_SEC}")
+                init()
             }
         }
     }
 
-
-    // TODO: 12/3/20 타임아웃 (5초 정도) & 최종결제 취소(이건 폴링 아이디처럼 가면 될 듯)
     /**
      * * 5. if(내앱 포그라운드 && 차이폴링 인증완료) IMP 최종승인 요청
      */
     suspend fun requestApprovePayments(approve: IamPortApprove) {
-        i("결제 최종 승인 요청전 한번 더 상태체크")
+        d("결제 최종 승인 요청전 한번 더 상태체크")
+
         approve.run {
+            if (!matchApproveData(this)) {
+                i("결제 데이터 매칭 실패로 최종결제하지 않습니다.")
+                d("상세정보\n payment :: $payment \n prepareData :: $prepareData \n approve :: $approve")
+                return@run
+            }
+
             when (val response =
-                apiGetChaiStatus(prepareData.idempotencyKey.toString(), prepareData.publicAPIKey.toString(), prepareData.paymentId.toString())) {
-                is NetworkError -> failureFinish(payment, "NetworkError ${response.error}")
-                is GenericError -> failureFinish(payment, "GenericError ${response.code} ${response.error}")
+                apiGetChaiStatus(idempotencyKey.toString(), publicAPIKey.toString(), paymentId.toString())) {
+                is NetworkError -> failureFinish(payment, prepareData, "NetworkError ${response.error}")
+                is GenericError -> failureFinish(payment, prepareData, "GenericError ${response.code} ${response.error}")
                 is Success -> {
                     val status = ChaiPaymentStatus.from(response.value.status)
                     if (status == approved) {
                         processApprovePayments(approve)
                     } else {
                         i("최종결제 진행하지 않습니다. $status")
-                        d("상세정보 $response.value")
+                        d("상세정보 ${response.value}")
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * 현재 결제중인 데이터와 머천트앱으로부터 전달받은 데이터가 동일한가 비교
+     */
+    private fun matchApproveData(approve: IamPortApprove): Boolean {
+        return approve.run {
+            payment.userCode == userCode && payment.iamPortRequest.merchant_uid == merchantUid
+                    && prepareData?.paymentId == paymentId && prepareData?.impUid == impUid
+                    && prepareData?.idempotencyKey == idempotencyKey && prepareData?.publicAPIKey == publicAPIKey
         }
     }
 
@@ -256,15 +278,15 @@ open class ChaiStrategy : BaseStrategy() {
         approve.run {
             when (val response =
                 apiApprovePayment(
-                    payment.userCode,
-                    prepareData.idempotencyKey.toString(),
-                    prepareData.paymentId,
-                    prepareData.idempotencyKey,
+                    userCode,
+                    idempotencyKey.toString(),
+                    paymentId,
+                    idempotencyKey,
                     approved,
                     OS.aos.name
                 )) {
-                is NetworkError -> failureFinish(payment, "최종결제 요청 실패 NetworkError ${response.error}")
-                is GenericError -> failureFinish(payment, "GenericError ${response.code} ${response.error}")
+                is NetworkError -> failureFinish(payment, prepareData, "최종결제 요청 실패 NetworkError ${response.error}")
+                is GenericError -> failureFinish(payment, prepareData, "GenericError ${response.code} ${response.error}")
 
                 is Success -> processApprove(response.value)
             }
@@ -284,9 +306,9 @@ open class ChaiStrategy : BaseStrategy() {
         when (ChaiPaymentStatus.from(chaiPayment.status)) {
             approved -> confirmMerchant(payment, data)
 
-            confirmed -> successFinish(payment, "가맹점 측 결제 승인 완료 (결제 성공) ${chaiPayment.status}")
+            confirmed -> successFinish(payment, prepareData, "가맹점 측 결제 승인 완료 (결제 성공) ${chaiPayment.status}")
 
-            partial_confirmed -> successFinish(payment, "부분 취소된 결제 ${chaiPayment.status}")
+            partial_confirmed -> successFinish(payment, prepareData, "부분 취소된 결제 ${chaiPayment.status}")
 
             waiting, prepared -> {
                 if (tryCount > CONST.TRY_OUT_COUNT) { // 타임아웃
@@ -305,9 +327,9 @@ open class ChaiStrategy : BaseStrategy() {
                 }
             }
 
-            user_canceled, canceled, failed, timeout -> failureFinish(payment, "결제실패 ${chaiPayment.status}")
+            user_canceled, canceled, failed, timeout -> failureFinish(payment, prepareData, "결제실패 ${chaiPayment.status}")
 
-            else -> failureFinish(payment, "결제실패 ${chaiPayment.status}")
+            else -> failureFinish(payment, prepareData, "결제실패 ${chaiPayment.status}")
 
         }
     }
@@ -323,7 +345,7 @@ open class ChaiStrategy : BaseStrategy() {
                 this@ChaiStrategy.prepareData = prepare.data
             } else {
                 w(prepare.msg)
-                failureFinish(payment, prepare.msg)
+                failureFinish(payment, prepareData, prepare.msg)
             }
         }
     }
@@ -334,9 +356,9 @@ open class ChaiStrategy : BaseStrategy() {
      */
     protected open suspend fun processApprove(Approve: Approve) {
         if (Approve.code == 0) {
-            successFinish(payment, "결제 성공")
+            successFinish(payment, prepareData, "결제 성공")
         } else {
-            failureFinish(payment, Approve.msg)
+            failureFinish(payment, prepareData, Approve.msg)
         }
     }
 

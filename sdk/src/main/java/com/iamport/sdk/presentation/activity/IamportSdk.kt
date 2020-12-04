@@ -151,7 +151,7 @@ internal class IamportSdk(
     private fun requestPayment(it: Payment) {
         // 네트워크 연결 상태 체크
         if (!Util.isInternetAvailable(hostHelper.context)) {
-            sdkFinish(Util.getFailResponse(it, "네트워크 연결 안됨"))
+            sdkFinish(IamPortResponse.makeFail(it, msg = "네트워크 연결 안됨"))
             return
         }
         viewModel.judgePayment(it) // 뷰모델에 데이터 판단 요청(native or webview pg)
@@ -191,7 +191,8 @@ internal class IamportSdk(
      * 차이앱 외부앱 열기
      */
     private fun openChaiApp(it: String) {
-        i(it)
+        i("openChaiApp")
+        d(it)
         runCatching {
             preventBackpress = true
             launcherChai?.launch(it to "openchai")

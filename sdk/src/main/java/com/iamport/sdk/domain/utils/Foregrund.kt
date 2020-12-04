@@ -9,7 +9,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Logger.d
 
 
@@ -60,10 +59,10 @@ object Foreground : ActivityLifecycleCallbacks {
     override fun onActivityCreated(activity: Activity, bundle: Bundle?) {}
     override fun onActivityStarted(activity: Activity) {
         if (++running == 1) {
-            Logger.i("app is 포그라운드! 살아왔다")
+            d("app is 포그라운드! 살아왔다")
             appStatus = AppStatus.RETURNED_TO_FOREGROUND
         } else if (running > 1) {
-            Logger.i("app is 포그라운드")
+            d("app is 포그라운드")
             appStatus = AppStatus.FOREGROUND
         }
     }
@@ -72,7 +71,7 @@ object Foreground : ActivityLifecycleCallbacks {
     override fun onActivityPaused(activity: Activity) {}
     override fun onActivityStopped(activity: Activity) {
         if (--running == 0) {
-            Logger.i("app is 백그라운드")
+            d("app is 백그라운드")
             appStatus = AppStatus.BACKGROUND
         }
     }

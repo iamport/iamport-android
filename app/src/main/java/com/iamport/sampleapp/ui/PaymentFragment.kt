@@ -75,7 +75,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
     override fun onStart() {
         super.onStart()
         viewDataBinding.merchantUid.setText(getRandomMerchantUid())
-
+        onPolling()
     }
 
 
@@ -111,7 +111,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
             buyer_name = "남궁안녕"
         )
 
-        d(GsonBuilder().setPrettyPrinting().create().toJson(request))
+        i(GsonBuilder().setPrettyPrinting().create().toJson(request))
 
         val userCode = Util.DevUserCode.values()[viewDataBinding.userCode.selectedItemPosition].name
 
@@ -124,21 +124,17 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
          * 결제요청 Type#2 함수 호출을 통한 결제결과 callbck
          */
 //        Iamport.payment(userCode, request) { callBackListener.result(it) }
-        Iamport.payment(userCode, request, approveCallback = { approveCallback(it) }) { callBackListener.result(it) }
+        Iamport.payment(userCode, request, approveCallback = { approveCallback(it) }, callback = { callBackListener.result(it) })
     }
 
-    private fun getRandomMerchantUid(): String {
-        return "muid_aos_${Date().time}"
-    }
-
+    // TODO 재고확인 등 최종결제를 위한 처리를 해주세요
     private fun approveCallback(iamPortApprove: IamPortApprove) {
         val secUnit = 1000L
-        val sec = 10
-        // TODO 재고확인 등 최종결제를 위한 처리를 해주세요
+        val sec = 1
         GlobalScope.launch {
             i("재고확인 합니다~~")
-            delay(sec * secUnit) // sec 초 간 재고확인 프로세스를 가정함
-            Iamport.chaiPayment(iamPortApprove) // 확인 후 SDK 에 최종결제 요청
+            delay(sec * secUnit) // sec 초간 재고확인 프로세스를 가정합니다
+            Iamport.chaiPayment(iamPortApprove) // TODO: 12/4/20 상태 확인 후 SDK 에 최종결제 요청
         }
     }
 
@@ -186,6 +182,10 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
                 .create()
                 .show()
         }
+    }
+
+    private fun getRandomMerchantUid(): String {
+        return "muid_aos_${Date().time}"
     }
 
 }

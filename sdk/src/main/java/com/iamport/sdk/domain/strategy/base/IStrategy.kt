@@ -1,8 +1,8 @@
 package com.iamport.sdk.domain.strategy.base
 
+import com.iamport.sdk.data.chai.response.PrepareData
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
-import com.iamport.sdk.domain.utils.Util
 import com.orhanobut.logger.Logger
 
 interface IStrategy {
@@ -12,16 +12,18 @@ interface IStrategy {
     }
 
     fun sdkFinish(response: IamPortResponse?)
-    fun successFinish(payment: Payment, msg: String) {
+    fun successFinish(payment: Payment, prepareData: PrepareData? = null, msg: String) {
         Logger.i(msg)
-        val response = Util.getSuccessResponse(payment, msg)
-        sdkFinish(response)
+        IamPortResponse.makeSuccess(payment, prepareData, msg).run {
+            sdkFinish(this)
+        }
     }
 
-    fun failureFinish(payment: Payment, errMsg: String) {
-        Logger.i(errMsg)
-        val response = Util.getFailResponse(payment, errMsg)
-        sdkFinish(response)
+    fun failureFinish(payment: Payment, prepareData: PrepareData? = null, msg: String) {
+        Logger.i(msg)
+        IamPortResponse.makeFail(payment, prepareData, msg).run {
+            sdkFinish(this)
+        }
     }
 
 }

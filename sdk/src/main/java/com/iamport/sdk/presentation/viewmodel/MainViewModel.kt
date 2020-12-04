@@ -120,7 +120,7 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
      */
     fun checkChaiStatus() {
         viewModelScope.launch(job) {
-            i("차이앱 종료돼서 차이 결제 상태 체크")
+            d("차이앱 종료돼서 차이 결제 상태 체크")
             repository.chaiStrategy.requestCheckChaiStatus()
         }
     }

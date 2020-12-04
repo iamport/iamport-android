@@ -34,11 +34,11 @@ class JudgeStrategy : BaseStrategy(), KoinComponent {
 //        * 1. IMP 서버에 유저 정보 요청해서 chai id 얻음
         val userDataList: ArrayList<UserData>? = when (val response = apiGetUsers(payment.userCode)) {
             is ResultWrapper.NetworkError -> {
-                failureFinish(payment, "NetworkError ${response.error}")
+                failureFinish(payment, msg = "NetworkError ${response.error}")
                 null
             }
             is ResultWrapper.GenericError -> {
-                failureFinish(payment, "GenericError ${response.code} ${response.error}")
+                failureFinish(payment, msg = "GenericError ${response.code} ${response.error}")
                 null
             }
 
@@ -47,7 +47,7 @@ class JudgeStrategy : BaseStrategy(), KoinComponent {
                     if (code == 0) {
                         data
                     } else {
-                        failureFinish(payment, msg)
+                        failureFinish(payment, msg = msg)
                         null
                     }
                 }
@@ -56,7 +56,7 @@ class JudgeStrategy : BaseStrategy(), KoinComponent {
 
         // 유저 PG 정보 아예 없으면 실패처리
         if (userDataList.isNullOrEmpty()) {
-            failureFinish(payment, "Not found PG [ ${payment.iamPortRequest.pg} ] in your info.")
+            failureFinish(payment, msg = "Not found PG [ ${payment.iamPortRequest.pg} ] in your info.")
             return Triple(JudgeKinds.EMPTY, null, payment)
         }
 

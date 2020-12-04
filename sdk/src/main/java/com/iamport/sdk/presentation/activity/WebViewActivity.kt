@@ -118,7 +118,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ko
     private fun requestPayment(it: Payment) {
         loadingVisible(true)
         if (!Util.isInternetAvailable(this)) {
-            sdkFinish(Util.getFailResponse(it, "네트워크 연결 안됨"))
+            sdkFinish(IamPortResponse.makeFail(it, msg = "네트워크 연결 안됨"))
             return
         }
         viewModel.requestPayment(it)

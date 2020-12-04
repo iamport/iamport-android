@@ -92,36 +92,6 @@ object Util {
         return "${CONST.PAYMENT_PLAY_STORE_URL}$pkg"
     }
 
-    /**
-     * 성공 리스폰스 객체
-     */
-    fun getSuccessResponse(payment: Payment, msg: String): IamPortResponse {
-        return payment.run {
-            IamPortResponse(
-                imp_success = true,
-                success = true,
-                imp_uid = userCode,
-                merchant_uid = iamPortRequest.merchant_uid,
-                error_msg = msg
-            )
-        }
-    }
-
-
-    /**
-     * 실패 리스폰스 객체
-     */
-    fun getFailResponse(payment: Payment, errorMsg: String): IamPortResponse {
-        return payment.run {
-            IamPortResponse(
-                imp_success = false,
-                success = false,
-                imp_uid = userCode,
-                merchant_uid = iamPortRequest.merchant_uid,
-                error_msg = errorMsg
-            )
-        }
-    }
 
     // 네트워크 연결 체크
     @Suppress("DEPRECATION")

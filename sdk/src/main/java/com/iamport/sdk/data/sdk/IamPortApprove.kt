@@ -6,6 +6,25 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class IamPortApprove(
-    val payment: Payment,
-    val prepareData: PrepareData
-) : Parcelable
+    val userCode: String,
+    val merchantUid: String,
+    val paymentId: String?,
+    val impUid: String?,
+    val idempotencyKey: String?,
+    val publicAPIKey: String?,
+    val msg: String? = null
+) : Parcelable {
+
+    companion object {
+        fun make(payment: Payment, data: PrepareData): IamPortApprove {
+            return IamPortApprove(
+                userCode = payment.userCode,
+                merchantUid = payment.iamPortRequest.merchant_uid,
+                paymentId = data.paymentId,
+                impUid = data.impUid,
+                idempotencyKey = data.idempotencyKey,
+                publicAPIKey = data.publicAPIKey
+            )
+        }
+    }
+}
