@@ -16,7 +16,6 @@ import com.iamport.sdk.domain.sdk.ICallbackPaymentResult
 import com.iamport.sdk.domain.sdk.Iamport
 import com.iamport.sdk.domain.utils.EventObserver
 import com.iamport.sdk.domain.utils.Util
-import com.orhanobut.logger.Logger.d
 import com.orhanobut.logger.Logger.i
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -124,7 +123,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
          * 결제요청 Type#2 함수 호출을 통한 결제결과 callbck
          */
 //        Iamport.payment(userCode, request) { callBackListener.result(it) }
-        Iamport.payment(userCode, request, approveCallback = { approveCallback(it) }, callback = { callBackListener.result(it) })
+        Iamport.payment(userCode, request, approveCallback = { approveCallback(it) }, paymentResultCallback = { callBackListener.result(it) })
     }
 
     // TODO 재고확인 등 최종결제를 위한 처리를 해주세요
