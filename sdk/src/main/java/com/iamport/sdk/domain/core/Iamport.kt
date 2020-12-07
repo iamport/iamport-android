@@ -104,6 +104,7 @@ object Iamport {
 
     /**
      * 결제 요청
+     * @param ((IamPortApprove?) -> Unit)? : (옵셔널) 차이 최종 결제 요청전 콜백
      * @param ICallbackPaymentResult? : 결제결과 callback type#1 ICallbackPaymentResult 구현
      */
     fun payment(
@@ -116,6 +117,7 @@ object Iamport {
 
     /**
      * 결제 요청
+     * @param ((IamPortApprove?) -> Unit)? : (옵셔널) 차이 최종 결제 요청전 콜백
      * @param (IamPortResponse?) -> Unit: ICallbackPaymentResult? : 결제결과 callbck type#2 함수 호출
      */
     fun payment(

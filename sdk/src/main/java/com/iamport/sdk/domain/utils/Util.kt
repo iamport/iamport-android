@@ -41,7 +41,7 @@ object Util {
     /**
      * pg사별 지원하는 결제수단
      */
-    fun getMappingPayMethod(pg: PG): Set<PayMethod> {
+    private fun getMappingPayMethod(pg: PG): Set<PayMethod> {
         return when (pg) {
             html5_inicis -> defaultPayMethod + setOf(
                 PayMethod.samsung,
@@ -147,6 +147,12 @@ object Util {
 
         lifecycleOwner.lifecycle.addObserver(lifecycleObserver)
         observeForever(observer)
+    }
+
+    fun versionName(hostHelper: HostHelper): String {
+        return hostHelper.context?.run {
+            packageManager.getPackageInfo(packageName, 0)?.versionName
+        } ?: kotlin.run { "" }
     }
 
 }

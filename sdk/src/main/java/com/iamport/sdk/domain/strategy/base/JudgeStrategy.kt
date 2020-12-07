@@ -25,7 +25,7 @@ class JudgeStrategy : BaseStrategy(), KoinComponent {
 
     // #1 API imp uid 에 따른 유저정보 가져오기
     private suspend fun apiGetUsers(userCode: String): ResultWrapper<Users> {
-        Logger.i("try apiGetUsers")
+        Logger.d("try apiGetUsers")
         return ApiHelper.safeApiCall(Dispatchers.IO) { iamportApi.getUsers(userCode) }
     }
 

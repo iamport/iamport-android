@@ -76,7 +76,7 @@ internal class IamportSdk(
      * BaseActivity 에서 onCreate 시 호출
      */
     fun initStart(payment: Payment, approveCallback: ((IamPortApprove) -> Unit)?, paymentResultCallBack: ((IamPortResponse?) -> Unit)?) {
-        i("HELLO I'MPORT SDK!")
+        i("HELLO I'MPORT SDK! ${Util.versionName(hostHelper)}")
         viewModel.clearData()
 
         this.preventBackpress = true

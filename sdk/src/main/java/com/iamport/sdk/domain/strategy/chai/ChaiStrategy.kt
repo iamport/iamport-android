@@ -46,7 +46,7 @@ open class ChaiStrategy : BaseStrategy() {
      *  SDK init
      */
     override fun init() {
-        d("나 init야")
+        d("ChaiStrategy init")
         tryOut = false
         networkError = null
         clearData()
@@ -72,13 +72,13 @@ open class ChaiStrategy : BaseStrategy() {
 
     // #2 API
     private suspend fun apiPostPrepare(request: PrepareRequest): ResultWrapper<Prepare> {
-        i("try apiPostPrepare")
+        d("try apiPostPrepare")
         return ApiHelper.safeApiCall(Dispatchers.IO) { iamportApi.postPrepare(request) }
     }
 
     // #3 API
     private suspend fun apiGetChaiStatus(idempotencyKey: String, publicApiKey: String, chaiPaymentId: String): ResultWrapper<ChaiPayment> {
-        i("try apiGetChaiStatus")
+        d("try apiGetChaiStatus")
         return ApiHelper.safeApiCall(Dispatchers.IO) {
             chaiApi.getChaiPayment(idempotencyKey, publicApiKey, chaiPaymentId)
         }
@@ -93,7 +93,7 @@ open class ChaiStrategy : BaseStrategy() {
         status: ChaiPaymentStatus,
         native: String,
     ): ResultWrapper<Approve> {
-        i("try apiApprovePayment")
+        d("try apiApprovePayment")
         return ApiHelper.safeApiCall(Dispatchers.IO) {
             iamportApi.postApprove(impUserCode, impUid, paymentId, idempotencyKey, status, native)
         }

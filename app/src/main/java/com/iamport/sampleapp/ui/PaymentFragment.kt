@@ -117,7 +117,8 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
         /**
          * 결제요청 Type#1 ICallbackPaymentResult 구현을 통한 결제결과 callback
          */
-//        Iamport.payment(userCode, request, callback = callBackListener)
+//        Iamport.payment(userCode, request, paymentResultCallback = callBackListener)
+        Iamport.payment(userCode, request, approveCallback = { approveCallback(it) }, paymentResultCallback = callBackListener)
 
         /**
          * 결제요청 Type#2 함수 호출을 통한 결제결과 callbck
@@ -132,7 +133,6 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
      *  CONST.CHAI_FINAL_PAYMENT_TIME_OUT_SEC 만큼 타임아웃 후 결제 데이터가
      *  초기화 되기 때문에 타임아웃 시간 안에 Iamport.chaiPayment 함수를 호출해주셔야 합니다.
      */
-    // Iamport.chaiPayment 함수를 호출해주셔야 합니다.
     private fun approveCallback(iamPortApprove: IamPortApprove) {
         val secUnit = 1000L
         val sec = 1
