@@ -85,7 +85,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
         })
 
         // 또는, 폴링 상태를 보고 싶을때 명시적으로 호출
-        i("${Iamport.isPolling()?.value?.peekContent()}")
+        i("isPolling? ${Iamport.isPolling()?.value?.peekContent()}")
     }
 
     // 결제 버튼 클릭
