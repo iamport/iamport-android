@@ -13,8 +13,6 @@ import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.data.sdk.PG.*
 import com.iamport.sdk.data.sdk.PayMethod
-import com.iamport.sdk.data.sdk.Payment
-import com.iamport.sdk.domain.utils.Util.observeAlways
 import com.orhanobut.logger.Logger
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets

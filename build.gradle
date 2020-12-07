@@ -8,6 +8,7 @@ buildscript {
         jcenter()
     }
     dependencies {
+        classpath 'com.android.tools:r8:2.1.67'
         classpath 'com.android.tools.build:gradle:4.1.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.koin:koin-gradle-plugin:$koin_version"
@@ -26,7 +27,12 @@ allprojects {
     repositories {
         google()
         jcenter()
-        maven { url "https://jitpack.io" }
+        maven {
+            url 'https://storage.googleapis.com/r8-releases/raw'
+        }
+        maven {
+            url 'https://jitpack.io'
+        }
     }
 }
 
