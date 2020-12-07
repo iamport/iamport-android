@@ -1,7 +1,7 @@
 package com.iamport.sdk.data.sdk
 
 import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 //card(신용카드)
 //trans(실시간계좌이체)

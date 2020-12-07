@@ -7,13 +7,12 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import com.google.gson.GsonBuilder
+import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.data.sdk.ProvidePgPkg
-import com.iamport.sdk.domain.utils.DelayRun
-import com.iamport.sdk.domain.utils.HostHelper
-import com.iamport.sdk.domain.utils.MODE
-import com.iamport.sdk.domain.utils.Util
+import com.iamport.sdk.domain.utils.*
+import com.iamport.sdk.domain.utils.Util.observeAlways
 import com.iamport.sdk.presentation.contract.ChaiContract
 import com.iamport.sdk.presentation.viewmodel.MainViewModel
 import com.iamport.sdk.presentation.viewmodel.MainViewModelFactory
@@ -28,7 +27,8 @@ internal class IamportSdk(
     val activity: ComponentActivity? = null,
     val fragment: Fragment? = null,
     val webViewLauncher: ActivityResultLauncher<Payment>?,
-    val close: LiveData<Boolean>
+    val approvePayment: LiveData<Event<IamPortApprove>>,
+    val close: LiveData<Event<Unit>>
 ) : KoinComponent {
 
     private val hostHelper: HostHelper = HostHelper(activity, fragment)
@@ -36,9 +36,13 @@ internal class IamportSdk(
     private val launcherChai: ActivityResultLauncher<Pair<String, String>>? // 차이앱 런처
     private val viewModel: MainViewModel // 요청할 뷰모델
 
+    private var paymentResultCallBack: ((IamPortResponse?) -> Unit)? = null // 콜백함수
+    private var chaiApproveCallBack: ((IamPortApprove) -> Unit)? = null // 콜백함수
+    private val isPolling = MutableLiveData<Event<Boolean>>()
+
     private val delayRun = DelayRun() // 딜레이 호출
-    private var paymentCallBack: ((IamPortResponse?) -> Unit)? = null // 콜백함수
     private var preventBackpress: Boolean = false // 종료버튼 막기
+
 
     init {
         viewModel = ViewModelProvider(hostHelper.viewModelStoreOwner, MainViewModelFactory(get(), get())).get(MainViewModel::class.java)
@@ -71,15 +75,22 @@ internal class IamportSdk(
     /**
      * BaseActivity 에서 onCreate 시 호출
      */
-    fun initStart(payment: Payment, paymentCallBack: ((IamPortResponse?) -> Unit)?) {
+    fun initStart(payment: Payment, approveCallback: ((IamPortApprove) -> Unit)?, paymentResultCallBack: ((IamPortResponse?) -> Unit)?) {
         i("HELLO I'MPORT SDK!")
         viewModel.clearData()
 
         this.preventBackpress = true
-        this.paymentCallBack = paymentCallBack
+        this.chaiApproveCallBack = approveCallback
+        this.paymentResultCallBack = paymentResultCallBack
 
         hostHelper.lifecycle.addObserver(lifecycleObserver)
         observeViewModel(payment) // 관찰할 LiveData
+
+        // 차이 최종결제 요청
+        approvePayment.observeAlways(hostHelper.lifecycleOwner, EventObserver { viewModel.requestApprovePayments(it) })
+
+        // 외부에서 종료
+        close.observeAlways(hostHelper.lifecycleOwner, EventObserver { clearData() })
     }
 
     /**
@@ -89,28 +100,45 @@ internal class IamportSdk(
         d(GsonBuilder().setPrettyPrinting().create().toJson(payment))
         payment?.let { pay: Payment ->
 
-            // 외부에서 종료
-            close.observe(hostHelper.lifecycleOwner, Observer { clearData() })
-
             // 결제결과 옵저빙
-            viewModel.impResponse().observe(hostHelper.lifecycleOwner, Observer {
-                run { it.getContentIfNotHandled()?.let(this::sdkFinish) }
-            })// 로직상 종료
+            viewModel.impResponse().observe(hostHelper.lifecycleOwner, EventObserver(this::sdkFinish))
+
             // 웹뷰앱 열기
-            viewModel.webViewPayment().observe(hostHelper.lifecycleOwner, Observer {
-                run { it.getContentIfNotHandled()?.let(this::requestWebViewPayment) }
-            })
+            viewModel.webViewPayment().observe(hostHelper.lifecycleOwner, EventObserver(this::requestWebViewPayment))
+
             // 차이앱 열기
-            viewModel.chaiUri().observe(hostHelper.lifecycleOwner, Observer {
-                run { it.getContentIfNotHandled()?.let(this::openChaiApp) }
-            })
+            viewModel.chaiUri().observe(hostHelper.lifecycleOwner, EventObserver(this::openChaiApp))
+
+            // 차이폴링여부
+            viewModel.isPolling().observe(hostHelper.lifecycleOwner, EventObserver(this::updatePolling))
+
+            // 차이 결제 상태 approve 처리
+            viewModel.chaiApprove().observeAlways(hostHelper.lifecycleOwner, EventObserver(this::chaiApprove))
 
             // 결제 시작
             delayRun.launch { requestPayment(pay) }
         }
     }
 
-    // 차이 앱 종료 콜백 감지
+    fun isPolling(): LiveData<Event<Boolean>> {
+        return isPolling
+    }
+
+    private fun updatePolling(it: Boolean) {
+        isPolling.value = Event(it)
+    }
+
+    private fun chaiApprove(approve: IamPortApprove) {
+        chaiApproveCallBack?.run {
+            invoke(approve)
+        } ?: run {
+            viewModel.requestApprovePayments(approve)
+        }
+    }
+
+    /**
+     * 차이 앱 종료 콜백 감지
+     */
     private fun resultCallback() {
         i("Result Callback ChaiLauncher")
         preventBackpress = false
@@ -123,7 +151,7 @@ internal class IamportSdk(
     private fun requestPayment(it: Payment) {
         // 네트워크 연결 상태 체크
         if (!Util.isInternetAvailable(hostHelper.context)) {
-            sdkFinish(Util.getFailResponse(it, "네트워크 연결 안됨"))
+            sdkFinish(IamPortResponse.makeFail(it, msg = "네트워크 연결 안됨"))
             return
         }
         viewModel.judgePayment(it) // 뷰모델에 데이터 판단 요청(native or webview pg)
@@ -155,7 +183,7 @@ internal class IamportSdk(
     private fun sdkFinish(iamPortResponse: IamPortResponse?) {
         i("명시적 sdkFinish ${iamPortResponse.toString()}")
         clearData()
-        paymentCallBack?.invoke(iamPortResponse)
+        paymentResultCallBack?.invoke(iamPortResponse)
     }
 
 
@@ -163,7 +191,8 @@ internal class IamportSdk(
      * 차이앱 외부앱 열기
      */
     private fun openChaiApp(it: String) {
-        i(it)
+        i("openChaiApp")
+        d(it)
         runCatching {
             preventBackpress = true
             launcherChai?.launch(it to "openchai")

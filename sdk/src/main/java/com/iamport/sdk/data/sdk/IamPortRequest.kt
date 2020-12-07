@@ -2,7 +2,7 @@ package com.iamport.sdk.data.sdk
 
 import android.os.Parcelable
 import com.iamport.sdk.domain.utils.CONST
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 /**
  * SDK 에 결제 요청할 데이터

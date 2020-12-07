@@ -7,12 +7,14 @@ import android.net.Uri
 import android.net.UrlQuerySanitizer
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.*
 import com.google.gson.Gson
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.data.sdk.PG.*
 import com.iamport.sdk.data.sdk.PayMethod
 import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.domain.utils.Util.observeAlways
 import com.orhanobut.logger.Logger
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
@@ -90,36 +92,6 @@ object Util {
         return "${CONST.PAYMENT_PLAY_STORE_URL}$pkg"
     }
 
-    /**
-     * 성공 리스폰스 객체
-     */
-    fun getSuccessResponse(payment: Payment, msg: String): IamPortResponse {
-        return payment.run {
-            IamPortResponse(
-                imp_success = true,
-                success = true,
-                imp_uid = userCode,
-                merchant_uid = iamPortRequest.merchant_uid,
-                error_msg = msg
-            )
-        }
-    }
-
-
-    /**
-     * 실패 리스폰스 객체
-     */
-    fun getFailResponse(payment: Payment, errorMsg: String): IamPortResponse {
-        return payment.run {
-            IamPortResponse(
-                imp_success = false,
-                success = false,
-                imp_uid = userCode,
-                merchant_uid = iamPortRequest.merchant_uid,
-                error_msg = errorMsg
-            )
-        }
-    }
 
     // 네트워크 연결 체크
     @Suppress("DEPRECATION")
@@ -164,5 +136,19 @@ object Util {
         return value ?: CONST.EMPTY_STR
     }
 
+    // LiveData 백그라운드 옵저빙
+
+    internal fun <T> LiveData<T>.observeAlways(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
+        val lifecycleObserver = object : LifecycleObserver {
+            @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+            fun onDestroy() {
+                removeObserver(observer)
+                lifecycleOwner.lifecycle.removeObserver(this)
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(lifecycleObserver)
+        observeForever(observer)
+    }
 
 }

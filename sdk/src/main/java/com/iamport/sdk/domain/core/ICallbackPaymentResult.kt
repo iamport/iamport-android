@@ -1,4 +1,4 @@
-package com.iamport.sdk.domain.sdk
+package com.iamport.sdk.domain.core
 
 import com.iamport.sdk.data.sdk.IamPortResponse
 

@@ -1,7 +1,7 @@
 package com.iamport.sdk.presentation.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.domain.repository.StrategyRepository
@@ -31,7 +31,6 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
         super.onCleared()
     }
 
-
     /**
      * 결제 데이터
      */
@@ -48,10 +47,25 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
 
 
     /**
+     * 차이 결제 상태 approve
+     */
+    fun chaiApprove(): LiveData<Event<IamPortApprove>> {
+        return bus.chaiApprove
+    }
+
+
+    /**
      * 결제 결과 콜백 및 종료
      */
     fun impResponse(): LiveData<Event<IamPortResponse?>> {
         return bus.impResponse
+    }
+
+    /**
+     * 외부 노출용 폴링여부
+     */
+    fun isPolling(): LiveData<Event<Boolean>> {
+        return bus.isPolling
     }
 
     /**
@@ -81,6 +95,16 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
 
 
     /**
+     * 차이 최종 결제 요청
+     */
+    fun requestApprovePayments(approve: IamPortApprove) {
+        viewModelScope.launch(job) {
+            i("차이 최종 결제 요청")
+            repository.chaiStrategy.requestApprovePayments(approve)
+        }
+    }
+
+    /**
      * 차이 결제 스테이터스 확인 with 폴링
      */
     fun pollingChaiStatus() {
@@ -96,7 +120,7 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
      */
     fun checkChaiStatus() {
         viewModelScope.launch(job) {
-            i("차이앱 종료돼서 차이 결제 상태 체크")
+            d("차이앱 종료돼서 차이 결제 상태 체크")
             repository.chaiStrategy.requestCheckChaiStatus()
         }
     }

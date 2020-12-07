@@ -1,15 +1,20 @@
-package com.iamport.sdk.domain.sdk
+package com.iamport.sdk.domain.core
 
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
+import androidx.annotation.MainThread
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortRequest
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.domain.utils.DelayRun
-import com.iamport.sdk.domain.utils.SingleLiveEvent
+import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.presentation.activity.IamportSdk
 import com.iamport.sdk.presentation.contract.WebViewActivityContract
+import com.orhanobut.logger.Logger.d
 import org.koin.core.component.KoinApiExtension
 
 
@@ -20,14 +25,14 @@ object Iamport {
 //    private var impCallbackImpl: ICallbackPaymentResult? = null // 결제결과 callback type#1 ICallbackPaymentResult 구현
 
     private var impCallbackFunction: ((IamPortResponse?) -> Unit)? = null // 결제결과 callbck type#2 함수 호출
+    private var approveCallback: ((IamPortApprove) -> Unit)? = null // 차이 결제 상태 approve 콜백
 
-    private lateinit var iamPortRequest: IamPortRequest
-
-    private val close = SingleLiveEvent<Boolean>()
+    private var approvePayment = MutableLiveData<Event<IamPortApprove>>()
+    private var close = MutableLiveData<Event<Unit>>()
 
     private var activity: ComponentActivity? = null
     private var fragment: Fragment? = null
-    private var delayRun : DelayRun? = null
+    private var delayRun: DelayRun? = null
 
 
     private fun clear() {
@@ -36,18 +41,22 @@ object Iamport {
         iamportSdk = null
     }
 
+
     /**
      * SDK Activity 열기 위한 Contract for Activity
      * @param componentActivity : Host Activity
      */
     fun init(componentActivity: ComponentActivity) {
+        d("init")
         clear()
         webViewLauncher = componentActivity.registerForActivityResult(WebViewActivityContract()) {
             callback(it)
         }
 
+        approvePayment = MutableLiveData()
+        close = MutableLiveData()
         activity = componentActivity
-        iamportSdk = IamportSdk(activity = componentActivity, webViewLauncher = webViewLauncher, close = close)
+        iamportSdk = IamportSdk(activity = componentActivity, webViewLauncher = webViewLauncher, approvePayment = approvePayment, close = close)
         delayRun = DelayRun()
     }
 
@@ -56,21 +65,36 @@ object Iamport {
      * @param fragment : Host Fragment
      */
     fun init(fragment: Fragment) {
+        d("init")
         clear()
         webViewLauncher = fragment.registerForActivityResult(WebViewActivityContract()) {
             callback(it)
         }
 
+        approvePayment = MutableLiveData()
+        close = MutableLiveData()
         this.fragment = fragment
-        iamportSdk = IamportSdk(fragment = fragment, webViewLauncher = webViewLauncher, close = close)
+        iamportSdk = IamportSdk(fragment = fragment, webViewLauncher = webViewLauncher, approvePayment = approvePayment, close = close)
         delayRun = DelayRun()
+    }
+
+    /**
+     * 외부에서 차이 최종결제 요청
+     */
+    fun chaiPayment(approve: IamPortApprove) {
+        approvePayment.postValue(Event(approve))
     }
 
     /**
      * 외부에서 SDK 종료
      */
+    @MainThread
     fun close() {
-        close.call()
+        close.value = (Event(Unit))
+    }
+
+    fun isPolling(): LiveData<Event<Boolean>>? {
+        return iamportSdk?.isPolling()
     }
 
     private val callback = fun(iamPortResponse: IamPortResponse?) {
@@ -83,10 +107,10 @@ object Iamport {
      * @param ICallbackPaymentResult? : 결제결과 callback type#1 ICallbackPaymentResult 구현
      */
     fun payment(
-        userCode: String, iamPortRequest: IamPortRequest, callback: ICallbackPaymentResult?,
+        userCode: String, iamPortRequest: IamPortRequest, approveCallback: ((IamPortApprove) -> Unit)? = null, paymentResultCallback: ICallbackPaymentResult?,
     ) {
         delayRun?.launch {
-            corePayment(userCode, iamPortRequest) { callback?.result(it) }
+            corePayment(userCode, iamPortRequest, approveCallback) { paymentResultCallback?.result(it) }
         }
     }
 
@@ -95,18 +119,23 @@ object Iamport {
      * @param (IamPortResponse?) -> Unit: ICallbackPaymentResult? : 결제결과 callbck type#2 함수 호출
      */
     fun payment(
-        userCode: String, iamPortRequest: IamPortRequest, callback: (IamPortResponse?) -> Unit
+        userCode: String, iamPortRequest: IamPortRequest, approveCallback: ((IamPortApprove) -> Unit)? = null, paymentResultCallback: (IamPortResponse?) -> Unit
     ) {
         delayRun?.launch {
-            corePayment(userCode, iamPortRequest, callback)
+            corePayment(userCode, iamPortRequest, approveCallback, paymentResultCallback)
         }
     }
 
     @KoinApiExtension
-    internal fun corePayment(userCode: String, iamPortRequest: IamPortRequest, callback: ((IamPortResponse?) -> Unit)?) {
-        impCallbackFunction = callback
-        this.iamPortRequest = iamPortRequest
+    internal fun corePayment(
+        userCode: String,
+        iamPortRequest: IamPortRequest,
+        approveCallback: ((IamPortApprove) -> Unit)?,
+        paymentResultCallback: ((IamPortResponse?) -> Unit)?
+    ) {
+        this.approveCallback = approveCallback
+        this.impCallbackFunction = paymentResultCallback
 
-        iamportSdk?.initStart(Payment(userCode, iamPortRequest), impCallbackFunction)
+        iamportSdk?.initStart(Payment(userCode, iamPortRequest), approveCallback, paymentResultCallback)
     }
 }

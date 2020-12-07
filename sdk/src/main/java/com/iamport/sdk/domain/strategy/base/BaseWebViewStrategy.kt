@@ -53,7 +53,7 @@ open class BaseWebViewStrategy : WebViewClient(), IStrategy, KoinComponent {
     override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
         super.onReceivedError(view, request, error)
         // 에러 발생시, 결제 취소 페이지 이동
-        failureFinish(payment, "code ${error?.errorCode}, description ${error?.description}")
+        failureFinish(payment, msg = "code ${error?.errorCode}, description ${error?.description}")
     }
 
 
@@ -71,7 +71,7 @@ open class BaseWebViewStrategy : WebViewClient(), IStrategy, KoinComponent {
      * 성공해서 SDK 종료
      */
     protected fun successFinish(payment: Payment) {
-        successFinish(payment, "")
+        successFinish(payment, msg = "")
     }
 
     /**

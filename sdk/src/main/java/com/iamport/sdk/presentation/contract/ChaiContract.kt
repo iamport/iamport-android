@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
+import com.orhanobut.logger.Logger.d
 import com.orhanobut.logger.Logger.i
 
 /**
@@ -12,7 +13,7 @@ import com.orhanobut.logger.Logger.i
 class ChaiContract : ActivityResultContract<Pair<String, String>, String>() {
 
     override fun createIntent(context: Context, input: Pair<String, String>): Intent {
-        i("createIntent :: $input")
+        d("createIntent :: $input")
         val intent = Intent.parseUri(input.first, Intent.URI_INTENT_SCHEME)
         return intent.apply { putExtra("input", input.second) }
     }

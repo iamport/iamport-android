@@ -14,6 +14,7 @@ import com.iamport.sdk.databinding.WebviewActivityBinding
 import com.iamport.sdk.domain.IamportWebChromeClient
 import com.iamport.sdk.domain.JsNativeInterface
 import com.iamport.sdk.domain.utils.CONST
+import com.iamport.sdk.domain.utils.EventObserver
 import com.iamport.sdk.domain.utils.Util
 import com.iamport.sdk.presentation.contract.BankPayContract
 import com.iamport.sdk.presentation.viewmodel.WebViewModel
@@ -91,14 +92,14 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ko
         d(GsonBuilder().setPrettyPrinting().create().toJson(payment))
         payment?.let { pay: Payment ->
 
-            viewModel.payment().observe(this) { it.getContentIfNotHandled()?.let(this::requestPayment) }
-            viewModel.loading().observe(this) { it.getContentIfNotHandled()?.let(this::loadingVisible) }
+            viewModel.payment().observe(this, EventObserver(this::requestPayment))
+            viewModel.loading().observe(this, EventObserver(this::loadingVisible))
 
-            viewModel.openWebView().observe(this) { it.getContentIfNotHandled()?.let(this::openWebView) }
-            viewModel.niceTransRequestParam().observe(this) { it.getContentIfNotHandled()?.let(this::openNiceTransApp) }
-            viewModel.thirdPartyUri().observe(this) { it.getContentIfNotHandled()?.let(this::openThirdPartyApp) }
+            viewModel.openWebView().observe(this, EventObserver(this::openWebView))
+            viewModel.niceTransRequestParam().observe(this, EventObserver(this::openNiceTransApp))
+            viewModel.thirdPartyUri().observe(this, EventObserver(this::openThirdPartyApp))
 
-            viewModel.impResponse().observe(this) { it.getContentIfNotHandled()?.let(this::sdkFinish) }
+            viewModel.impResponse().observe(this, EventObserver(this::sdkFinish))
 
             viewModel.startPayment(pay)
         }
@@ -117,7 +118,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ko
     private fun requestPayment(it: Payment) {
         loadingVisible(true)
         if (!Util.isInternetAvailable(this)) {
-            sdkFinish(Util.getFailResponse(it, "네트워크 연결 안됨"))
+            sdkFinish(IamPortResponse.makeFail(it, msg = "네트워크 연결 안됨"))
             return
         }
         viewModel.requestPayment(it)
