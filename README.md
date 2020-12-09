@@ -31,8 +31,8 @@ implementation 'com.github.iamport:iamport-android:x.y.z'
 ```kotlin
 
 // SDK 초기화
-// (activity) LifecycleOwners must call register before they are STARTED.
-// (fragement) Fragments must call registerForActivityResult() before they are created (i.e. initialization, onAttach(), or onCreate())
+// (activity 일 경우) LifecycleOwners must call register before they are STARTED.
+// (fragement 일 경우) Fragments must call registerForActivityResult() before they are created (i.e. initialization, onAttach(), or onCreate())
 fun onCreate() {
     ..
     Iamport.init(this)
@@ -40,11 +40,20 @@ fun onCreate() {
 }
 
 // SDK 종료
+// 화면을 나가는 시점, 화면이 꺼지는 시점(onDestroy, onDetach 등)에 추가
 fun onDestroy() {
 ..
-  Iamport.close() // 화면을 나가는 시점, 화면이 꺼지는 시점(onDestroy, onDetach 등)에 추가
+  Iamport.close() 
 ..
 }
+
+// activity / fragment 무관하게 Host Activity (ex: MainActivity) 에서 필수로 호출 해주세요.
+// onUserLeaveHint 에서 해당 함수를 호출해주셔야 불필요한 백그라운드 작업을 줄일 수 있습니다.
+override fun onUserLeaveHint() {
+    super.onUserLeaveHint()
+    Iamport.catchUserLeave() // TODO SDK 백그라운드 작업 중지를 위해서 필수 호출!
+}
+    
 
 /**
  * SDK 에 결제 요청할 데이터 구성
