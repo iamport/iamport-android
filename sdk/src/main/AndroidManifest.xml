@@ -1,18 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.iamport.sdk">
-
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
     <application
-        android:name="com.iamport.sdk.presentation.App"
+        android:name=".presentation.App"
         android:allowBackup="true"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true">
+        <service
+            android:name=".presentation.ChaiService"
+            android:enabled="true"
+            android:exported="true"></service>
+
         <activity
-            android:name="com.iamport.sdk.presentation.activity.WebViewActivity"
+            android:name=".presentation.activity.WebViewActivity"
             android:hardwareAccelerated="true"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
@@ -23,7 +29,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <!--  // FIXME scheme 변수로 불러오기 및 CONST.APP_SCHME 도 수정-->
+                <!-- // FIXME scheme 변수로 불러오기 및 CONST.APP_SCHME 도 수정 -->
                 <data android:scheme="iamport_android_webview" />
             </intent-filter>
         </activity>

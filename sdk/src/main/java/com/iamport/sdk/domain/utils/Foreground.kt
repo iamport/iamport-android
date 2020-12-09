@@ -21,6 +21,8 @@ object Foreground : ActivityLifecycleCallbacks {
 
     var isScreenOn: Boolean = true // 스크린 on/off 여부
 
+    var isHome : Boolean = false // 홈키 눌렀는지 여부
+
     enum class AppStatus {
         BACKGROUND,  // app is background
         RETURNED_TO_FOREGROUND,  // app returned to foreground(or first launch)
@@ -50,14 +52,9 @@ object Foreground : ActivityLifecycleCallbacks {
     }
 
 
-    fun onTrimMemory(level: Int) {
-        if (level == TRIM_MEMORY_UI_HIDDEN) {
-            d("onTrimMemory")
-        }
-    }
-
     override fun onActivityCreated(activity: Activity, bundle: Bundle?) {}
     override fun onActivityStarted(activity: Activity) {
+        isHome = false
         if (++running == 1) {
             d("app is 포그라운드! 살아왔다")
             appStatus = AppStatus.RETURNED_TO_FOREGROUND

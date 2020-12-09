@@ -15,7 +15,7 @@ enum class MODE {
 /**
  * SDK 실행 호스트 헬퍼 클래스
  */
-class HostHelper(val activity: ComponentActivity? = null, fragment: Fragment? = null) {
+class HostHelper(var activity: ComponentActivity? = null, fragment: Fragment? = null) {
     lateinit var mode: MODE
     lateinit var viewModelStoreOwner: ViewModelStoreOwner
     lateinit var lifecycleOwner: LifecycleOwner
@@ -25,16 +25,19 @@ class HostHelper(val activity: ComponentActivity? = null, fragment: Fragment? = 
     init {
         when {
             activity != null -> {
-                viewModelStoreOwner = activity
-                lifecycleOwner = activity
-                lifecycle = activity.lifecycle
-                context = activity.baseContext
+                activity?.let {
+                    viewModelStoreOwner = it
+                    lifecycleOwner = it
+                    lifecycle = it.lifecycle
+                    context = it.baseContext
+                }
                 mode = MODE.ACTIVITY
             }
             fragment != null -> {
                 viewModelStoreOwner = fragment
                 lifecycleOwner = fragment
                 lifecycle = fragment.lifecycle
+                activity = fragment.activity
                 context = fragment.context
                 mode = MODE.FRAGMENT
             }

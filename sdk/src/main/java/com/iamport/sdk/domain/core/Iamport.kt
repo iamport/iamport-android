@@ -12,6 +12,7 @@ import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.domain.utils.DelayRun
 import com.iamport.sdk.domain.utils.Event
+import com.iamport.sdk.domain.utils.Foreground
 import com.iamport.sdk.presentation.activity.IamportSdk
 import com.iamport.sdk.presentation.contract.WebViewActivityContract
 import com.orhanobut.logger.Logger.d
@@ -91,6 +92,13 @@ object Iamport {
     @MainThread
     fun close() {
         close.value = (Event(Unit))
+    }
+
+    /**
+     * 외부에서 SDK 홈키 캐치
+     */
+    fun catchUserLeave() {
+        Foreground.isHome = true
     }
 
     fun isPolling(): LiveData<Event<Boolean>>? {

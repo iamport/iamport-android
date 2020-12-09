@@ -1,8 +1,5 @@
 package com.iamport.sdk.presentation.activity
 
-import android.app.Activity
-import android.app.ActivityManager
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.activity.ComponentActivity
@@ -10,7 +7,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import com.google.gson.GsonBuilder
-import com.iamport.sdk.data.chai.CHAI
 import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
@@ -21,12 +17,10 @@ import com.iamport.sdk.presentation.contract.ChaiContract
 import com.iamport.sdk.presentation.viewmodel.MainViewModel
 import com.iamport.sdk.presentation.viewmodel.MainViewModelFactory
 import com.orhanobut.logger.Logger.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
+import java.util.*
 
 
 @KoinApiExtension
@@ -35,7 +29,7 @@ internal class IamportSdk(
     val fragment: Fragment? = null,
     val webViewLauncher: ActivityResultLauncher<Payment>?,
     val approvePayment: LiveData<Event<IamPortApprove>>,
-    val close: LiveData<Event<Unit>>
+    val close: LiveData<Event<Unit>>,
 ) : KoinComponent {
 
     private val hostHelper: HostHelper = HostHelper(activity, fragment)
@@ -59,7 +53,6 @@ internal class IamportSdk(
         } else {
             fragment?.registerForActivityResult(ChaiContract()) { resultCallback() }
         }
-
         clearData()
 //        repeatTopPackage()
     }
@@ -248,27 +241,26 @@ internal class IamportSdk(
         }
     }
 
-    private fun repeatTopPackage() {
-        viewModel.viewModelScope.launch(Dispatchers.Default) {
-            repeat(10000) {
-                delay(2000)
-                checkingTopPackage()
-            }
-        }
-    }
+//    private fun repeatTopPackage() {
+//        viewModel.viewModelScope.launch(Dispatchers.Default) {
+//            repeat(10000) {
+//                delay(2000)
+//                checkingTopPackage()
+//            }
+//        }
+//    }
 
-    private fun checkingTopPackage() {
-        val am = hostHelper.context?.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            i("top taskInfo ::: ${am.appTasks[0].taskInfo}")
-//            i("top activity ::: ${am.appTasks[0].taskInfo.topActivity?.className}")
-//            i("top packageName ::: ${am.appTasks[0].taskInfo.topActivity?.packageName}")
-//            i("top packageName ::: ${am.appTasks[0].taskInfo.origActivity?.packageName}")
+//    private fun checkingTopPackage() {
+//        val am = hostHelper.context?.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+//            for ( task in am.appTasks) {
+//                i("top activity ::: ${task.taskInfo.topActivity?.className}")
+//                i("top packageName ::: ${task.taskInfo.topActivity?.packageName}")
+//            }
+//
+//            val tasks = am.getRunningTasks(1)
+//            i("RunningTasks packageName ::: ${tasks[0].topActivity?.packageName}")
+//        }
+//    }
 
-//            i("top packageName ::: ${hostHelper.context?.run {
-//                packageManager.getPackageInfo("finance.chai.app", 0)?.versionName
-//            }}")
-
-        }
-    }
 }
