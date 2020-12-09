@@ -25,7 +25,7 @@ class JudgeStrategy : BaseStrategy(), KoinComponent {
 
     // #1 API imp uid 에 따른 유저정보 가져오기
     private suspend fun apiGetUsers(userCode: String): ResultWrapper<Users> {
-        Logger.i("try apiGetUsers")
+        Logger.d("try apiGetUsers")
         return ApiHelper.safeApiCall(Dispatchers.IO) { iamportApi.getUsers(userCode) }
     }
 
@@ -56,7 +56,7 @@ class JudgeStrategy : BaseStrategy(), KoinComponent {
 
         // 유저 PG 정보 아예 없으면 실패처리
         if (userDataList.isNullOrEmpty()) {
-            failureFinish(payment, msg = "Not found PG [ ${payment.iamPortRequest.pg} ] in your info.")
+            failureFinish(payment, msg = "Not found PG [ ${payment.iamPortRequest.pg} ] and any PG in your info.")
             return Triple(JudgeKinds.EMPTY, null, payment)
         }
 

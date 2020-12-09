@@ -28,7 +28,7 @@ object CONST {
 
     const val PAYMENT_FILE_URL = "file:///android_asset/iamportcdn.html"
 
-    const val IAMPORT_LOG = "IAMPORT_LOG"
+    const val IAMPORT_LOG = "IAMPORT"
 
     const val CONTRACT_INPUT = "input"
     const val CONTRACT_OUTPUT = "output"

@@ -27,7 +27,6 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // onCreate 시 필수적으로 init 을 해주셔야 합니다.
         Iamport.init(this) // fragment
     }
 
@@ -85,7 +84,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
         })
 
         // 또는, 폴링 상태를 보고 싶을때 명시적으로 호출
-        i("${Iamport.isPolling()?.value?.peekContent()}")
+        i("isPolling? ${Iamport.isPolling()?.value?.peekContent()}")
     }
 
     // 결제 버튼 클릭
@@ -117,7 +116,8 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
         /**
          * 결제요청 Type#1 ICallbackPaymentResult 구현을 통한 결제결과 callback
          */
-//        Iamport.payment(userCode, request, callback = callBackListener)
+//        Iamport.payment(userCode, request, paymentResultCallback = callBackListener)
+//        Iamport.payment(userCode, request, approveCallback = { approveCallback(it) }, paymentResultCallback = callBackListener)
 
         /**
          * 결제요청 Type#2 함수 호출을 통한 결제결과 callbck
@@ -126,14 +126,19 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
         Iamport.payment(userCode, request, approveCallback = { approveCallback(it) }, paymentResultCallback = { callBackListener.result(it) })
     }
 
-    // TODO 재고확인 등 최종결제를 위한 처리를 해주세요
+
+    /**
+     *  TODO 재고확인 등 최종결제를 위한 처리를 해주세요
+     *  CONST.CHAI_FINAL_PAYMENT_TIME_OUT_SEC 만큼 타임아웃 후 결제 데이터가
+     *  초기화 되기 때문에 타임아웃 시간 안에 Iamport.chaiPayment 함수를 호출해주셔야 합니다.
+     */
     private fun approveCallback(iamPortApprove: IamPortApprove) {
         val secUnit = 1000L
         val sec = 1
         GlobalScope.launch {
             i("재고확인 합니다~~")
             delay(sec * secUnit) // sec 초간 재고확인 프로세스를 가정합니다
-            Iamport.chaiPayment(iamPortApprove) // TODO: 12/4/20 상태 확인 후 SDK 에 최종결제 요청
+            Iamport.chaiPayment(iamPortApprove) // TODO: 상태 확인 후 SDK 에 최종결제 요청
         }
     }
 

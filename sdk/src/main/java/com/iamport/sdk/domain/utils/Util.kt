@@ -13,8 +13,6 @@ import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.data.sdk.PG.*
 import com.iamport.sdk.data.sdk.PayMethod
-import com.iamport.sdk.data.sdk.Payment
-import com.iamport.sdk.domain.utils.Util.observeAlways
 import com.orhanobut.logger.Logger
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
@@ -43,7 +41,7 @@ object Util {
     /**
      * pg사별 지원하는 결제수단
      */
-    fun getMappingPayMethod(pg: PG): Set<PayMethod> {
+    private fun getMappingPayMethod(pg: PG): Set<PayMethod> {
         return when (pg) {
             html5_inicis -> defaultPayMethod + setOf(
                 PayMethod.samsung,
@@ -149,6 +147,12 @@ object Util {
 
         lifecycleOwner.lifecycle.addObserver(lifecycleObserver)
         observeForever(observer)
+    }
+
+    fun versionName(hostHelper: HostHelper): String {
+        return hostHelper.context?.run {
+            packageManager.getPackageInfo(packageName, 0)?.versionName
+        } ?: kotlin.run { "" }
     }
 
 }

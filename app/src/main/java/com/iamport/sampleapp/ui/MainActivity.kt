@@ -18,4 +18,8 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+    }
+
 }
