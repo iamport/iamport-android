@@ -140,9 +140,9 @@ implementation "org.jetbrains.kotlin:kotlin-stdlib:$코틀린_버전"
 ---
 
 ## :bulb:샘플앱
-[앱 소스 경로](../iamport-android/app)
+[앱 소스 경로](./app)
 
-[PaymentFragment](../iamport-android/app/src/main/java/com/iamport/sampleapp/ui/PaymentFragment.kt)
+[PaymentFragment.kt](./app/src/main/java/com/iamport/sampleapp/ui/PaymentFragment.kt)
 
 ```kotlin
 
