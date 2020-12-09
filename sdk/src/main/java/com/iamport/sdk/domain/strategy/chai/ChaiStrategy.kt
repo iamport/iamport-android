@@ -317,12 +317,18 @@ open class ChaiStrategy : BaseStrategy() {
                     clearData()
                 } else {
                     tryOut = false
-                    if (Foreground.isBackground && Foreground.isScreenOn) {
-                        d("결제폴링! $chaiPayment")
-                        pollingCheckStatus(pollingDelay, idx)
-                    } else {
-                        d("프로세스 체크 재귀폴링 $chaiPayment")
+                    d("Foreground.isHome ${Foreground.isHome}")
+                    if (Foreground.isHome) {
+                        d("홈이라서 체크 로컬 폴링 $chaiPayment")
                         pollingProcessStatus(chaiPayment, payment, data, idx)
+                    } else {
+                        if (Foreground.isBackground && Foreground.isScreenOn) {
+                            d("결제 리모트 폴링! $chaiPayment")
+                            pollingCheckStatus(pollingDelay, idx)
+                        } else {
+                            d("프로세스 체크 로컬 폴링 $chaiPayment")
+                            pollingProcessStatus(chaiPayment, payment, data, idx)
+                        }
                     }
                 }
             }
