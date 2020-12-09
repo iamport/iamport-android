@@ -1,6 +1,7 @@
 package com.iamport.sdk.presentation.viewmodel
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.viewModelScope
 import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
@@ -30,6 +31,7 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
         clearData()
         super.onCleared()
     }
+
 
     /**
      * 결제 데이터

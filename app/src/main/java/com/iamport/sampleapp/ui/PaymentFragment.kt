@@ -27,7 +27,6 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // onCreate 시 필수적으로 init 을 해주셔야 합니다.
         Iamport.init(this) // fragment
     }
 
@@ -118,7 +117,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
          * 결제요청 Type#1 ICallbackPaymentResult 구현을 통한 결제결과 callback
          */
 //        Iamport.payment(userCode, request, paymentResultCallback = callBackListener)
-        Iamport.payment(userCode, request, approveCallback = { approveCallback(it) }, paymentResultCallback = callBackListener)
+//        Iamport.payment(userCode, request, approveCallback = { approveCallback(it) }, paymentResultCallback = callBackListener)
 
         /**
          * 결제요청 Type#2 함수 호출을 통한 결제결과 callbck

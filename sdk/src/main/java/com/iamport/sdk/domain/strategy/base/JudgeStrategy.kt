@@ -56,7 +56,7 @@ class JudgeStrategy : BaseStrategy(), KoinComponent {
 
         // 유저 PG 정보 아예 없으면 실패처리
         if (userDataList.isNullOrEmpty()) {
-            failureFinish(payment, msg = "Not found PG [ ${payment.iamPortRequest.pg} ] in your info.")
+            failureFinish(payment, msg = "Not found PG [ ${payment.iamPortRequest.pg} ] and any PG in your info.")
             return Triple(JudgeKinds.EMPTY, null, payment)
         }
 
