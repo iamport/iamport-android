@@ -105,6 +105,10 @@ object Iamport {
         return iamportSdk?.isPolling()
     }
 
+    fun isPollingValue(): Boolean {
+        return isPolling()?.value?.peekContent() ?: false
+    }
+
     private val callback = fun(iamPortResponse: IamPortResponse?) {
 //        impCallbackImpl?.result(iamPortResponse)
         impCallbackFunction?.invoke(iamPortResponse)

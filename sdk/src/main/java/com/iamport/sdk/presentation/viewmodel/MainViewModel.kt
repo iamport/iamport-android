@@ -20,6 +20,22 @@ import org.koin.core.component.KoinComponent
 @KoinApiExtension
 class MainViewModel(private val bus: NativeLiveDataEventBus, private val repository: StrategyRepository) : BaseViewModel(), KoinComponent {
 
+    var playChai: Boolean
+        get() {
+            return bus.playChai
+        }
+        set(value) {
+            bus.playChai = value
+        }
+
+    var chaiClearVersion: Boolean
+        get() {
+            return bus.chaiClearVersion
+        }
+        set(value) {
+            bus.chaiClearVersion = value
+        }
+
     private var job = Job()
         get() {
             if (field.isCancelled) field = Job()
@@ -31,7 +47,6 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
         clearData()
         super.onCleared()
     }
-
 
     /**
      * 결제 데이터
@@ -63,12 +78,14 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
         return bus.impResponse
     }
 
+
     /**
      * 외부 노출용 폴링여부
      */
     fun isPolling(): LiveData<Event<Boolean>> {
         return bus.isPolling
     }
+
 
     /**
      * 결제 요청
@@ -91,6 +108,8 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
      * 차이 데이터 클리어
      */
     fun clearData() {
+        playChai = false
+        chaiClearVersion = false
         repository.chaiStrategy.init()
         job.cancel()
     }
@@ -110,6 +129,10 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
      * 차이 결제 스테이터스 확인 with 폴링
      */
     fun pollingChaiStatus() {
+        if (!playChai) {
+            d("차이 설치 되지 않았으므로 무시 pollingChaiStatus")
+            return
+        }
         viewModelScope.launch(job) {
             d("백그라운드라서 폴링 시도")
             repository.chaiStrategy.requestPollingChaiStatus()
@@ -121,6 +144,10 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
      * 차이 결제 스테이터스 확인
      */
     fun checkChaiStatus() {
+        if (!playChai) {
+            d("차이 설치 되지 않았으므로 무시 checkChaiStatus")
+            return
+        }
         viewModelScope.launch(job) {
             d("차이앱 종료돼서 차이 결제 상태 체크")
             repository.chaiStrategy.requestCheckChaiStatus()

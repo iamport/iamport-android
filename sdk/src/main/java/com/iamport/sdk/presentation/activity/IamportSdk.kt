@@ -7,6 +7,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import com.google.gson.GsonBuilder
+import com.iamport.sdk.data.chai.CHAI
 import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
@@ -17,6 +18,9 @@ import com.iamport.sdk.presentation.contract.ChaiContract
 import com.iamport.sdk.presentation.viewmodel.MainViewModel
 import com.iamport.sdk.presentation.viewmodel.MainViewModelFactory
 import com.orhanobut.logger.Logger.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -42,8 +46,6 @@ internal class IamportSdk(
     private val isPolling = MutableLiveData<Event<Boolean>>()
 
     private val delayRun = DelayRun() // 딜레이 호출
-    private var preventBackpress: Boolean = false // 종료버튼 막기
-
 
     init {
         viewModel = ViewModelProvider(hostHelper.viewModelStoreOwner, MainViewModelFactory(get(), get())).get(MainViewModel::class.java)
@@ -54,7 +56,6 @@ internal class IamportSdk(
             fragment?.registerForActivityResult(ChaiContract()) { resultCallback() }
         }
         clearData()
-//        repeatTopPackage()
     }
 
     private val lifecycleObserver = object : LifecycleObserver {
@@ -80,7 +81,6 @@ internal class IamportSdk(
         i("HELLO I'MPORT SDK! ${Util.versionName(hostHelper)}")
         viewModel.clearData()
 
-        this.preventBackpress = true
         this.chaiApproveCallBack = approveCallback
         this.paymentResultCallBack = paymentResultCallBack
 
@@ -142,7 +142,6 @@ internal class IamportSdk(
      */
     private fun resultCallback() {
         i("Result Callback ChaiLauncher")
-        preventBackpress = false
         viewModel.checkChaiStatus()
     }
 
@@ -167,21 +166,13 @@ internal class IamportSdk(
         webViewLauncher?.launch(Payment(it.userCode, it.iamPortRequest))
     }
 
-//    fun onUserLeaveHint() {
-//        hostHelper.activity = object : Activity {
-//            override fun onUserLeaveHint() {
-//                super.onUserLeaveHint()
-//            }
-//        }
-//    }
-
 
     /**
      * 뷰모델 데이터 클리어
      */
     fun clearData() {
         d("clearData!")
-        preventBackpress = false
+        updatePolling(false)
         viewModel.clearData()
     }
 
@@ -203,8 +194,11 @@ internal class IamportSdk(
         i("openChaiApp")
         d(it)
         runCatching {
-            preventBackpress = true
             launcherChai?.launch(it to "openchai")
+            viewModel.playChai = true
+            CHAI.pkg = getIntentPackage(Intent.parseUri(it, Intent.URI_INTENT_SCHEME))?.also {
+                viewModel.chaiClearVersion = checkChaiVersionCode(it)
+            }
         }.onFailure { thr: Throwable ->
             i("${thr.message}")
             movePlayStore(Intent.parseUri(it, Intent.URI_INTENT_SCHEME))
@@ -212,12 +206,8 @@ internal class IamportSdk(
         }
     }
 
-
-    /**
-     * 앱 패키지 검색하여 플레이 스토어로 이동
-     */
-    private fun movePlayStore(intent: Intent) {
-        val pkg = intent.`package` ?: run {
+    private fun getIntentPackage(intent: Intent): String? {
+        return intent.`package` ?: run {
             // intent 에 패키지 없으면 ProvidePgPkg에서 intnet.schme 으로 앱 패키지 검색
             i("Not found in intent package")
             when (val providePgPkg = intent.scheme?.let { ProvidePgPkg.from(it) }) {
@@ -228,38 +218,51 @@ internal class IamportSdk(
                 else -> providePgPkg.pkg
             }
         }
+    }
 
-        if (!pkg.isNullOrBlank()) {
-            i("movePlayStore :: $pkg")
-            Intent(Intent.ACTION_VIEW, Uri.parse(Util.getMarketId(pkg))).let {
+
+    /**
+     * 앱 패키지 검색하여 플레이 스토어로 이동
+     */
+    private fun movePlayStore(intent: Intent) {
+        getIntentPackage(intent)?.let {
+            i("movePlayStore :: $it")
+            Intent(Intent.ACTION_VIEW, Uri.parse(Util.getMarketId(it))).run {
+                flags = Intent.FLAG_ACTIVITY_NO_USER_ACTION
                 if (hostHelper.mode == MODE.ACTIVITY) {
-                    activity?.startActivity(it)
+                    activity?.startActivity(this)
                 } else {
-                    fragment?.startActivity(it)
+                    fragment?.startActivity(this)
                 }
             }
         }
     }
 
-//    private fun repeatTopPackage() {
-//        viewModel.viewModelScope.launch(Dispatchers.Default) {
-//            repeat(10000) {
-//                delay(2000)
+    private fun checkChaiVersionCode(chaiPackageName: String): Boolean {
+        d("chai app version : ${Util.versionCode(hostHelper.context, chaiPackageName).toLong()}")
+        return Util.versionCode(hostHelper.context, chaiPackageName).toLong() > CHAI.NEW_SINGLE_ACTIVITY_VERSION
+    }
+
+    private fun repeatTopPackage() {
+        viewModel.viewModelScope.launch(Dispatchers.Default) {
+            repeat(10000) {
+                delay(2000)
 //                checkingTopPackage()
-//            }
-//        }
-//    }
+            }
+        }
+    }
 
 //    private fun checkingTopPackage() {
 //        val am = hostHelper.context?.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+//
+//        val tasks = am.getRunningTasks(1)
+//        i("RunningTasks packageName ::: ${tasks[0].topActivity?.packageName}")
+//
 //        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-//            for ( task in am.appTasks) {
+//            for (task in am.appTasks) {
 //                i("top activity ::: ${task.taskInfo.topActivity?.className}")
 //                i("top packageName ::: ${task.taskInfo.topActivity?.packageName}")
 //            }
-//
-//            val tasks = am.getRunningTasks(1)
-//            i("RunningTasks packageName ::: ${tasks[0].topActivity?.packageName}")
 //        }
 //    }
 
