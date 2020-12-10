@@ -90,7 +90,7 @@
 
 ```
 
-> (Optional) 차이결제 + approveCallback 가 있을 때, 
+> (Optional) 차이 결제에서 approveCallback 이 있을 때 (최종 결제전 재고 확인 등이 필요할 때)
 
 > 콜백 전달 받은 후에 chaiPayment 함수 호출 
 (타임아웃 : CONST.CHAI_FINAL_PAYMENT_TIME_OUT_SEC)
@@ -106,33 +106,43 @@
   })
 
   // 또는, 폴링 상태를 보고 싶을때 명시적으로 호출
-  i("isPolling? ${Iamport.isPolling()?.value?.peekContent()}")
+  i("isPolling? ${Iamport.isPollingValue()}")
 ```
 
 ---
 
+자바 프로젝트는 이쪽을 참조해주세요
 <details>
-<summary><strong>JAVA usage 펼쳐보기</strong></summary>
+<summary>JAVA usage 펼쳐보기</summary>
 
-### java usage
-
+### JAVA usage
 > 필수구현 사항
+
+> 자바 프로젝트에선 app build.gradle 에서 kotin-stblib 추가가 필요합니다
+[$코틀린-버전][4]
+
+```gradle 
+  implementation "org.jetbrains.kotlin:kotlin-stdlib:$코틀린-버전"
+```
+
 ```java
 
   @Override
   public void onCreate() {
     Iamport.INSTANCE.init(this);
+    ..
   }
 
   @Override
   public void onDeatroy() {
+    ..
     Iamport.INSTANCE.close();
   }
   
   @Override
   public void onUserLeaveHint() {
-      super.onUserLeaveHint()
-      Iamport.INSTANCE.catchUserLeave() // TODO SDK 백그라운드 작업 중지를 위해서 필수 호출!
+    ..   
+    Iamport.INSTANCE.catchUserLeave() // TODO SDK 백그라운드 작업 중지를 위해서 필수 호출!
   }
 
   IamPortRequest request
@@ -156,7 +166,7 @@
 ```
 
 
-> (Optional) 차이결제 + approveCallback 가 있을 때, 
+> (Optional) 차이 결제에서 approveCallback 이 있을 때 (최종 결제전 재고 확인 등이 필요할 때)
 
 > 콜백 전달 받은 후에 chaiPayment 함수 호출 
 (타임아웃 : CONST.CHAI_FINAL_PAYMENT_TIME_OUT_SEC)
@@ -164,20 +174,26 @@
   Iamport.INSTANCE.chaiPayment(iamPortApprove) // 재고 등 확인 후, 차이 최종 결제 요청 실행.
 ```
 
-> 자바 프로젝트에선 kotin stblib 추가가 필요합니다
-[$코틀린-버전][4]
-
-```gradle 
-  implementation "org.jetbrains.kotlin:kotlin-stdlib:$코틀린-버전"
-```
-
 [4]: https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib
+
+
+> (Optional) 차이폴링 여부 확인
+```java
+  Iamport.INSTANCE.isPolling().observe(this, EventObserver -> {
+      i("차이 폴링? :: " + it)
+  });
+
+  i("isPolling? " + Iamport.INSTANCE.isPollingValue())
+```
 
 </details>
 
 ---
 
 ## :bulb: 샘플앱
+
+[앱 소스 확인 경로](./app/src/main/java/com/iamport/sampleapp)
+
 <p float="left">
 <img src="./img/chai_sample.webp">
 <img src="./img/kcp_sample.webp">
@@ -186,10 +202,6 @@
 1. git clone 
 2. Android Studio project open
 3. build app
-
----
-
-[앱 소스 확인 경로](./app/src/main/java/com/iamport/sampleapp)
 
 ---
 
