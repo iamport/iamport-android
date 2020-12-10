@@ -26,16 +26,16 @@
 ## :fire: 사용방법
 
 ### Gradle implementation
+> project build.gradle
 ```gradle
-  // project gralde
   maven {
     url 'https://jitpack.io'
   }
 ```
 
+> app build.gradle 
 [$SDK-VERSION][5]
 ```gradle
-  // app gradle
   implementation 'com.github.iamport:iamport-android:$SDK-VERSION'
 ```
 
@@ -51,7 +51,6 @@
   // activity 에서 호출시 : LifecycleOwners must call register before they are STARTED.
   // fragement 에서 호출시 : Fragments must call before they are created (i.e. initialization, onAttach(), or onCreate())
   fun onCreate() {
-      ..
       Iamport.init(this)
       ..
   }
@@ -61,26 +60,25 @@
   // fragement 에서 호출시 : onDestroy, onDetach 등
   // 공통 : 화면을 나가는 시점, 꺼지는 시점 등에 추가
   fun onDestroy() {
-  ..
     Iamport.close() 
-  ..
+    ..
   }
 
   // 공통 : Host Activity(e.g. MainActivity) 에서 필수로 호출 해주세요.
   // onUserLeaveHint 에서 해당 함수를 호출해주셔야 불필요한 백그라운드 작업을 줄일 수 있습니다.
   override fun onUserLeaveHint() {
-      super.onUserLeaveHint()
+      ..
       Iamport.catchUserLeave() // TODO SDK 백그라운드 작업 중지를 위해서 필수 호출!
   }
     
 
   // SDK 에 결제 요청할 데이터 구성
   val request = IamPortRequest(
-      pg = "chai",                                 // PG 사
+      pg = "chai",                                   // PG 사
       pay_method = PayMethod.trans,                 // 결제수단
-      name = "여기주문이요",                           // 주문명
-      merchant_uid = "mid_123456",                 // 주문번호
-      amount = "3000",                             // 결제금액
+      name = "여기주문이요",                          // 주문명
+      merchant_uid = "mid_123456",                // 주문번호
+      amount = "3000",                           // 결제금액
       buyer_name = "홍길동"
   )
 
@@ -94,7 +92,8 @@
 
 > (Optional) 차이결제 + approveCallback 가 있을 때, 
 
-> 콜백 전달 받은 후(타임아웃 : CONST.CHAI_FINAL_PAYMENT_TIME_OUT_SEC)에 아래 함수 호출
+> 콜백 전달 받은 후에 chaiPayment 함수 호출 
+(타임아웃 : CONST.CHAI_FINAL_PAYMENT_TIME_OUT_SEC)
 ```kotlin
   Iamport.chaiPayment(iamPortApprove) // 재고 등 확인 후, 차이 최종 결제 요청 실행.
 ```
@@ -159,7 +158,8 @@
 
 > (Optional) 차이결제 + approveCallback 가 있을 때, 
 
-> 콜백 전달 받은 후(타임아웃 : CONST.CHAI_FINAL_PAYMENT_TIME_OUT_SEC)에 아래 함수 호출
+> 콜백 전달 받은 후에 chaiPayment 함수 호출 
+(타임아웃 : CONST.CHAI_FINAL_PAYMENT_TIME_OUT_SEC)
 ```java
   Iamport.INSTANCE.chaiPayment(iamPortApprove) // 재고 등 확인 후, 차이 최종 결제 요청 실행.
 ```
@@ -178,7 +178,10 @@
 ---
 
 ## :bulb: 샘플앱
-<img src="./img/app_sample.png" width="30%" height="30%">
+<p float="left">
+<img src="./img/chai_sample.webp">
+<img src="./img/kcp_sample.webp">
+</p>
 
 1. git clone 
 2. Android Studio project open
