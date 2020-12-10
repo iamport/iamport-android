@@ -87,6 +87,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
         i("isPolling? ${Iamport.isPolling()?.value?.peekContent()}")
     }
 
+
     // 결제 버튼 클릭
     private fun onClickPayment() {
 
@@ -123,7 +124,9 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
          * 결제요청 Type#2 함수 호출을 통한 결제결과 callbck
          */
 //        Iamport.payment(userCode, request) { callBackListener.result(it) }
-        Iamport.payment(userCode, request, approveCallback = { approveCallback(it) }, paymentResultCallback = { callBackListener.result(it) })
+        Iamport.payment(userCode, request,
+            approveCallback = { approveCallback(it) },
+            paymentResultCallback = { callBackListener.result(it) })
     }
 
 
@@ -167,6 +170,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
         override fun onNothingSelected(parent: AdapterView<*>?) {
         }
     }
+
 
     private val backPressCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {

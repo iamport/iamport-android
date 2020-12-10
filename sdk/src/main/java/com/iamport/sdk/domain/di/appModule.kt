@@ -40,7 +40,7 @@ fun provideIamportApi(gson: Gson, client: OkHttpClient): IamportApi {
 
     return Retrofit.Builder()
 //        .baseUrl(if (BuildConfig.DEBUG) CONST.IAMPORT_TEST_URL else CONST.IAMPORT_PROD_URL)
-        .baseUrl(CONST.IAMPORT_TEST_URL)
+        .baseUrl(CONST.IAMPORT_PROD_URL)
         .addConverterFactory(GsonConverterFactory.create(gson))
         .client(client)
         .build()

@@ -18,16 +18,11 @@ class WebViewActivityContract : ActivityResultContract<Payment, IamPortResponse>
 
     @KoinApiExtension
     override fun createIntent(context: Context, input: Payment): Intent {
-        val intent = Intent(context, WebViewActivity::class.java)
-
-        // 액티비티 하나 제한
-        intent.flags = Intent.FLAG_ACTIVITY_NO_ANIMATION or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-
-        val bundle = Bundle()
-        bundle.putParcelable(CONST.BUNDLE_PAYMENT, input)
-        intent.putExtra(CONST.CONTRACT_INPUT, bundle)
-
-        return intent
+        return Intent(context, WebViewActivity::class.java).apply {
+            // 액티비티 하나 제한
+            flags = Intent.FLAG_ACTIVITY_NO_ANIMATION or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra(CONST.CONTRACT_INPUT, Bundle().apply { putParcelable(CONST.BUNDLE_PAYMENT, input) })
+        }
     }
 
     override fun parseResult(resultCode: Int, intent: Intent?): IamPortResponse? {
