@@ -14,9 +14,10 @@ class ChaiContract : ActivityResultContract<Pair<String, String>, String>() {
 
     override fun createIntent(context: Context, input: Pair<String, String>): Intent {
         d("createIntent :: $input")
-        val intent = Intent.parseUri(input.first, Intent.URI_INTENT_SCHEME)
-        intent.apply { flags = Intent.FLAG_ACTIVITY_NO_USER_ACTION }
-        return intent.apply { putExtra("input", input.second) }
+        return Intent.parseUri(input.first, Intent.URI_INTENT_SCHEME).apply {
+            flags = Intent.FLAG_ACTIVITY_NO_USER_ACTION
+            putExtra("input", input.second)
+        }
     }
 
     override fun parseResult(resultCode: Int, intent: Intent?): String? {

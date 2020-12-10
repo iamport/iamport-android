@@ -13,6 +13,12 @@ import com.iamport.sdk.data.sdk.ProvidePgPkg
  */
 class BankPayContract : ActivityResultContract<String, Pair<String, String>>() {
 
+    override fun createIntent(context: Context, input: String?): Intent {
+        val intent = Intent(Intent.ACTION_MAIN)
+        intent.component = ComponentName(ProvidePgPkg.BANKPAY.pkg, ProvidePgPkg.getNiceBankPayAppCls())
+        return intent.apply { putExtra(NiceBankpay.INTENT_RESULT_NAME, input) }
+    }
+
     override fun parseResult(resultCode: Int, intent: Intent?): Pair<String, String>? {
         return when (resultCode) {
             Activity.RESULT_OK -> {
@@ -24,11 +30,5 @@ class BankPayContract : ActivityResultContract<String, Pair<String, String>>() {
             }
             else -> null
         }
-    }
-
-    override fun createIntent(context: Context, input: String?): Intent {
-        val intent = Intent(Intent.ACTION_MAIN)
-        intent.component = ComponentName(ProvidePgPkg.BANKPAY.pkg, ProvidePgPkg.getNiceBankPayAppCls())
-        return intent.apply { putExtra(NiceBankpay.INTENT_RESULT_NAME, input) }
     }
 }
