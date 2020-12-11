@@ -64,13 +64,6 @@
     ..
   }
 
-  // 공통 : Host Activity(e.g. MainActivity) 에서 필수로 호출 해주세요.
-  // onUserLeaveHint 에서 해당 함수를 호출해주셔야 불필요한 백그라운드 작업을 줄일 수 있습니다.
-  override fun onUserLeaveHint() {
-      ..
-      Iamport.catchUserLeave() // TODO SDK 백그라운드 작업 중지를 위해서 필수 호출!
-  }
-    
 
   // SDK 에 결제 요청할 데이터 구성
   val request = IamPortRequest(
@@ -138,12 +131,6 @@
     ..
     Iamport.INSTANCE.close();
   }
-  
-  @Override
-  public void onUserLeaveHint() {
-    ..   
-    Iamport.INSTANCE.catchUserLeave() // TODO SDK 백그라운드 작업 중지를 위해서 필수 호출!
-  }
 
   IamPortRequest request
           = IamPortRequest.builder()
@@ -153,7 +140,6 @@
           .merchant_uid("mid_123456")
           .amount("3000")
           .buyer_name("홍길동").build();
-
 
   Iamport.INSTANCE.payment("imp123456", request, 
     iamPortApprove -> {

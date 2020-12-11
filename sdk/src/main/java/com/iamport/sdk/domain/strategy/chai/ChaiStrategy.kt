@@ -185,7 +185,7 @@ open class ChaiStrategy : BaseStrategy() {
                 return
             }
             tryCount++
-//            updatePolling(true)
+            updatePolling(true)
 
             when (val response =
                 apiGetChaiStatus(data.idempotencyKey.toString(), data.publicAPIKey.toString(), data.paymentId.toString())) {
@@ -202,7 +202,7 @@ open class ChaiStrategy : BaseStrategy() {
                         if (Foreground.isBackground || !Foreground.isScreenOn) {
                             d("NetworkError 결제 폴링! ${response.error}")
                             pollingCheckStatus(pollingDelay, idx)
-                            updatePolling(true)
+//                            updatePolling(true)
                         } else {
                             d("NetworkError 결제 clearData")
                             clearData()
@@ -328,16 +328,16 @@ open class ChaiStrategy : BaseStrategy() {
 //                    d("Foreground.isHome ${Foreground.isHome}")
                     if (Foreground.isHome) {
                         d("홈이라서 체크 로컬 폴링 $chaiPayment")
-                        updatePolling(false)
+//                        updatePolling(false)
                         pollingProcessStatus(chaiPayment, payment, data, idx)
                     } else {
                         if (Foreground.isBackground && Foreground.isScreenOn) {
                             d("결제 리모트 폴링! $chaiPayment")
-                            updatePolling(true)
+//                            updatePolling(true)
                             pollingCheckStatus(pollingDelay, idx)
                         } else {
                             d("프로세스 체크 로컬 폴링 $chaiPayment")
-                            updatePolling(false)
+//                            updatePolling(false)
                             pollingProcessStatus(chaiPayment, payment, data, idx)
                         }
                     }

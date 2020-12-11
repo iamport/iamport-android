@@ -97,13 +97,13 @@ object Iamport {
         close.value = (Event(Unit))
     }
 
-    /**
-     * 외부에서 SDK 홈키 캐치
-     */
-    fun catchUserLeave() {
-//        Foreground.isHome = true
-        catchHome.value = (Event(Unit))
-    }
+//    /**
+//     * 외부에서 SDK 홈키 캐치
+//     */
+//    fun catchUserLeave() {
+////        Foreground.isHome = true
+//        catchHome.value = (Event(Unit))
+//    }
 
     fun isPolling(): LiveData<Event<Boolean>>? {
         return iamportSdk?.isPolling()
