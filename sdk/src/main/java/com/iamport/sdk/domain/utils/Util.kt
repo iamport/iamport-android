@@ -149,10 +149,22 @@ object Util {
         observeForever(observer)
     }
 
-    fun versionName(hostHelper: HostHelper): String {
+    fun versionName(hostHelper: HostHelper, name: String? = null): String {
         return hostHelper.context?.run {
-            packageManager.getPackageInfo(packageName, 0)?.versionName
+            packageManager.getPackageInfo(name ?: packageName, 0)?.versionName
         } ?: kotlin.run { "" }
+    }
+
+    fun versionCode(context: Context?, name: String? = null): Number {
+        return context?.run {
+            packageManager.getPackageInfo(name ?: packageName, 0)?.let {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    it.longVersionCode
+                } else {
+                    it.versionCode
+                }
+            }
+        } ?: kotlin.run { 0L }
     }
 
 }

@@ -162,6 +162,12 @@ open class ChaiStrategy : BaseStrategy() {
             return
         }
 
+        if(bus.chaiClearVersion) {
+            d("새버전이라서 폴링 안할건데? 초기화 할건데?")
+            clearData()
+            return
+        }
+        
         requestPollingChaiStatus()
     }
 
@@ -317,7 +323,7 @@ open class ChaiStrategy : BaseStrategy() {
                     clearData()
                 } else {
                     tryOut = false
-                    d("Foreground.isHome ${Foreground.isHome}")
+//                    d("Foreground.isHome ${Foreground.isHome}")
                     if (Foreground.isHome) {
                         d("홈이라서 체크 로컬 폴링 $chaiPayment")
                         pollingProcessStatus(chaiPayment, payment, data, idx)
