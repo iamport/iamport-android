@@ -12,6 +12,7 @@ import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.data.sdk.ProvidePgPkg
+import com.iamport.sdk.domain.service.ChaiService
 import com.iamport.sdk.domain.utils.*
 import com.iamport.sdk.domain.utils.Util.observeAlways
 import com.iamport.sdk.presentation.contract.ChaiContract
@@ -92,6 +93,7 @@ internal class IamportSdk(
 
         // 외부에서 종료
         close.observeAlways(hostHelper.lifecycleOwner, EventObserver { clearData() })
+
     }
 
     /**
@@ -111,7 +113,12 @@ internal class IamportSdk(
             viewModel.chaiUri().observe(hostHelper.lifecycleOwner, EventObserver(this::openChaiApp))
 
             // 차이폴링여부
-            viewModel.isPolling().observe(hostHelper.lifecycleOwner, EventObserver(this::updatePolling))
+            viewModel.isPolling().observeAlways(
+                hostHelper.lifecycleOwner, EventObserver {
+                    updatePolling(it)
+                    controlForegroundService(it)
+                }
+            )
 
             // 차이 결제 상태 approve 처리
             viewModel.chaiApprove().observeAlways(hostHelper.lifecycleOwner, EventObserver(this::chaiApprove))
@@ -127,6 +134,22 @@ internal class IamportSdk(
 
     private fun updatePolling(it: Boolean) {
         isPolling.value = Event(it)
+    }
+
+    private fun controlForegroundService(it: Boolean) {
+        hostHelper.context?.run {
+            Intent(this, ChaiService::class.java).also { intent: Intent ->
+                if (it) {
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        startForegroundService(intent)
+                    } else {
+                        startService(intent)
+                    }
+                } else {
+                    stopService(intent)
+                }
+            }
+        }
     }
 
     private fun chaiApprove(approve: IamPortApprove) {
@@ -173,6 +196,7 @@ internal class IamportSdk(
     fun clearData() {
         d("clearData!")
         updatePolling(false)
+        controlForegroundService(false)
         viewModel.clearData()
     }
 
@@ -240,7 +264,7 @@ internal class IamportSdk(
 
     private fun checkChaiVersionCode(chaiPackageName: String): Boolean {
         d("chai app version : ${Util.versionCode(hostHelper.context, chaiPackageName).toLong()}")
-        return Util.versionCode(hostHelper.context, chaiPackageName).toLong() > CHAI.NEW_SINGLE_ACTIVITY_VERSION
+        return Util.versionCode(hostHelper.context, chaiPackageName).toLong() > CHAI.SINGLE_ACTIVITY_VERSION
     }
 
     private fun repeatTopPackage() {
