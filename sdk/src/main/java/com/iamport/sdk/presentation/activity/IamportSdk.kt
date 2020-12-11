@@ -35,6 +35,7 @@ internal class IamportSdk(
     val webViewLauncher: ActivityResultLauncher<Payment>?,
     val approvePayment: LiveData<Event<IamPortApprove>>,
     val close: LiveData<Event<Unit>>,
+    val catchHome: LiveData<Event<Unit>>,
 ) : KoinComponent {
 
     private val hostHelper: HostHelper = HostHelper(activity, fragment)
@@ -46,7 +47,8 @@ internal class IamportSdk(
     private var chaiApproveCallBack: ((IamPortApprove) -> Unit)? = null // 콜백함수
     private val isPolling = MutableLiveData<Event<Boolean>>()
 
-    private val delayRun = DelayRun() // 딜레이 호출
+    private val preventOverlapRun = PreventOverlapRun() // 딜레이 호출
+    private var preventHome: Boolean = false
 
     init {
         viewModel = ViewModelProvider(hostHelper.viewModelStoreOwner, MainViewModelFactory(get(), get())).get(MainViewModel::class.java)
@@ -60,6 +62,12 @@ internal class IamportSdk(
     }
 
     private val lifecycleObserver = object : LifecycleObserver {
+
+        @OnLifecycleEvent(Lifecycle.Event.ON_START)
+        fun onStart() {
+            d("onStart")
+            viewModel.checkChaiStatus()
+        }
 
         @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
         fun onStop() {
@@ -80,7 +88,7 @@ internal class IamportSdk(
      */
     fun initStart(payment: Payment, approveCallback: ((IamPortApprove) -> Unit)?, paymentResultCallBack: ((IamPortResponse?) -> Unit)?) {
         i("HELLO I'MPORT SDK! ${Util.versionName(hostHelper)}")
-        viewModel.clearData()
+        clearData()
 
         this.chaiApproveCallBack = approveCallback
         this.paymentResultCallBack = paymentResultCallBack
@@ -94,6 +102,7 @@ internal class IamportSdk(
         // 외부에서 종료
         close.observeAlways(hostHelper.lifecycleOwner, EventObserver { clearData() })
 
+        catchHome.observeAlways(hostHelper.lifecycleOwner, EventObserver { updateCatchHome() })
     }
 
     /**
@@ -124,8 +133,16 @@ internal class IamportSdk(
             viewModel.chaiApprove().observeAlways(hostHelper.lifecycleOwner, EventObserver(this::chaiApprove))
 
             // 결제 시작
-            delayRun.launch { requestPayment(pay) }
+            preventOverlapRun.launch { requestPayment(pay) }
         }
+    }
+
+    // TODO: 12/11/20 시나리오 확인 필요
+    // 스킴 액티비티 죽었을 때, leave 가 불려서 home 으로 인식되는데
+    // 1. 앱이 끝나고 결제 되도 될지
+    // 2. 앱은 바로 결제 되지만, home 갔을 때 포그라운드 서비스 떠도 될 지
+    private fun updateCatchHome() {
+        Foreground.isHome = true
     }
 
     fun isPolling(): LiveData<Event<Boolean>> {
@@ -166,6 +183,7 @@ internal class IamportSdk(
     private fun resultCallback() {
         i("Result Callback ChaiLauncher")
         viewModel.checkChaiStatus()
+        viewModel.receiveChaiCallBack = true
     }
 
     /**

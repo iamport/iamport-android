@@ -55,6 +55,7 @@ object Foreground : ActivityLifecycleCallbacks {
     override fun onActivityCreated(activity: Activity, bundle: Bundle?) {}
     override fun onActivityStarted(activity: Activity) {
         isHome = false
+        isScreenOn = true
         if (++running == 1) {
             d("app is 포그라운드! 살아왔다")
             appStatus = AppStatus.RETURNED_TO_FOREGROUND

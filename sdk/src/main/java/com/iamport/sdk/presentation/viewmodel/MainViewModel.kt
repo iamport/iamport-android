@@ -20,6 +20,12 @@ import org.koin.core.component.KoinComponent
 @KoinApiExtension
 class MainViewModel(private val bus: NativeLiveDataEventBus, private val repository: StrategyRepository) : BaseViewModel(), KoinComponent {
 
+    private var job = Job()
+        get() {
+            if (field.isCancelled) field = Job()
+            return field
+        }
+
     var playChai: Boolean
         get() {
             return bus.playChai
@@ -36,11 +42,14 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
             bus.chaiClearVersion = value
         }
 
-    private var job = Job()
+    var receiveChaiCallBack: Boolean
         get() {
-            if (field.isCancelled) field = Job()
-            return field
+            return bus.receiveChaiCallBack
         }
+        set(value) {
+            bus.receiveChaiCallBack = value
+        }
+
 
     override fun onCleared() {
         d("onCleared")
@@ -110,6 +119,7 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
     fun clearData() {
         playChai = false
         chaiClearVersion = false
+        receiveChaiCallBack = false
         repository.chaiStrategy.init()
         job.cancel()
     }
@@ -130,7 +140,7 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
      */
     fun pollingChaiStatus() {
         if (!playChai) {
-            d("차이 설치 되지 않았으므로 무시 pollingChaiStatus")
+            d("ignore pollingChaiStatus cause playChai")
             return
         }
         viewModelScope.launch(job) {
@@ -145,13 +155,19 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
      */
     fun checkChaiStatus() {
         if (!playChai) {
-            d("차이 설치 되지 않았으므로 무시 checkChaiStatus")
+            d("ignore checkChaiStatus cause playChai")
             return
         }
+
+        if(receiveChaiCallBack) {
+            d("ignore checkChaiStatus cause receiveChaiCallBack")
+            receiveChaiCallBack = false // 스킴 액티비티 종료시에 불릴 수 있기 때문에 초기화 해줘야함
+            return
+        }
+
         viewModelScope.launch(job) {
             d("차이앱 종료돼서 차이 결제 상태 체크")
             repository.chaiStrategy.requestCheckChaiStatus()
         }
     }
-
 }

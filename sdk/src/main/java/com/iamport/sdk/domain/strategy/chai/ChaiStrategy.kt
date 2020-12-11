@@ -222,7 +222,7 @@ open class ChaiStrategy : BaseStrategy() {
                 }
             }
         } ?: run {
-            d("Stop poilling, Not found PrepareData")
+            d("Ignore poilling, Not found PrepareData")
         }
     }
 
