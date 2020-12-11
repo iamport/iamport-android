@@ -59,7 +59,7 @@ object Iamport {
         catchHome = MutableLiveData()
         activity = componentActivity
         iamportSdk =
-            IamportSdk(activity = componentActivity, webViewLauncher = webViewLauncher, approvePayment = approvePayment, close = close)
+            IamportSdk(activity = componentActivity, webViewLauncher = webViewLauncher, approvePayment = approvePayment, close = close, catchHome = catchHome)
         preventOverlapRun = PreventOverlapRun()
     }
 
@@ -78,7 +78,7 @@ object Iamport {
         close = MutableLiveData()
         catchHome = MutableLiveData()
         this.fragment = fragment
-        iamportSdk = IamportSdk(fragment = fragment, webViewLauncher = webViewLauncher, approvePayment = approvePayment, close = close)
+        iamportSdk = IamportSdk(fragment = fragment, webViewLauncher = webViewLauncher, approvePayment = approvePayment, close = close, catchHome = catchHome)
         preventOverlapRun = PreventOverlapRun()
     }
 
