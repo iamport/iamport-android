@@ -12,6 +12,7 @@ import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.domain.utils.PreventOverlapRun
 import com.iamport.sdk.domain.utils.Event
+import com.iamport.sdk.domain.utils.Foreground
 import com.iamport.sdk.presentation.activity.IamportSdk
 import com.iamport.sdk.presentation.contract.WebViewActivityContract
 import com.orhanobut.logger.Logger.d
@@ -104,6 +105,10 @@ object Iamport {
 ////        Foreground.isHome = true
 //        catchHome.value = (Event(Unit))
 //    }
+
+    fun enableChaiPollingForegroundService(it: Boolean) {
+        Foreground.enableForegroundService = it
+    }
 
     fun isPolling(): LiveData<Event<Boolean>>? {
         return iamportSdk?.isPolling()

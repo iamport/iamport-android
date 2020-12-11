@@ -154,6 +154,10 @@ internal class IamportSdk(
     }
 
     private fun controlForegroundService(it: Boolean) {
+        if (!Foreground.enableForegroundService) {
+            return
+        }
+
         hostHelper.context?.run {
             Intent(this, ChaiService::class.java).also { intent: Intent ->
                 if (it) {

@@ -23,6 +23,8 @@ object Foreground : ActivityLifecycleCallbacks {
 
     var isHome : Boolean = false // 홈키 눌렀는지 여부
 
+    var enableForegroundService : Boolean = true // 폴링시
+
     enum class AppStatus {
         BACKGROUND,  // app is background
         RETURNED_TO_FOREGROUND,  // app returned to foreground(or first launch)
