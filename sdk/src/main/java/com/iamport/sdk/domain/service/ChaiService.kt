@@ -45,6 +45,7 @@ open class ChaiService : Service() {
         val title = "결제를 확인중 입니다"
 
         val stopIcon = R.drawable.chuck_ic_delete_white_24dp
+        val stopTitle = "결제를 중지하시려면 아래로 당겨주세요"
         val stopBtnName = "중지"
 
         val broadcastIntent = Intent(CONST.BROADCAST_FOREGROUND_SERVICE)
@@ -58,6 +59,7 @@ open class ChaiService : Service() {
             Notification.Builder(this, channelId)
                 .setSmallIcon(icon)  // 아이콘 셋팅
                 .setContentTitle(title)
+                .setContentText(if (Foreground.enableForegroundServiceStopButton) stopTitle else null)
                 .setContentIntent(pendingIntent)
                 .addAction(if (Foreground.enableForegroundServiceStopButton) action else null)
                 .build()
@@ -66,6 +68,7 @@ open class ChaiService : Service() {
                 .setSmallIcon(icon)
                 .setContentTitle(title)
                 .setContentIntent(pendingIntent)
+                .setContentText(if (Foreground.enableForegroundServiceStopButton) stopTitle else null)
             if (Foreground.enableForegroundServiceStopButton) {
                 builder.addAction(stopIcon, stopBtnName, pendingStopIntent)
                     .build()
