@@ -2,18 +2,21 @@ package com.iamport.sampleapp.ui
 
 import android.app.AlertDialog.Builder
 import android.content.Context
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.activity.OnBackPressedCallback
 import com.google.gson.GsonBuilder
+import com.iamport.sampleapp.MerchantReceiver
 import com.iamport.sampleapp.PaymentResultData.result
 import com.iamport.sampleapp.R
 import com.iamport.sampleapp.databinding.PaymentFragmentBinding
 import com.iamport.sdk.data.sdk.*
 import com.iamport.sdk.domain.core.ICallbackPaymentResult
 import com.iamport.sdk.domain.core.Iamport
+import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.EventObserver
 import com.iamport.sdk.domain.utils.Util
 import com.orhanobut.logger.Logger.i
@@ -24,6 +27,7 @@ import java.util.*
 
 class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
     override val layoutResourceId: Int = R.layout.payment_fragment
+    private val receiver = MerchantReceiver()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,9 +43,18 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
         super.onDetach()
         Iamport.close()
         backPressCallback.remove()
+        this.context?.unregisterReceiver(receiver)
     }
 
     override fun initStart() {
+
+        // 차이 폴링중에 포그라운드 서비스 생성
+        Iamport.enableChaiPollingForegroundService(true)
+
+        // 포그라운드 서비스 클릭시 broadcast
+        this.context?.registerReceiver(receiver, IntentFilter().apply {
+            addAction(CONST.BROADCAST_FOREGROUND_SERVICE)
+        })
 
         viewDataBinding.paymentButton.setOnClickListener {
             onClickPayment()

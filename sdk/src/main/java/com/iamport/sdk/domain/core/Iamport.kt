@@ -30,12 +30,12 @@ object Iamport {
 
     private var approvePayment = MutableLiveData<Event<IamPortApprove>>()
     private var close = MutableLiveData<Event<Unit>>()
+    private var finish = MutableLiveData<Event<Unit>>()
     private var catchHome = MutableLiveData<Event<Unit>>()
 
-    private var activity: ComponentActivity? = null
+    var activity: ComponentActivity? = null
     private var fragment: Fragment? = null
     private var preventOverlapRun: PreventOverlapRun? = null
-
 
     private fun clear() {
         fragment = null
@@ -43,6 +43,12 @@ object Iamport {
         iamportSdk = null
     }
 
+    fun createLiveData() {
+        this.approvePayment = MutableLiveData()
+        this.close = MutableLiveData()
+        this.finish = MutableLiveData()
+        this.catchHome = MutableLiveData()
+    }
 
     /**
      * SDK Activity 열기 위한 Contract for Activity
@@ -54,14 +60,18 @@ object Iamport {
         webViewLauncher = componentActivity.registerForActivityResult(WebViewActivityContract()) {
             callback(it)
         }
-
-        approvePayment = MutableLiveData()
-        close = MutableLiveData()
-        catchHome = MutableLiveData()
-        activity = componentActivity
-        iamportSdk =
-            IamportSdk(activity = componentActivity, webViewLauncher = webViewLauncher, approvePayment = approvePayment, close = close, catchHome = catchHome)
-        preventOverlapRun = PreventOverlapRun()
+        createLiveData()
+        this.activity = componentActivity
+        this.iamportSdk =
+            IamportSdk(
+                activity = componentActivity,
+                webViewLauncher = webViewLauncher,
+                approvePayment = approvePayment,
+                close = close,
+                finish = finish,
+                catchHome = catchHome
+            )
+        this.preventOverlapRun = PreventOverlapRun()
     }
 
     /**
@@ -75,12 +85,18 @@ object Iamport {
             callback(it)
         }
 
-        approvePayment = MutableLiveData()
-        close = MutableLiveData()
-        catchHome = MutableLiveData()
+        createLiveData()
         this.fragment = fragment
-        iamportSdk = IamportSdk(fragment = fragment, webViewLauncher = webViewLauncher, approvePayment = approvePayment, close = close, catchHome = catchHome)
-        preventOverlapRun = PreventOverlapRun()
+        this.activity = fragment.activity
+        this.iamportSdk = IamportSdk(
+            fragment = fragment,
+            webViewLauncher = webViewLauncher,
+            approvePayment = approvePayment,
+            close = close,
+            finish = finish,
+            catchHome = catchHome
+        )
+        this.preventOverlapRun = PreventOverlapRun()
     }
 
     /**
@@ -96,6 +112,14 @@ object Iamport {
     @MainThread
     fun close() {
         close.value = (Event(Unit))
+    }
+
+    /**
+     * 외부에서 SDK 실패 종료
+     */
+    @MainThread
+    fun failFinish() {
+        finish.value = (Event(Unit))
     }
 
 //    /**

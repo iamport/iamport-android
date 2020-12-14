@@ -59,6 +59,10 @@ open class ChaiStrategy : BaseStrategy() {
         super.sdkFinish(response)
     }
 
+    fun failFinish(errMsg: String) {
+        failureFinish(payment, prepareData, errMsg)
+    }
+
     /**
      * prepareData 데이터 초기화
      */

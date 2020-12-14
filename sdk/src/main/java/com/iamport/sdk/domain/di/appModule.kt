@@ -2,13 +2,11 @@ package com.iamport.sdk.domain.di
 
 import android.content.Context
 import com.google.gson.Gson
-import com.iamport.sdk.BuildConfig
 import com.iamport.sdk.data.remote.ChaiApi
 import com.iamport.sdk.data.remote.IamportApi
 import com.iamport.sdk.data.remote.NiceApi
+import com.iamport.sdk.domain.core.IamportReceiver
 import com.iamport.sdk.domain.repository.StrategyRepository
-import com.iamport.sdk.domain.strategy.base.BaseStrategy
-import com.iamport.sdk.domain.strategy.base.BaseWebViewStrategy
 import com.iamport.sdk.domain.strategy.base.JudgeStrategy
 import com.iamport.sdk.domain.strategy.chai.ChaiStrategy
 import com.iamport.sdk.domain.strategy.webview.NiceTransWebViewStrategy
@@ -68,6 +66,7 @@ fun provideChaiApi(gson: Gson, client: OkHttpClient): ChaiApi {
 @OptIn(KoinApiExtension::class)
 val appModule = module {
     viewModel { WebViewModel(get(), get()) }
+    single { IamportReceiver() }
     single { Gson() }
     single { provideOkHttpClient(get()) }
 
@@ -83,5 +82,6 @@ val appModule = module {
     single { provideIamportApi(get(), get()) }
     single { provideChaiApi(get(), get()) }
     single { provideNiceApi(get(), get()) }
+
 
 }

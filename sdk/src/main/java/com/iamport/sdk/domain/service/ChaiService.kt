@@ -1,17 +1,16 @@
 package com.iamport.sdk.domain.service
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.Service
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import com.iamport.sdk.R
+import com.iamport.sdk.domain.utils.CONST
+
 
 open class ChaiService : Service() {
-    private val channelId = "iamport-service-ch-id"
+    private val channelId = "Iamport Pamyent SDK"
 
     @Override
     override fun onCreate() {
@@ -23,7 +22,7 @@ open class ChaiService : Service() {
     }
 
     private fun channelRegister() {
-        val channelName = "iamport-service-ch-name"
+        val channelName = "iamport service ch"
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelId, channelName,
@@ -41,16 +40,23 @@ open class ChaiService : Service() {
         channelRegister()
 
         val icon = R.drawable.chuck_ic_search_white_24dp
-        val title = "결제를 확인중입니다"
+        val title = "결제를 확인중 입니다"
+
+        val broadcastIntent = Intent(CONST.BROADCAST_FOREGROUND_SERVICE)
+        val pendingIntent = PendingIntent.getBroadcast(this, 0, broadcastIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
         val notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder(this, channelId)
                 .setSmallIcon(icon)  // 아이콘 셋팅
                 .setContentTitle(title)
+                .setContentIntent(pendingIntent)
                 .build()
         } else {
             Notification.Builder(this)
                 .setSmallIcon(icon)
                 .setContentTitle(title)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
                 .build()
         }
 
