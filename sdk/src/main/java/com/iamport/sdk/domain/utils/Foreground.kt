@@ -23,6 +23,8 @@ object Foreground : ActivityLifecycleCallbacks {
 
     var isHome : Boolean = false // 홈키 눌렀는지 여부
 
+    var enableForegroundService : Boolean = true // 폴링시
+
     enum class AppStatus {
         BACKGROUND,  // app is background
         RETURNED_TO_FOREGROUND,  // app returned to foreground(or first launch)
@@ -55,6 +57,7 @@ object Foreground : ActivityLifecycleCallbacks {
     override fun onActivityCreated(activity: Activity, bundle: Bundle?) {}
     override fun onActivityStarted(activity: Activity) {
         isHome = false
+        isScreenOn = true
         if (++running == 1) {
             d("app is 포그라운드! 살아왔다")
             appStatus = AppStatus.RETURNED_TO_FOREGROUND

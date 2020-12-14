@@ -23,7 +23,6 @@ import org.koin.core.component.inject
 import java.util.concurrent.atomic.AtomicInteger
 
 // TODO: 12/1/20 구조 좀 정리하기 ㅠㅠ 너무 복잡 ㅠㅠ
-// TODO: 12/1/20 현재 폴링상태인지 머천트 앱에게 공지하기
 @KoinApiExtension
 open class ChaiStrategy : BaseStrategy() {
 
@@ -162,13 +161,17 @@ open class ChaiStrategy : BaseStrategy() {
             return
         }
 
-        if(bus.chaiClearVersion) {
+        if (bus.chaiClearVersion) {
             d("새버전이라서 폴링 안할건데? 초기화 할건데?")
             clearData()
             return
         }
-        
+
         requestPollingChaiStatus()
+    }
+
+    private suspend fun updatePolling(isPolling: Boolean) = withContext(Dispatchers.Main) {
+        bus.isPolling.value = Event(isPolling)
     }
 
     /**
@@ -182,9 +185,7 @@ open class ChaiStrategy : BaseStrategy() {
                 return
             }
             tryCount++
-            withContext(Dispatchers.Main) {
-                bus.isPolling.value = Event(true)
-            }
+            updatePolling(true)
 
             when (val response =
                 apiGetChaiStatus(data.idempotencyKey.toString(), data.publicAPIKey.toString(), data.paymentId.toString())) {
@@ -201,6 +202,7 @@ open class ChaiStrategy : BaseStrategy() {
                         if (Foreground.isBackground || !Foreground.isScreenOn) {
                             d("NetworkError 결제 폴링! ${response.error}")
                             pollingCheckStatus(pollingDelay, idx)
+//                            updatePolling(true)
                         } else {
                             d("NetworkError 결제 clearData")
                             clearData()
@@ -220,7 +222,7 @@ open class ChaiStrategy : BaseStrategy() {
                 }
             }
         } ?: run {
-            d("Stop poilling, Not found PrepareData")
+            d("Ignore poilling, Not found PrepareData")
         }
     }
 
@@ -319,20 +321,23 @@ open class ChaiStrategy : BaseStrategy() {
             waiting, prepared -> {
                 if (tryCount > CONST.TRY_OUT_COUNT) { // 타임아웃
                     tryOut = true
-                    i("${CONST.TRY_OUT_MIN} 분 이상 결제되지 않아 결제취소 처리합니다. 결제를 재시도 해주세요.")
+                    i("${CONST.TRY_OUT_MIN}분 이상 결제되지 않아 결제취소 처리합니다. 결제를 재시도 해주세요.")
                     clearData()
                 } else {
                     tryOut = false
 //                    d("Foreground.isHome ${Foreground.isHome}")
                     if (Foreground.isHome) {
                         d("홈이라서 체크 로컬 폴링 $chaiPayment")
+//                        updatePolling(false)
                         pollingProcessStatus(chaiPayment, payment, data, idx)
                     } else {
                         if (Foreground.isBackground && Foreground.isScreenOn) {
                             d("결제 리모트 폴링! $chaiPayment")
+//                            updatePolling(true)
                             pollingCheckStatus(pollingDelay, idx)
                         } else {
                             d("프로세스 체크 로컬 폴링 $chaiPayment")
+//                            updatePolling(false)
                             pollingProcessStatus(chaiPayment, payment, data, idx)
                         }
                     }

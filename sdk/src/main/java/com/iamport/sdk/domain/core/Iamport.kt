@@ -10,7 +10,7 @@ import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortRequest
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
-import com.iamport.sdk.domain.utils.DelayRun
+import com.iamport.sdk.domain.utils.PreventOverlapRun
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.Foreground
 import com.iamport.sdk.presentation.activity.IamportSdk
@@ -30,10 +30,11 @@ object Iamport {
 
     private var approvePayment = MutableLiveData<Event<IamPortApprove>>()
     private var close = MutableLiveData<Event<Unit>>()
+    private var catchHome = MutableLiveData<Event<Unit>>()
 
     private var activity: ComponentActivity? = null
     private var fragment: Fragment? = null
-    private var delayRun: DelayRun? = null
+    private var preventOverlapRun: PreventOverlapRun? = null
 
 
     private fun clear() {
@@ -56,9 +57,11 @@ object Iamport {
 
         approvePayment = MutableLiveData()
         close = MutableLiveData()
+        catchHome = MutableLiveData()
         activity = componentActivity
-        iamportSdk = IamportSdk(activity = componentActivity, webViewLauncher = webViewLauncher, approvePayment = approvePayment, close = close)
-        delayRun = DelayRun()
+        iamportSdk =
+            IamportSdk(activity = componentActivity, webViewLauncher = webViewLauncher, approvePayment = approvePayment, close = close, catchHome = catchHome)
+        preventOverlapRun = PreventOverlapRun()
     }
 
     /**
@@ -74,9 +77,10 @@ object Iamport {
 
         approvePayment = MutableLiveData()
         close = MutableLiveData()
+        catchHome = MutableLiveData()
         this.fragment = fragment
-        iamportSdk = IamportSdk(fragment = fragment, webViewLauncher = webViewLauncher, approvePayment = approvePayment, close = close)
-        delayRun = DelayRun()
+        iamportSdk = IamportSdk(fragment = fragment, webViewLauncher = webViewLauncher, approvePayment = approvePayment, close = close, catchHome = catchHome)
+        preventOverlapRun = PreventOverlapRun()
     }
 
     /**
@@ -94,11 +98,16 @@ object Iamport {
         close.value = (Event(Unit))
     }
 
-    /**
-     * 외부에서 SDK 홈키 캐치
-     */
-    fun catchUserLeave() {
-        Foreground.isHome = true
+//    /**
+//     * 외부에서 SDK 홈키 캐치
+//     */
+//    fun catchUserLeave() {
+////        Foreground.isHome = true
+//        catchHome.value = (Event(Unit))
+//    }
+
+    fun enableChaiPollingForegroundService(it: Boolean) {
+        Foreground.enableForegroundService = it
     }
 
     fun isPolling(): LiveData<Event<Boolean>>? {
@@ -122,7 +131,7 @@ object Iamport {
     fun payment(
         userCode: String, iamPortRequest: IamPortRequest, approveCallback: ((IamPortApprove) -> Unit)? = null, paymentResultCallback: ICallbackPaymentResult?,
     ) {
-        delayRun?.launch {
+        preventOverlapRun?.launch {
             corePayment(userCode, iamPortRequest, approveCallback) { paymentResultCallback?.result(it) }
         }
     }
@@ -135,7 +144,7 @@ object Iamport {
     fun payment(
         userCode: String, iamPortRequest: IamPortRequest, approveCallback: ((IamPortApprove) -> Unit)? = null, paymentResultCallback: (IamPortResponse?) -> Unit
     ) {
-        delayRun?.launch {
+        preventOverlapRun?.launch {
             corePayment(userCode, iamPortRequest, approveCallback, paymentResultCallback)
         }
     }

@@ -64,13 +64,6 @@
     ..
   }
 
-  // 공통 : Host Activity(e.g. MainActivity) 에서 필수로 호출 해주세요.
-  // onUserLeaveHint 에서 해당 함수를 호출해주셔야 불필요한 백그라운드 작업을 줄일 수 있습니다.
-  override fun onUserLeaveHint() {
-      ..
-      Iamport.catchUserLeave() // TODO SDK 백그라운드 작업 중지를 위해서 필수 호출!
-  }
-    
 
   // SDK 에 결제 요청할 데이터 구성
   val request = IamPortRequest(
@@ -98,7 +91,7 @@
   Iamport.chaiPayment(iamPortApprove) // 재고 등 확인 후, 차이 최종 결제 요청 실행.
 ```
 
-> (Optional) 차이폴링 여부 확인
+> (Optional) 차이 결제 폴링 여부 확인
 ```kotlin
   // 차이 결제 상태체크 폴링 여부를 확인하실 수 있습니다.
   Iamport.isPolling()?.observe(this, EventObserver {
@@ -108,6 +101,15 @@
   // 또는, 폴링 상태를 보고 싶을때 명시적으로 호출
   i("isPolling? ${Iamport.isPollingValue()}")
 ```
+
+
+> (Optional) 차이 결제 폴링 중에는 포그라운드 서비스가 알람에 뜨게 됩니다.
+
+> 해당 enableChaiPollingForegroundService(false) 를 Iamport.payment(결제 함수) 전에 호출해주시면 포그라운드 서비스를 등록하지 않습니다
+```kotlin
+    Iamport.enableChaiPollingForegroundService(false) // default true
+```
+
 
 ---
 
@@ -138,12 +140,6 @@
     ..
     Iamport.INSTANCE.close();
   }
-  
-  @Override
-  public void onUserLeaveHint() {
-    ..   
-    Iamport.INSTANCE.catchUserLeave() // TODO SDK 백그라운드 작업 중지를 위해서 필수 호출!
-  }
 
   IamPortRequest request
           = IamPortRequest.builder()
@@ -153,7 +149,6 @@
           .merchant_uid("mid_123456")
           .amount("3000")
           .buyer_name("홍길동").build();
-
 
   Iamport.INSTANCE.payment("imp123456", request, 
     iamPortApprove -> {

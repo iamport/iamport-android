@@ -73,7 +73,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
     override fun onStart() {
         super.onStart()
         viewDataBinding.merchantUid.setText(getRandomMerchantUid())
-        onPolling()
+//        onPolling()
     }
 
 

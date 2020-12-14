@@ -3,7 +3,6 @@ package com.iamport.sdk.domain.strategy.base
 import com.google.gson.Gson
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
-import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.NativeLiveDataEventBus
 import kotlinx.coroutines.CancellationException

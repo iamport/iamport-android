@@ -12,10 +12,10 @@
         android:allowBackup="true"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true">
+
         <service
-            android:name=".presentation.ChaiService"
-            android:enabled="true"
-            android:exported="true"></service>
+            android:name=".domain.service.ChaiService"
+            android:enabled="true" />
 
         <activity
             android:name=".presentation.activity.WebViewActivity"
