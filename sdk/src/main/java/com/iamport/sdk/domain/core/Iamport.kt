@@ -130,8 +130,9 @@ object Iamport {
 //        catchHome.value = (Event(Unit))
 //    }
 
-    fun enableChaiPollingForegroundService(it: Boolean) {
-        Foreground.enableForegroundService = it
+    fun enableChaiPollingForegroundService(enableService: Boolean, enableFailStopButton : Boolean = true) {
+        Foreground.enableForegroundService = enableService
+        Foreground.enableForegroundServiceStopButton = enableFailStopButton
     }
 
     fun isPolling(): LiveData<Event<Boolean>>? {

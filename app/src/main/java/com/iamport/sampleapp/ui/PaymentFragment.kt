@@ -46,15 +46,25 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
         this.context?.unregisterReceiver(receiver)
     }
 
-    override fun initStart() {
+    // 차이 폴링중에 포그라운드 서비스 생성
+    // (* 포그라운드 서비스 직접 구현시에는 enableService = false 로 설정하고,
+    // Iamport.isPolling()?.observe 에서 true 전달 받을 시점에, 직접 포그라운드 서비스 만들어 띄우시면 됩니다.)
+    private fun registForegroundServiceReceiver() {
+        // enableService = true 시, 폴링중 포그라운드 서비스를 보여줍니다.
+        // enableFailStopButton = true 시, 포그라운드 서비스에서 중지 버튼 생성합니다.
+        Iamport.enableChaiPollingForegroundService(enableService = true, enableFailStopButton = true)
 
-        // 차이 폴링중에 포그라운드 서비스 생성
-        Iamport.enableChaiPollingForegroundService(true)
-
-        // 포그라운드 서비스 클릭시 broadcast
+        // 포그라운드 서비스 및 포그라운드 서비스 중지 버튼 클릭시 전달받는 broadcast 리시버
         this.context?.registerReceiver(receiver, IntentFilter().apply {
             addAction(CONST.BROADCAST_FOREGROUND_SERVICE)
+            addAction(CONST.BROADCAST_FOREGROUND_SERVICE_STOP)
         })
+
+    }
+
+    override fun initStart() {
+
+        registForegroundServiceReceiver()
 
         viewDataBinding.paymentButton.setOnClickListener {
             onClickPayment()

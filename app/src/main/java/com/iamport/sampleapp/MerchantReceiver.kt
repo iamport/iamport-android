@@ -18,8 +18,13 @@ class MerchantReceiver : BroadcastReceiver() {
         // 포그라운드 서비스 클릭시 호출 됩니다.
         if (action == CONST.BROADCAST_FOREGROUND_SERVICE) {
             // TODO: 적절한 처리가 필요
-//            Iamport.close() // 예시입니다. 단순 SDK 종료.
-            Iamport.failFinish() // 예시입니다. 데이터가 있을시 실패 response
         }
+
+        // 포그라운드 서비스의 중지 버튼 클릭시 호출 됩니다.
+        if (action == CONST.BROADCAST_FOREGROUND_SERVICE_STOP) {
+            // TODO: 적절한 처리가 필요
+            Iamport.failFinish()
+        }
+
     }
 }

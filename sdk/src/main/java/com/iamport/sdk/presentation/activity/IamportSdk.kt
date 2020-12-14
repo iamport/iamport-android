@@ -67,6 +67,7 @@ internal class IamportSdk(
 
         IntentFilter().let {
             it.addAction(CONST.BROADCAST_FOREGROUND_SERVICE)
+            it.addAction(CONST.BROADCAST_FOREGROUND_SERVICE_STOP)
             hostHelper.context?.registerReceiver(iamportReceiver, it)
         }
         clearData()
