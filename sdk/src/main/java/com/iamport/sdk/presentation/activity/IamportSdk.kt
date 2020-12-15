@@ -1,17 +1,20 @@
 package com.iamport.sdk.presentation.activity
 
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.gson.GsonBuilder
 import com.iamport.sdk.data.chai.CHAI
 import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.data.sdk.ProvidePgPkg
+import com.iamport.sdk.domain.core.IamportReceiver
 import com.iamport.sdk.domain.service.ChaiService
 import com.iamport.sdk.domain.utils.*
 import com.iamport.sdk.domain.utils.Util.observeAlways
@@ -25,6 +28,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
+import org.koin.core.component.inject
 import java.util.*
 
 
@@ -35,9 +39,9 @@ internal class IamportSdk(
     val webViewLauncher: ActivityResultLauncher<Payment>?,
     val approvePayment: LiveData<Event<IamPortApprove>>,
     val close: LiveData<Event<Unit>>,
+    val finish: LiveData<Event<Unit>>,
     val catchHome: LiveData<Event<Unit>>,
 ) : KoinComponent {
-
     private val hostHelper: HostHelper = HostHelper(activity, fragment)
 
     private val launcherChai: ActivityResultLauncher<Pair<String, String>>? // 차이앱 런처
@@ -50,6 +54,8 @@ internal class IamportSdk(
     private val preventOverlapRun = PreventOverlapRun() // 딜레이 호출
     private var preventHome: Boolean = false
 
+    private val iamportReceiver: IamportReceiver by inject()
+
     init {
         viewModel = ViewModelProvider(hostHelper.viewModelStoreOwner, MainViewModelFactory(get(), get())).get(MainViewModel::class.java)
 
@@ -57,6 +63,12 @@ internal class IamportSdk(
             activity?.registerForActivityResult(ChaiContract()) { resultCallback() }
         } else {
             fragment?.registerForActivityResult(ChaiContract()) { resultCallback() }
+        }
+
+        IntentFilter().let {
+            it.addAction(CONST.BROADCAST_FOREGROUND_SERVICE)
+            it.addAction(CONST.BROADCAST_FOREGROUND_SERVICE_STOP)
+            hostHelper.context?.registerReceiver(iamportReceiver, it)
         }
         clearData()
     }
@@ -80,6 +92,9 @@ internal class IamportSdk(
             d("onDestroy")
             clearData()
             hostHelper.lifecycle.removeObserver(this)
+            runCatching {
+                hostHelper.context?.unregisterReceiver(iamportReceiver)
+            }
         }
     }
 
@@ -111,6 +126,9 @@ internal class IamportSdk(
     private fun observeViewModel(payment: Payment?) {
         d(GsonBuilder().setPrettyPrinting().create().toJson(payment))
         payment?.let { pay: Payment ->
+
+            // 외부에서 sdk 실패종료
+            finish.observeAlways(hostHelper.lifecycleOwner, EventObserver { viewModel.failSdkFinish(pay) })
 
             // 결제결과 옵저빙
             viewModel.impResponse().observe(hostHelper.lifecycleOwner, EventObserver(this::sdkFinish))

@@ -23,7 +23,8 @@ object Foreground : ActivityLifecycleCallbacks {
 
     var isHome : Boolean = false // 홈키 눌렀는지 여부
 
-    var enableForegroundService : Boolean = true // 폴링시
+    var enableForegroundService : Boolean = true // 폴링시 포그라운드 서비스 enable
+    var enableForegroundServiceStopButton : Boolean = true // 폴링시 포그라운드 서비스 결제실패 버튼 enable
 
     enum class AppStatus {
         BACKGROUND,  // app is background

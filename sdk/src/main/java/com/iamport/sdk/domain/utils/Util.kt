@@ -51,8 +51,8 @@ object Util {
                 PayMethod.happymoney
             )
             kcp -> defaultPayMethod + setOf(PayMethod.samsung)
-            kcp_billing, kakaopay, kakao,
-            paypal, payco, smilepay, alipay ->
+            kcp_billing, kakaopay,
+            paypal, payco, smilepay, alipay, settle_firm ->
                 setOf(PayMethod.card)
             uplus -> defaultPayMethod + setOf(
                 PayMethod.cultureland,
