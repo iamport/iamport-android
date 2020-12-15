@@ -37,7 +37,7 @@ object ApiHelper {
     private fun convertErrorBody(throwable: HttpException): ErrorResponse? {
         return try {
             throwable.response()?.errorBody()?.string()?.let {
-                i(it)
+                d(it)
                 Gson().fromJson(it, ErrorResponse::class.java)
             }
         } catch (exception: Exception) {

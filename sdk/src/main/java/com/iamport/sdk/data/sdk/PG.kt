@@ -1,5 +1,7 @@
 package com.iamport.sdk.data.sdk
 
+import com.iamport.sdk.domain.utils.CONST
+
 //html5_inicis(이니시스웹표준)
 //inicis(이니시스ActiveX결제창)
 //kcp(NHN KCP)
@@ -36,7 +38,7 @@ enum class PG(val korName: String) {
     bluewalnut("bluewalnut"); /*, inicis("이니시스ActiveX결제창"), syrup("시럽페이");*/
 
     fun getPgSting(storeId: String? = null): String {
-        return "${this.name}${if (!storeId.isNullOrBlank()) ".${storeId}" else ""}"
+        return "${this.name}${if (!storeId.isNullOrBlank()) ".${storeId}" else CONST.EMPTY_STR}"
     }
 
     companion object {

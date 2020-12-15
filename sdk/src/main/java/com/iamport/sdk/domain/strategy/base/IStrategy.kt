@@ -13,14 +13,14 @@ interface IStrategy {
 
     fun sdkFinish(response: IamPortResponse?)
     fun successFinish(payment: Payment, prepareData: PrepareData? = null, msg: String) {
-        Logger.i(msg)
+        Logger.d(msg)
         IamPortResponse.makeSuccess(payment, prepareData, msg).run {
             sdkFinish(this)
         }
     }
 
     fun failureFinish(payment: Payment, prepareData: PrepareData? = null, msg: String) {
-        Logger.i(msg)
+        Logger.d(msg)
         IamPortResponse.makeFail(payment, prepareData, msg).run {
             sdkFinish(this)
         }

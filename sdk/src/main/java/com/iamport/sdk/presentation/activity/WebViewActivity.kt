@@ -49,7 +49,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ko
      * BaseActivity 에서 onCreate 시 호출
      */
     override fun initStart() {
-        i("HELLO I'MPORT WebView SDK!")
+        i("HELLO I'MPORT WebView SDK! ${Util.versionName(this)}")
 
         initLoading()
 
@@ -61,7 +61,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ko
     }
 
     override fun onNewIntent(intent: Intent?) {
-        i("onNewIntent")
+        d("onNewIntent")
         super.onNewIntent(intent)
         this.intent = intent
 //        removeObserveViewModel(payment)
@@ -192,7 +192,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ko
         }
 
         if (!pkg.isNullOrBlank()) {
-            i("movePlayStore :: $pkg")
+            d("movePlayStore :: $pkg")
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Util.getMarketId(pkg))))
         }
     }

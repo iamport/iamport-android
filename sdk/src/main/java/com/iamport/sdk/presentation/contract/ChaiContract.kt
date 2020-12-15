@@ -23,7 +23,7 @@ class ChaiContract : ActivityResultContract<Pair<String, String>, String>() {
     override fun parseResult(resultCode: Int, intent: Intent?): String? {
         return when (resultCode) {
             Activity.RESULT_OK -> {
-                i("${intent?.getStringExtra("output")}")
+                d("${intent?.getStringExtra("output")}")
                 intent?.getStringExtra("output")
             }
             else -> null

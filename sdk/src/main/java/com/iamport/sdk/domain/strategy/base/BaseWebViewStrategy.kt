@@ -71,7 +71,7 @@ open class BaseWebViewStrategy : WebViewClient(), IStrategy, KoinComponent {
      * 성공해서 SDK 종료
      */
     protected fun successFinish(payment: Payment) {
-        successFinish(payment, msg = "")
+        successFinish(payment, msg = CONST.EMPTY_STR)
     }
 
     /**

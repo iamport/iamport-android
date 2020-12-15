@@ -171,7 +171,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
     private val callBackListener = object : ICallbackPaymentResult {
         override fun result(iamPortResponse: IamPortResponse?) {
             val resJson = GsonBuilder().setPrettyPrinting().create().toJson(iamPortResponse)
-            i("머천트 앱 결과 뿅\n$resJson")
+            i("결제 결과 콜백\n$resJson")
             result = iamPortResponse
             if (iamPortResponse != null) {
                 requireActivity().supportFragmentManager.beginTransaction()

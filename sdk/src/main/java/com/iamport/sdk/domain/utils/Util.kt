@@ -149,10 +149,10 @@ object Util {
         observeForever(observer)
     }
 
-    fun versionName(hostHelper: HostHelper, name: String? = null): String {
-        return hostHelper.context?.run {
+    fun versionName(context: Context?, name: String? = null): String {
+        return context?.run {
             packageManager.getPackageInfo(name ?: packageName, 0)?.versionName
-        } ?: kotlin.run { "" }
+        } ?: kotlin.run { CONST.EMPTY_STR }
     }
 
     fun versionCode(context: Context?, name: String? = null): Number {

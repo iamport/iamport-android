@@ -30,7 +30,7 @@ class NiceTransWebViewStrategy : WebViewStrategy() {
         webView = view
 
         request?.url?.let {
-            i("아주 나이스~ $it")
+            d("아주 나이스~ $it")
             if (isNiceTransScheme(it)) {
 
                 bankTid = it.getQueryParameter(NiceBankpay.USER_KEY).toString()
@@ -52,7 +52,7 @@ class NiceTransWebViewStrategy : WebViewStrategy() {
     fun processBankPayPayment(resPair: Pair<String, String>) {
         when (val code = BankPayResultCode.from(resPair.first)) {
             OK -> {
-                i(BankPayResultCode.desc(code))
+                d(BankPayResultCode.desc(code))
                 webView?.postUrl(niceTransUrl, makeNiceTransPaymentsQuery(resPair).toByteArray())
             }
             CANCEL, FAIL_SIGN, FAIL_OTP,

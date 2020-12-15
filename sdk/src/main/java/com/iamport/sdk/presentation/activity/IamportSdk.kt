@@ -50,7 +50,6 @@ internal class IamportSdk(
     private val isPolling = MutableLiveData<Event<Boolean>>()
 
     private val preventOverlapRun = PreventOverlapRun() // 딜레이 호출
-    private var preventHome: Boolean = false
 
     private val iamportReceiver: IamportReceiver by inject()
 
@@ -100,7 +99,7 @@ internal class IamportSdk(
      * BaseActivity 에서 onCreate 시 호출
      */
     fun initStart(payment: Payment, approveCallback: ((IamPortApprove) -> Unit)?, paymentResultCallBack: ((IamPortResponse?) -> Unit)?) {
-        i("HELLO I'MPORT SDK! ${Util.versionName(hostHelper)}")
+        i("HELLO I'MPORT SDK! ${Util.versionName(hostHelper.context)}")
         clearData()
 
         this.chaiApproveCallBack = approveCallback
@@ -124,30 +123,30 @@ internal class IamportSdk(
     private fun observeViewModel(payment: Payment?) {
         d(GsonBuilder().setPrettyPrinting().create().toJson(payment))
         payment?.let { pay: Payment ->
+            hostHelper.lifecycleOwner.let { owner: LifecycleOwner ->
 
-            // 외부에서 sdk 실패종료
-            finish.observeAlways(hostHelper.lifecycleOwner, EventObserver { viewModel.failSdkFinish(pay) })
+                // 외부에서 sdk 실패종료
+                finish.observeAlways(owner, EventObserver { viewModel.failSdkFinish(pay) })
 
-            // 결제결과 옵저빙
-            viewModel.impResponse().observe(hostHelper.lifecycleOwner, EventObserver(this::sdkFinish))
+                // 결제결과 옵저빙
+                viewModel.impResponse().observe(owner, EventObserver(this::sdkFinish))
 
-            // 웹뷰앱 열기
-            viewModel.webViewPayment().observe(hostHelper.lifecycleOwner, EventObserver(this::requestWebViewPayment))
+                // 웹뷰앱 열기
+                viewModel.webViewPayment().observe(owner, EventObserver(this::requestWebViewPayment))
 
-            // 차이앱 열기
-            viewModel.chaiUri().observe(hostHelper.lifecycleOwner, EventObserver(this::openChaiApp))
+                // 차이앱 열기
+                viewModel.chaiUri().observe(owner, EventObserver(this::openChaiApp))
 
-            // 차이폴링여부
-            viewModel.isPolling().observeAlways(
-                hostHelper.lifecycleOwner, EventObserver {
+                // 차이폴링여부
+                viewModel.isPolling().observeAlways(owner, EventObserver {
                     updatePolling(it)
                     controlForegroundService(it)
-                }
-            )
+                })
 
-            // 차이 결제 상태 approve 처리
-            viewModel.chaiApprove().observeAlways(hostHelper.lifecycleOwner, EventObserver(this::chaiApprove))
+                // 차이 결제 상태 approve 처리
+                viewModel.chaiApprove().observeAlways(owner, EventObserver(this::chaiApprove))
 
+            }
             // 결제 시작
             preventOverlapRun.launch { requestPayment(pay) }
         }
@@ -163,6 +162,7 @@ internal class IamportSdk(
 
     private fun controlForegroundService(it: Boolean) {
         if (!ChaiService.enableForegroundService) {
+            d("차이 폴링 포그라운드 서비스 실행하지 않음")
             return
         }
 
@@ -193,7 +193,7 @@ internal class IamportSdk(
      * 차이 앱 종료 콜백 감지
      */
     private fun resultCallback() {
-        i("Result Callback ChaiLauncher")
+        d("Result Callback ChaiLauncher")
         viewModel.checkChaiStatus()
         viewModel.receiveChaiCallBack = true
     }
@@ -235,7 +235,8 @@ internal class IamportSdk(
      * 모든 결과 처리 및 SDK 종료
      */
     private fun sdkFinish(iamPortResponse: IamPortResponse?) {
-        i("명시적 sdkFinish ${iamPortResponse.toString()}")
+        i("SDK Finish")
+        d(iamPortResponse.toString())
         clearData()
         paymentResultCallBack?.invoke(iamPortResponse)
     }
@@ -266,7 +267,8 @@ internal class IamportSdk(
             i("Not found in intent package")
             when (val providePgPkg = intent.scheme?.let { ProvidePgPkg.from(it) }) {
                 null -> {
-                    i("Not found in intent schme :: ${intent.scheme}")
+                    i("Not found in intent schme")
+                    d("Not found in intent schme :: ${intent.scheme}")
                     return@run null
                 }
                 else -> providePgPkg.pkg
@@ -280,7 +282,7 @@ internal class IamportSdk(
      */
     private fun movePlayStore(intent: Intent) {
         getIntentPackage(intent)?.let {
-            i("movePlayStore :: $it")
+            d("movePlayStore :: $it")
             Intent(Intent.ACTION_VIEW, Uri.parse(Util.getMarketId(it))).run {
                 flags = Intent.FLAG_ACTIVITY_NO_USER_ACTION
                 if (hostHelper.mode == MODE.ACTIVITY) {
