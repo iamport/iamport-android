@@ -29,24 +29,22 @@ open class ChaiStrategy : BaseStrategy() {
     private val chaiApi: ChaiApi by inject() // 차이 서버 API
     private val iamportApi: IamportApi by inject() // 아임포트 서버 API
 
-    lateinit var chaiId: String // 차이 PG 아이디
+    private lateinit var chaiId: String // 차이 PG 아이디
+
     private var prepareData: PrepareData? = null // 차이 api 에 호출하기 위한 데이터
 
     private val pollingDelay = CONST.POLLING_DELAY // 폴링 간격
     private var pollingId = AtomicInteger() // 폴링 중복호출 방지위한 아이디 인덱스
 
-    // 폴링 타임아웃
-    private var tryOut = false
-    private var tryCount = 0
+    private var tryCount = 0     // 폴링 타임아웃
 
-    private var networkError: String? = null
+    private var networkError: String? = null // 네트워크 에러
 
     /**
      *  SDK init
      */
     override fun init() {
         d("ChaiStrategy init")
-        tryOut = false
         networkError = null
         clearData()
     }
@@ -59,6 +57,9 @@ open class ChaiStrategy : BaseStrategy() {
         super.sdkFinish(response)
     }
 
+    /**
+     * 외부에서 실패 종료 하기 위해 사용
+     */
     fun failFinish(errMsg: String) {
         failureFinish(payment, prepareData, errMsg)
     }
@@ -71,6 +72,52 @@ open class ChaiStrategy : BaseStrategy() {
         pollingId = AtomicInteger()
         tryCount = 0
         bus.isPolling.value = Event(false)
+    }
+
+    /**
+     * 외부에 폴링여부 알리기 위해 사용
+     */
+    private suspend fun updatePolling(isPolling: Boolean) = withContext(Dispatchers.Main) {
+        bus.isPolling.value = Event(isPolling)
+    }
+
+    // 타임아웃 상황
+    private fun isTryOut(): Boolean {
+        return tryCount > CONST.TRY_OUT_COUNT
+    }
+
+    // 배
+    private fun isBgOrScreenOff(): Boolean {
+        return Foreground.isBackground || !Foreground.isScreenOn
+    }
+
+    private fun isBgAndScreenOn(): Boolean {
+        return Foreground.isBackground && Foreground.isScreenOn
+    }
+
+    suspend fun doWork(chaiId: String, payment: Payment) {
+        this.chaiId = chaiId
+        doWork(payment)
+    }
+
+    /**
+     * 간략한 시퀀스 설명
+     * 1. IMP 서버에 유저 정보 요청해서 chai id 얻음 -> 결제 시퀀스 전 체크하는 것으로 수정함
+     * 2. IMP 서버에 결제시작 요청 (+ chai id)
+     * 3. chai 앱 실행
+     * 4. 백그라운드 chai 서버 폴링
+     * 5. if(차이폴링 approve) IMP 최종승인 요청
+     */
+    override suspend fun doWork(payment: Payment) {
+        super.doWork(payment)
+        d("doWork! $payment")
+//        * 2. IMP 서버에 결제시작 요청 (+ chai id)
+        when (val response = apiPostPrepare(PrepareRequest.make(chaiId, payment))) {
+            is NetworkError -> failureFinish(payment, prepareData, "NetworkError ${response.error}")
+            is GenericError -> failureFinish(payment, prepareData, "GenericError ${response.code} ${response.error}")
+
+            is Success -> processPrepare(response.value)
+        }
     }
 
     // #2 API
@@ -102,32 +149,6 @@ open class ChaiStrategy : BaseStrategy() {
         }
     }
 
-    suspend fun doWork(chaiId: String, payment: Payment) {
-        this.chaiId = chaiId
-        doWork(payment)
-    }
-
-    /**
-     * 간략한 시퀀스 설명
-     * * 1. IMP 서버에 유저 정보 요청해서 chai id 얻음 -> 결제 시퀀스 전 체크하는 것으로 수정함₩
-     * 2. IMP 서버에 결제시작 요청 (+ chai id)
-     * 3. chai 앱 실행
-     * 4. 백그라운드 chai 서버 폴링
-     * 5. if(차이폴링 approve) IMP 최종승인 요청
-     */
-    override suspend fun doWork(payment: Payment) {
-        super.doWork(payment)
-        d("doWork! $payment")
-//        * 2. IMP 서버에 결제시작 요청 (+ chai id)
-        when (val response = apiPostPrepare(PrepareRequest.make(chaiId, payment))) {
-            is NetworkError -> failureFinish(payment, prepareData, "NetworkError ${response.error}")
-            is GenericError -> failureFinish(payment, prepareData, "GenericError ${response.code} ${response.error}")
-
-            is Success -> processPrepare(response.value)
-        }
-    }
-
-
     /**
      * pollingDelay 간격으로 checkChaiStatus 호출
      */
@@ -137,7 +158,7 @@ open class ChaiStrategy : BaseStrategy() {
     }
 
     /**
-     * pollingDelay 간격으로 pollingProcessStatus 호출
+     * pollingDelay 간격으로 pollingProcessStatus 호출 (로컬 폴링 전용)
      */
     private suspend fun pollingProcessStatus(chaiPayment: ChaiPayment, payment: Payment, data: PrepareData, idx: Int) {
         delay(pollingDelay)
@@ -155,7 +176,7 @@ open class ChaiStrategy : BaseStrategy() {
      * 차이앱 꺼졌을 때 처리
      */
     suspend fun requestCheckChaiStatus() {
-        if (tryOut) { // 타임아웃
+        if (isTryOut()) { // 타임아웃
             failureFinish(payment, prepareData, "${CONST.TRY_OUT_MIN} 분 이상 결제되지 않아 결제취소 처리합니다. 결제를 재시도 해주세요.")
             return
         }
@@ -174,8 +195,28 @@ open class ChaiStrategy : BaseStrategy() {
         requestPollingChaiStatus()
     }
 
-    private suspend fun updatePolling(isPolling: Boolean) = withContext(Dispatchers.Main) {
-        bus.isPolling.value = Event(isPolling)
+    private suspend fun processChaiStatusNetworkError(idx: Int, error: String?) {
+        networkError = error
+
+        when (isTryOut()) {
+            true -> {
+                i("결제 실패 tryOut & NetworkError $networkError")
+                clearData()
+                networkError = null
+            }
+            false -> {
+                when (isBgOrScreenOff()) {
+                    true -> {
+                        d("NetworkError 결제 폴링! $networkError")
+                        pollingCheckStatus(pollingDelay, idx)
+                    }
+                    false -> {
+                        d("NetworkError 결제 clearData")
+                        clearData()
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -194,25 +235,7 @@ open class ChaiStrategy : BaseStrategy() {
             when (val response =
                 apiGetChaiStatus(data.idempotencyKey.toString(), data.publicAPIKey.toString(), data.paymentId.toString())) {
 
-                is NetworkError -> {
-                    networkError = response.error
-                    if (tryCount > CONST.TRY_OUT_COUNT) { // 타임아웃
-                        i("결제 실패 tryOut & NetworkError ${response.error}")
-                        tryOut = true
-                        clearData()
-                        networkError = null
-                    } else {
-                        tryOut = false
-                        if (Foreground.isBackground || !Foreground.isScreenOn) {
-                            d("NetworkError 결제 폴링! ${response.error}")
-                            pollingCheckStatus(pollingDelay, idx)
-//                            updatePolling(true)
-                        } else {
-                            d("NetworkError 결제 clearData")
-                            clearData()
-                        }
-                    }
-                }
+                is NetworkError -> processChaiStatusNetworkError(idx, response.error)
 
                 is GenericError -> {
                     networkError = null
@@ -286,17 +309,10 @@ open class ChaiStrategy : BaseStrategy() {
     }
 
     private suspend fun processApprovePayments(approve: IamPortApprove) {
-        i("결제 최종 승인 요청~~~")
+        d("결제 최종 승인 요청~~~")
         approve.run {
             when (val response =
-                apiApprovePayment(
-                    userCode,
-                    idempotencyKey.toString(),
-                    paymentId,
-                    idempotencyKey,
-                    approved,
-                    OS.aos.name
-                )) {
+                apiApprovePayment(userCode, idempotencyKey.toString(), paymentId, idempotencyKey, approved, OS.aos.name)) {
                 is NetworkError -> failureFinish(payment, prepareData, "최종결제 요청 실패 NetworkError ${response.error}")
                 is GenericError -> failureFinish(payment, prepareData, "GenericError ${response.code} ${response.error}")
 
@@ -323,27 +339,16 @@ open class ChaiStrategy : BaseStrategy() {
             partial_confirmed -> successFinish(payment, prepareData, "부분 취소된 결제 ${chaiPayment.status}")
 
             waiting, prepared -> {
-                if (tryCount > CONST.TRY_OUT_COUNT) { // 타임아웃
-                    tryOut = true
+                if (isTryOut()) { // 타임아웃
                     i("${CONST.TRY_OUT_MIN}분 이상 결제되지 않아 결제취소 처리합니다. 결제를 재시도 해주세요.")
                     clearData()
                 } else {
-                    tryOut = false
-//                    d("Foreground.isHome ${Foreground.isHome}")
-                    if (Foreground.isHome) {
-                        d("홈이라서 체크 로컬 폴링 $chaiPayment")
-//                        updatePolling(false)
-                        pollingProcessStatus(chaiPayment, payment, data, idx)
+                    if (isBgAndScreenOn()) {
+                        d("결제 리모트 폴링! $chaiPayment")
+                        pollingCheckStatus(pollingDelay, idx)
                     } else {
-                        if (Foreground.isBackground && Foreground.isScreenOn) {
-                            d("결제 리모트 폴링! $chaiPayment")
-//                            updatePolling(true)
-                            pollingCheckStatus(pollingDelay, idx)
-                        } else {
-                            d("프로세스 체크 로컬 폴링 $chaiPayment")
-//                            updatePolling(false)
-                            pollingProcessStatus(chaiPayment, payment, data, idx)
-                        }
+                        d("프로세스 체크 로컬 폴링 $chaiPayment")
+                        pollingProcessStatus(chaiPayment, payment, data, idx)
                     }
                 }
             }
@@ -351,7 +356,6 @@ open class ChaiStrategy : BaseStrategy() {
             user_canceled, canceled, failed, timeout -> failureFinish(payment, prepareData, "결제실패 ${chaiPayment.status}")
 
             else -> failureFinish(payment, prepareData, "결제실패 ${chaiPayment.status}")
-
         }
     }
 

@@ -10,6 +10,7 @@ import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortRequest
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.domain.service.ChaiService
 import com.iamport.sdk.domain.utils.PreventOverlapRun
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.Foreground
@@ -31,7 +32,6 @@ object Iamport {
     private var approvePayment = MutableLiveData<Event<IamPortApprove>>()
     private var close = MutableLiveData<Event<Unit>>()
     private var finish = MutableLiveData<Event<Unit>>()
-    private var catchHome = MutableLiveData<Event<Unit>>()
 
     var activity: ComponentActivity? = null
     private var fragment: Fragment? = null
@@ -43,11 +43,10 @@ object Iamport {
         iamportSdk = null
     }
 
-    fun createLiveData() {
+    private fun createLiveData() {
         this.approvePayment = MutableLiveData()
         this.close = MutableLiveData()
         this.finish = MutableLiveData()
-        this.catchHome = MutableLiveData()
     }
 
     /**
@@ -57,10 +56,11 @@ object Iamport {
     fun init(componentActivity: ComponentActivity) {
         d("init")
         clear()
+        createLiveData()
+
         webViewLauncher = componentActivity.registerForActivityResult(WebViewActivityContract()) {
             callback(it)
         }
-        createLiveData()
         this.activity = componentActivity
         this.iamportSdk =
             IamportSdk(
@@ -68,8 +68,7 @@ object Iamport {
                 webViewLauncher = webViewLauncher,
                 approvePayment = approvePayment,
                 close = close,
-                finish = finish,
-                catchHome = catchHome
+                finish = finish
             )
         this.preventOverlapRun = PreventOverlapRun()
     }
@@ -81,11 +80,12 @@ object Iamport {
     fun init(fragment: Fragment) {
         d("init")
         clear()
+        createLiveData()
+
         webViewLauncher = fragment.registerForActivityResult(WebViewActivityContract()) {
             callback(it)
         }
 
-        createLiveData()
         this.fragment = fragment
         this.activity = fragment.activity
         this.iamportSdk = IamportSdk(
@@ -93,8 +93,7 @@ object Iamport {
             webViewLauncher = webViewLauncher,
             approvePayment = approvePayment,
             close = close,
-            finish = finish,
-            catchHome = catchHome
+            finish = finish
         )
         this.preventOverlapRun = PreventOverlapRun()
     }
@@ -122,17 +121,9 @@ object Iamport {
         finish.value = (Event(Unit))
     }
 
-//    /**
-//     * 외부에서 SDK 홈키 캐치
-//     */
-//    fun catchUserLeave() {
-////        Foreground.isHome = true
-//        catchHome.value = (Event(Unit))
-//    }
-
-    fun enableChaiPollingForegroundService(enableService: Boolean, enableFailStopButton : Boolean = true) {
-        Foreground.enableForegroundService = enableService
-        Foreground.enableForegroundServiceStopButton = enableFailStopButton
+    fun enableChaiPollingForegroundService(enableService: Boolean, enableFailStopButton: Boolean = true) {
+        ChaiService.enableForegroundService = enableService
+        ChaiService.enableForegroundServiceStopButton = enableFailStopButton
     }
 
     fun isPolling(): LiveData<Event<Boolean>>? {

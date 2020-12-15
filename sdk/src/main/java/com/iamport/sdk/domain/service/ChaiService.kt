@@ -14,6 +14,11 @@ import com.iamport.sdk.domain.utils.Foreground
 open class ChaiService : Service() {
     private val channelId = "Iamport Pamyent SDK"
 
+    companion object {
+        var enableForegroundService : Boolean = true // 폴링시 포그라운드 서비스 enable
+        var enableForegroundServiceStopButton : Boolean = true // 폴링시 포그라운드 서비스 결제실패 버튼 enable
+    }
+
     @Override
     override fun onCreate() {
         startNotification()
@@ -59,17 +64,17 @@ open class ChaiService : Service() {
             Notification.Builder(this, channelId)
                 .setSmallIcon(icon)  // 아이콘 셋팅
                 .setContentTitle(title)
-                .setContentText(if (Foreground.enableForegroundServiceStopButton) stopTitle else null)
+                .setContentText(if (enableForegroundServiceStopButton) stopTitle else null)
                 .setContentIntent(pendingIntent)
-                .addAction(if (Foreground.enableForegroundServiceStopButton) action else null)
+                .addAction(if (enableForegroundServiceStopButton) action else null)
                 .build()
         } else {
             val builder = Notification.Builder(this)
                 .setSmallIcon(icon)
                 .setContentTitle(title)
                 .setContentIntent(pendingIntent)
-                .setContentText(if (Foreground.enableForegroundServiceStopButton) stopTitle else null)
-            if (Foreground.enableForegroundServiceStopButton) {
+                .setContentText(if (enableForegroundServiceStopButton) stopTitle else null)
+            if (enableForegroundServiceStopButton) {
                 builder.addAction(stopIcon, stopBtnName, pendingStopIntent)
                     .build()
             } else {

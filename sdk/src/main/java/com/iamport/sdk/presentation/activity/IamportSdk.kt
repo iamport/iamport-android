@@ -7,7 +7,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.gson.GsonBuilder
 import com.iamport.sdk.data.chai.CHAI
 import com.iamport.sdk.data.sdk.IamPortApprove
@@ -40,7 +39,6 @@ internal class IamportSdk(
     val approvePayment: LiveData<Event<IamPortApprove>>,
     val close: LiveData<Event<Unit>>,
     val finish: LiveData<Event<Unit>>,
-    val catchHome: LiveData<Event<Unit>>,
 ) : KoinComponent {
     private val hostHelper: HostHelper = HostHelper(activity, fragment)
 
@@ -155,14 +153,6 @@ internal class IamportSdk(
         }
     }
 
-    // TODO: 12/11/20 시나리오 확인 필요
-    // 스킴 액티비티 죽었을 때, leave 가 불려서 home 으로 인식되는데
-    // 1. 앱이 끝나고 결제 되도 될지
-    // 2. 앱은 바로 결제 되지만, home 갔을 때 포그라운드 서비스 떠도 될 지
-    private fun updateCatchHome() {
-        Foreground.isHome = true
-    }
-
     fun isPolling(): LiveData<Event<Boolean>> {
         return isPolling
     }
@@ -172,7 +162,7 @@ internal class IamportSdk(
     }
 
     private fun controlForegroundService(it: Boolean) {
-        if (!Foreground.enableForegroundService) {
+        if (!ChaiService.enableForegroundService) {
             return
         }
 
