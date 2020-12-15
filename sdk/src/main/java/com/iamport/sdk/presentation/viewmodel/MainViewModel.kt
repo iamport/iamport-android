@@ -26,12 +26,36 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
             return field
         }
 
+    var playChai: Boolean
+        get() {
+            return bus.playChai
+        }
+        set(value) {
+            bus.playChai = value
+        }
+
+    var chaiClearVersion: Boolean
+        get() {
+            return bus.chaiClearVersion
+        }
+        set(value) {
+            bus.chaiClearVersion = value
+        }
+
+    var receiveChaiCallBack: Boolean
+        get() {
+            return bus.receiveChaiCallBack
+        }
+        set(value) {
+            bus.receiveChaiCallBack = value
+        }
+
+
     override fun onCleared() {
         d("onCleared")
         clearData()
         super.onCleared()
     }
-
 
     /**
      * 결제 데이터
@@ -63,12 +87,14 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
         return bus.impResponse
     }
 
+
     /**
      * 외부 노출용 폴링여부
      */
     fun isPolling(): LiveData<Event<Boolean>> {
         return bus.isPolling
     }
+
 
     /**
      * 결제 요청
@@ -91,6 +117,9 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
      * 차이 데이터 클리어
      */
     fun clearData() {
+        playChai = false
+        chaiClearVersion = false
+        receiveChaiCallBack = false
         repository.chaiStrategy.init()
         job.cancel()
     }
@@ -110,6 +139,10 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
      * 차이 결제 스테이터스 확인 with 폴링
      */
     fun pollingChaiStatus() {
+        if (!playChai) {
+            d("ignore pollingChaiStatus cause playChai")
+            return
+        }
         viewModelScope.launch(job) {
             d("백그라운드라서 폴링 시도")
             repository.chaiStrategy.requestPollingChaiStatus()
@@ -121,10 +154,20 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
      * 차이 결제 스테이터스 확인
      */
     fun checkChaiStatus() {
+        if (!playChai) {
+            d("ignore checkChaiStatus cause playChai")
+            return
+        }
+
+        if(receiveChaiCallBack) {
+            d("ignore checkChaiStatus cause receiveChaiCallBack")
+            receiveChaiCallBack = false // 스킴 액티비티 종료시에 불릴 수 있기 때문에 초기화 해줘야함
+            return
+        }
+
         viewModelScope.launch(job) {
             d("차이앱 종료돼서 차이 결제 상태 체크")
             repository.chaiStrategy.requestCheckChaiStatus()
         }
     }
-
 }

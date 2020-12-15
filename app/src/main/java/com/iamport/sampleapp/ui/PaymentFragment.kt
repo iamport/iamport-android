@@ -73,7 +73,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
     override fun onStart() {
         super.onStart()
         viewDataBinding.merchantUid.setText(getRandomMerchantUid())
-        onPolling()
+//        onPolling()
     }
 
 
@@ -83,8 +83,8 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
             i("차이 폴링? :: $it")
         })
 
-        // 또는, 폴링 상태를 보고 싶을때 명시적으로 호출
-        i("isPolling? ${Iamport.isPolling()?.value?.peekContent()}")
+        // 또는, 폴링 상태를 보고 싶을 때 명시적으로 호출
+        i("isPolling? ${Iamport.isPollingValue()}")
     }
 
 

@@ -17,8 +17,8 @@ object CONST {
     // 이 url 로 감지되면, 결제완료 콜백이란 의미 + 붙은 파라미터로 결제결과 처리
     const val IAMPORT_DUMMY_URL = "http://localhost/iamport"
 
-    const val IAMPORT_PROD_URL = "https://service.iamport.kr"
-    const val IAMPORT_TEST_URL = "https://kicc.iamport.kr"
+    const val IAMPORT_PROD_URL = "https://service.iamport.kr" // 테스트도 상용서버에서
+//    const val IAMPORT_TEST_URL = "https://kicc.iamport.kr"
 
 
     const val CHAI_SERVICE_URL = "https://api.chai.finance"

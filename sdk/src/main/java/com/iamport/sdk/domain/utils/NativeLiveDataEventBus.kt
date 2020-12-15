@@ -1,6 +1,5 @@
 package com.iamport.sdk.domain.utils
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortResponse
@@ -8,7 +7,9 @@ import com.iamport.sdk.data.sdk.Payment
 
 open class NativeLiveDataEventBus {
 
-//    var isBackground = false
+    var playChai: Boolean = false
+    var chaiClearVersion: Boolean = false
+    var receiveChaiCallBack: Boolean = false
 
     // 결제 완료 콜백
     val impResponse = MutableLiveData<Event<IamPortResponse?>>()
