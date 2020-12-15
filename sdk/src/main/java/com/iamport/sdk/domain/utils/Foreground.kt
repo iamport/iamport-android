@@ -35,9 +35,6 @@ object Foreground : ActivityLifecycleCallbacks {
         app.registerActivityLifecycleCallbacks(this)
 
         // 스크린 on/off 감지 intent 필터
-        val screenFilter = IntentFilter(Intent.ACTION_SCREEN_OFF).apply {
-            addAction(Intent.ACTION_SCREEN_ON)
-        }
         app.registerReceiver(object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 when (intent?.action) {
@@ -46,7 +43,9 @@ object Foreground : ActivityLifecycleCallbacks {
                 }
                 d(intent?.action.toString())
             }
-        }, screenFilter)
+        }, IntentFilter(Intent.ACTION_SCREEN_OFF).apply {
+            addAction(Intent.ACTION_SCREEN_ON)
+        })
     }
 
 

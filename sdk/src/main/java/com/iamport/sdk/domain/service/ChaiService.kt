@@ -29,7 +29,7 @@ open class ChaiService : Service() {
     }
 
     private fun channelRegister() {
-        val channelName = "iamport service ch"
+        val channelName = "Iamport Service"
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelId, channelName,
@@ -60,7 +60,7 @@ open class ChaiService : Service() {
         val pendingStopIntent = PendingIntent.getBroadcast(this, 0, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
         val notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val action = Notification.Action.Builder(Icon.createWithResource("", stopIcon), stopBtnName, pendingStopIntent).build()
+            val action = Notification.Action.Builder(Icon.createWithResource(CONST.EMPTY_STR, stopIcon), stopBtnName, pendingStopIntent).build()
             Notification.Builder(this, channelId)
                 .setSmallIcon(icon)  // 아이콘 셋팅
                 .setContentTitle(title)

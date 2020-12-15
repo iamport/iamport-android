@@ -60,10 +60,23 @@ class JudgeStrategy : BaseStrategy(), KoinComponent {
             return Triple(JudgeKinds.EMPTY, null, payment)
         }
 
-        return when (val user = userDataList.find { it.pg_provider.getPgSting() == payment.iamPortRequest.pg }) {
-            null -> userDataList[0].let { getPgTriple(it, replacePG(it, payment)) } // user 를 찾지 못하면 디폴트 값 사용
+        val defUser = findDefaultUserData(userDataList)
+        if (defUser == null) {
+            failureFinish(payment, msg = "Not found Default PG. All PG empty.")
+            return Triple(JudgeKinds.EMPTY, null, payment)
+        }
+
+        Logger.d("userDataList :: $userDataList")
+
+        return when (val user = userDataList.find { it.pg_provider?.getPgSting() == payment.iamPortRequest.pg }) {
+            null -> defUser.let { getPgTriple(it, replacePG(it.pg_provider!!, payment)) } // user 를 찾지 못하면 디폴트 값 사용
+
             else -> getPgTriple(user, payment)
         }
+    }
+
+    private fun findDefaultUserData(userDataList: ArrayList<UserData>): UserData? {
+        return userDataList.find { it.pg_provider != null }
     }
 
     /**
@@ -79,8 +92,8 @@ class JudgeStrategy : BaseStrategy(), KoinComponent {
     /**
      * payment PG 를 default PG 로 수정함
      */
-    private fun replacePG(defUser: UserData, payment: Payment): Payment {
-        val iamPortRequest = payment.iamPortRequest.copy(pg = defUser.pg_provider.getPgSting())
+    private fun replacePG(pg: PG, payment: Payment): Payment {
+        val iamPortRequest = payment.iamPortRequest.copy(pg = pg.getPgSting())
         return payment.copy(iamPortRequest = iamPortRequest)
     }
 

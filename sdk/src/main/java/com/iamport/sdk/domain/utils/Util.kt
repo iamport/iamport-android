@@ -9,6 +9,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.*
 import com.google.gson.Gson
+import com.iamport.sdk.BuildConfig
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.data.sdk.PG.*
@@ -21,7 +22,7 @@ object Util {
 
     // FIXME: 11/20/20 임시로 놔둔거임
     enum class DevUserCode(val desc: String) {
-        imp96304110("bingbong"), imp55870459("kicc"), imp60029475("moblisans");
+        imp96304110("bingbong 테스트"), imp55870459("kicc 테스트"), imp60029475("mobilians 테스트");
 
         companion object {
             fun getUserCodes(): List<String> {
@@ -29,6 +30,51 @@ object Util {
             }
         }
     }
+
+    enum class SampleUserCode(val desc: String) {
+        imp19424728("default 테스트"),
+        imp10391932("kakao 테스트"),
+        imp09350031("paypal 테스트"),
+        imp60029475("mobilians 테스트"),
+        imp41073887("naverco, naverpay 테스트"),
+        imp49241793("smilepay 테스트"),
+        imp37739582("chai 테스트"),
+        imp87936124("alipay 테스트"),
+        imp42284830("payple 테스트");
+
+        companion object {
+            fun getUserCodes(): List<String> {
+                return values().map { "${it.desc} (${it.name})" }.toList()
+            }
+        }
+    }
+
+    fun getUserCodeList(): List<String> {
+        return if (BuildConfig.DEBUG) {
+            DevUserCode.getUserCodes() + SampleUserCode.getUserCodes()
+        } else {
+            SampleUserCode.getUserCodes()
+        }
+    }
+
+    fun getUserCode(position: Int): String {
+        val sampleUserCodeValues = SampleUserCode.values()
+        return if (BuildConfig.DEBUG) {
+            val devUserCodeValues = DevUserCode.values()
+            if (position >= devUserCodeValues.size) {
+                sampleUserCodeValues[position - devUserCodeValues.size].name
+            } else {
+                devUserCodeValues[position].name
+            }
+        } else {
+            sampleUserCodeValues[position].name
+        }
+    }
+
+    inline fun <reified T : Enum<T>> printAllValues() {
+        print(enumValues<T>().joinToString { it.name })
+    }
+
 
     private val defaultPayMethod =
         setOf(PayMethod.card, PayMethod.vbank, PayMethod.trans, PayMethod.phone)
@@ -149,10 +195,10 @@ object Util {
         observeForever(observer)
     }
 
-    fun versionName(hostHelper: HostHelper, name: String? = null): String {
-        return hostHelper.context?.run {
+    fun versionName(context: Context?, name: String? = null): String {
+        return context?.run {
             packageManager.getPackageInfo(name ?: packageName, 0)?.versionName
-        } ?: kotlin.run { "" }
+        } ?: kotlin.run { CONST.EMPTY_STR }
     }
 
     fun versionCode(context: Context?, name: String? = null): Number {
