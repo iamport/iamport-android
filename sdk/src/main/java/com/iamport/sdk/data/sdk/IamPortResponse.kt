@@ -27,7 +27,7 @@ data class IamPortResponse(
     val imp_success: Boolean = false,
     val success: Boolean = false,
     val imp_uid: String?,
-    val merchant_uid: String,
+    val merchant_uid: String?,
     val error_msg: String? = null,
     val error_code: String? = null,
 ) : Parcelable {

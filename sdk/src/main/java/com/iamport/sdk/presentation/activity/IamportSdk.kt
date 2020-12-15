@@ -113,8 +113,6 @@ internal class IamportSdk(
 
         // 외부에서 종료
         close.observeAlways(hostHelper.lifecycleOwner, EventObserver { clearData() })
-
-//        catchHome.observeAlways(hostHelper.lifecycleOwner, EventObserver { updateCatchHome() })
     }
 
     /**

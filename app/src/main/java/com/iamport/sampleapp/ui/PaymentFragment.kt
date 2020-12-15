@@ -76,7 +76,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
 
         val userCodeAdapter = ArrayAdapter(
             requireContext(), R.layout.support_simple_spinner_dropdown_item,
-            Util.DevUserCode.getUserCodes()
+            Util.getUserCodeList()
         )
 
         val pgAdapter = ArrayAdapter(
@@ -133,9 +133,9 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
             buyer_name = "남궁안녕"
         )
 
+        val userCode = Util.getUserCode(viewDataBinding.userCode.selectedItemPosition)
+        i("userCode :: $userCode")
         i(GsonBuilder().setPrettyPrinting().create().toJson(request))
-
-        val userCode = Util.DevUserCode.values()[viewDataBinding.userCode.selectedItemPosition].name
 
         /**
          * 결제요청 Type#1 ICallbackPaymentResult 구현을 통한 결제결과 callback
@@ -151,7 +151,6 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
             approveCallback = { approveCallback(it) },
             paymentResultCallback = { callBackListener.result(it) })
     }
-
 
     /**
      *  TODO 재고확인 등 최종결제를 위한 처리를 해주세요
