@@ -16,7 +16,7 @@ open class ChaiService : Service() {
 
     companion object {
         var enableForegroundService : Boolean = true // 폴링시 포그라운드 서비스 enable
-        var enableForegroundServiceStopButton : Boolean = true // 폴링시 포그라운드 서비스 결제실패 버튼 enable
+        var enableForegroundServiceStopButton : Boolean = false // 폴링시 포그라운드 서비스 결제실패 버튼 enable
     }
 
     @Override
