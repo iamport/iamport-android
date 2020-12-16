@@ -40,6 +40,7 @@ internal class IamportSdk(
     val close: LiveData<Event<Unit>>,
     val finish: LiveData<Event<Unit>>,
 ) : KoinComponent {
+
     private val hostHelper: HostHelper = HostHelper(activity, fragment)
 
     private val launcherChai: ActivityResultLauncher<Pair<String, String>>? // 차이앱 런처
@@ -47,8 +48,8 @@ internal class IamportSdk(
 
     private var paymentResultCallBack: ((IamPortResponse?) -> Unit)? = null // 콜백함수
     private var chaiApproveCallBack: ((IamPortApprove) -> Unit)? = null // 콜백함수
-    private val isPolling = MutableLiveData<Event<Boolean>>()
 
+    private val isPolling = MutableLiveData<Event<Boolean>>()
     private val preventOverlapRun = PreventOverlapRun() // 딜레이 호출
 
     private val iamportReceiver: IamportReceiver by inject()
@@ -62,11 +63,6 @@ internal class IamportSdk(
             fragment?.registerForActivityResult(ChaiContract()) { resultCallback() }
         }
 
-        IntentFilter().let {
-            it.addAction(CONST.BROADCAST_FOREGROUND_SERVICE)
-            it.addAction(CONST.BROADCAST_FOREGROUND_SERVICE_STOP)
-            hostHelper.context?.registerReceiver(iamportReceiver, it)
-        }
         clearData()
     }
 
@@ -100,6 +96,13 @@ internal class IamportSdk(
      */
     fun initStart(payment: Payment, approveCallback: ((IamPortApprove) -> Unit)?, paymentResultCallBack: ((IamPortResponse?) -> Unit)?) {
         i("HELLO I'MPORT SDK! ${Util.versionName(hostHelper.context)}")
+
+        IntentFilter().let {
+            it.addAction(CONST.BROADCAST_FOREGROUND_SERVICE)
+            it.addAction(CONST.BROADCAST_FOREGROUND_SERVICE_STOP)
+            hostHelper.context?.registerReceiver(iamportReceiver, it)
+        }
+
         clearData()
 
         this.chaiApproveCallBack = approveCallback
@@ -199,13 +202,21 @@ internal class IamportSdk(
     /**
      * 결제 요청 실행
      */
-    private fun requestPayment(it: Payment) {
+    private fun requestPayment(payment: Payment) {
+        Payment.validator(payment).run {
+            if (!first) {
+                sdkFinish(second?.let { IamPortResponse.makeFail(payment, msg = it) })
+                return
+            }
+        }
+
         // 네트워크 연결 상태 체크
         if (!Util.isInternetAvailable(hostHelper.context)) {
-            sdkFinish(IamPortResponse.makeFail(it, msg = "네트워크 연결 안됨"))
+            sdkFinish(IamPortResponse.makeFail(payment, msg = "네트워크 연결 안됨"))
             return
         }
-        viewModel.judgePayment(it) // 뷰모델에 데이터 판단 요청(native or webview pg)
+
+        viewModel.judgePayment(payment) // 뷰모델에 데이터 판단 요청(native or webview pg)
     }
 
 

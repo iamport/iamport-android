@@ -277,7 +277,7 @@ open class ChaiStrategy : BaseStrategy() {
             if (!matchApproveData(this)) {
                 i("결제 데이터 매칭 실패로 최종결제하지 않습니다.")
                 d("상세정보\n payment :: $payment \n prepareData :: $prepareData \n approve :: $approve")
-                return@run
+                return
             }
 
             when (val response =

@@ -32,8 +32,8 @@ class StrategyRepository : KoinComponent {
 
     fun failSdkFinish(payment: Payment ) {
         when(getPaymentKinds(payment)) {
-            PaymenyKinds.CHAI -> chaiStrategy.failFinish("결제확인 서비스 종료")
-            else -> Logger.d("결제확인 서비스 종료")
+            PaymenyKinds.CHAI -> chaiStrategy.failFinish("사용자가 결제확인 서비스 종료하셨습니다")
+            else -> Logger.d("사용자가 결제확인 서비스 종료하셨습니다")
         }
     }
 

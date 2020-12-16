@@ -15,10 +15,12 @@ class MerchantReceiver : BroadcastReceiver() {
 
         when (intent.action) {
             CONST.BROADCAST_FOREGROUND_SERVICE -> {
+                Logger.d("MerchantReceiver BROADCAST_FOREGROUND_SERVICE")
                 // 포그라운드 서비스 클릭시 호출
                 // TODO: 적절한 처리가 필요
             }
             CONST.BROADCAST_FOREGROUND_SERVICE_STOP -> {
+                Logger.d("MerchantReceiver BROADCAST_FOREGROUND_SERVICE_STOP")
                 // 포그라운드 서비스 중지버튼 클릭시 호출
                 // TODO: 적절한 처리가 필요
                 Iamport.failFinish()

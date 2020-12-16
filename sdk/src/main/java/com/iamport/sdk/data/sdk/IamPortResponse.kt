@@ -18,10 +18,6 @@ https://docs.iamport.kr/tech/imp?lang=ko#param
  */
 // 모두 명세상 필수인지 모르겠음
 // 이니시스 실시간 계좌이체 -> imp_success, success 없음?
-// 가상계좌 -> vbank_due 입력
-// 다날의 가상계좌 결제 -> 사업자 등록번호 필수입력 biz_num
-// 그냥 휴대폰 소액결제 -> digital 필수입력
-// 페이팔 -> m_redirect_url 필수
 @Parcelize
 data class IamPortResponse(
     val imp_success: Boolean? = false,

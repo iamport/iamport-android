@@ -13,7 +13,6 @@ import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.domain.service.ChaiService
 import com.iamport.sdk.domain.utils.PreventOverlapRun
 import com.iamport.sdk.domain.utils.Event
-import com.iamport.sdk.domain.utils.Foreground
 import com.iamport.sdk.presentation.activity.IamportSdk
 import com.iamport.sdk.presentation.contract.WebViewActivityContract
 import com.orhanobut.logger.Logger.d
@@ -43,10 +42,11 @@ object Iamport {
         iamportSdk = null
     }
 
-    private fun createLiveData() {
+    private fun createInitialData() {
         this.approvePayment = MutableLiveData()
         this.close = MutableLiveData()
         this.finish = MutableLiveData()
+        this.preventOverlapRun = PreventOverlapRun()
     }
 
     /**
@@ -56,11 +56,12 @@ object Iamport {
     fun init(componentActivity: ComponentActivity) {
         d("init")
         clear()
-        createLiveData()
+        createInitialData()
 
         webViewLauncher = componentActivity.registerForActivityResult(WebViewActivityContract()) {
             callback(it)
         }
+
         this.activity = componentActivity
         this.iamportSdk =
             IamportSdk(
@@ -70,7 +71,6 @@ object Iamport {
                 close = close,
                 finish = finish
             )
-        this.preventOverlapRun = PreventOverlapRun()
     }
 
     /**
@@ -80,7 +80,7 @@ object Iamport {
     fun init(fragment: Fragment) {
         d("init")
         clear()
-        createLiveData()
+        createInitialData()
 
         webViewLauncher = fragment.registerForActivityResult(WebViewActivityContract()) {
             callback(it)
@@ -95,7 +95,6 @@ object Iamport {
             close = close,
             finish = finish
         )
-        this.preventOverlapRun = PreventOverlapRun()
     }
 
     /**
