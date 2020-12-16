@@ -115,7 +115,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
     private fun onClickPayment() {
 
         val pg = PG.values()[viewDataBinding.pg.selectedItemPosition]
-        val payMethod = PayMethod.values()[viewDataBinding.pgMethod.selectedItemPosition]
+        val payMethod = PayMethod.from(viewDataBinding.pgMethod.selectedItem.toString())
 
         val paymentName = viewDataBinding.name.text.toString().trim()
         val merchantUid = viewDataBinding.merchantUid.text.toString().trim()
