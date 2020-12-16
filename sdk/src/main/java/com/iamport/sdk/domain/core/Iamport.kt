@@ -120,7 +120,7 @@ object Iamport {
         finish.value = (Event(Unit))
     }
 
-    fun enableChaiPollingForegroundService(enableService: Boolean, enableFailStopButton: Boolean = true) {
+    fun enableChaiPollingForegroundService(enableService: Boolean, enableFailStopButton: Boolean = false) {
         ChaiService.enableForegroundService = enableService
         ChaiService.enableForegroundServiceStopButton = enableFailStopButton
     }
