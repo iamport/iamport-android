@@ -25,50 +25,11 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 
-fun provideOkHttpClient(context: Context): OkHttpClient {
-    return OkHttpClient.Builder()
-        .connectTimeout(20, TimeUnit.MINUTES)
-        .readTimeout(20, TimeUnit.SECONDS)
-        .writeTimeout(20, TimeUnit.SECONDS)
-        .addInterceptor(ChuckInterceptor(context))
-        .build()
-}
-
-fun provideIamportApi(gson: Gson, client: OkHttpClient): IamportApi {
-
-    return Retrofit.Builder()
-        .baseUrl(CONST.IAMPORT_PROD_URL)
-        .addConverterFactory(GsonConverterFactory.create(gson))
-        .client(client)
-        .build()
-        .create(IamportApi::class.java)
-}
-
-fun provideNiceApi(gson: Gson, client: OkHttpClient): NiceApi {
-    return Retrofit.Builder()
-        .baseUrl("${CONST.IAMPORT_DUMMY_URL}/")
-        .addConverterFactory(GsonConverterFactory.create(gson))
-        .client(client)
-        .build()
-        .create(NiceApi::class.java)
-}
-
-fun provideChaiApi(gson: Gson, client: OkHttpClient): ChaiApi {
-    return Retrofit.Builder()
-//        .baseUrl(if (BuildConfig.DEBUG) CONST.CHAI_SERVICE_STAGING_URL else CONST.CHAI_SERVICE_URL)
-        .baseUrl(CONST.CHAI_SERVICE_STAGING_URL)
-        .addConverterFactory(GsonConverterFactory.create(gson))
-        .client(client)
-        .build()
-        .create(ChaiApi::class.java)
-}
-
 @OptIn(KoinApiExtension::class)
 val appModule = module {
     viewModel { WebViewModel(get(), get()) }
     single { IamportReceiver() }
     single { Gson() }
-    single { provideOkHttpClient(get()) }
 
     single { StrategyRepository() }
     single { WebViewLiveDataEventBus() }
@@ -78,10 +39,5 @@ val appModule = module {
     single { ChaiStrategy() }
     single { WebViewStrategy() }
     single { NiceTransWebViewStrategy() }
-
-    single { provideIamportApi(get(), get()) }
-    single { provideChaiApi(get(), get()) }
-    single { provideNiceApi(get(), get()) }
-
 
 }
