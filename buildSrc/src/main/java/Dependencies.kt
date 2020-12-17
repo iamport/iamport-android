@@ -3,9 +3,16 @@ object Versions {
     const val kotlin_stdlib_jdk = "1.4.21"
     const val core_ktx = "1.3.2"
     const val appcompat = "1.2.0"
+
+
+    const val mokito = "3.6.28"
+
     const val junit = "4.13.1"
     const val testJunit = "1.1.2"
-    const val espresso_core = ".3.0"
+    const val espresso_core = "3.3.0"
+
+    const val androidx_test_core = "1.0.0"
+    const val androidx_test_runner = "1.1.0"
 
     const val constraintlayout = "2.0.4"
     const val lifecycle_extensions = "2.2.0"
@@ -34,6 +41,7 @@ object Versions {
     const val spinKit = "1.4.0"
 
     const val chuck = "1.1.0"
+    const val robolectric = "4.3"
 }
 
 object Libs {
@@ -41,10 +49,20 @@ object Libs {
     const val kotlin_stdlib_jdk = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin_stdlib_jdk}"
     const val core_ktx = "androidx.core:core-ktx:${Versions.core_ktx}"
     const val appcompat = "androidx.appcompat:appcompat:${Versions.appcompat}"
+
+    const val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"
+    const val mokito_core = "org.mockito:mockito-core:${Versions.mokito}"
+    const val mokito_inline = "org.mockito:mockito-inline:${Versions.mokito}"
+    const val mokito_android = "org.mockito:mockito-android:${Versions.mokito}"
+
     const val junit = "junit:junit:${Versions.junit}"
     const val testJunit = "androidx.test.ext:junit:${Versions.testJunit}"
     const val espresso_core = "androidx.test.espresso:espresso-core:${Versions.espresso_core}"
 
+    // Core library
+    const val androidx_test = "androidx.test:core:${Versions.androidx_test_core}"
+    const val androidx_test_runner = "androidx.test:runner:${Versions.androidx_test_runner}"
+    const val androidx_test_rules = "androidx.test:rules:${Versions.androidx_test_runner}"
 
     // Android Support/Architecture
     const val constraintlayout = "androidx.constraintlayout:constraintlayout:${Versions.constraintlayout}"
@@ -88,5 +106,6 @@ object Libs {
 
     const val chuck = "com.readystatesoftware.chuck:library:${Versions.chuck}"
     const val releaseChuck = "com.readystatesoftware.chuck:library-no-op:${Versions.chuck}"
+
 }
 
