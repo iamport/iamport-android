@@ -17,13 +17,15 @@ https://docs.iamport.kr/tech/imp?lang=ko#param
 }
  */
 // 모두 명세상 필수인지 모르겠음
+// 이니시스 실시간 계좌이체 -> imp_success, success 없음?
 @Parcelize
 data class IamPortResponse(
-    val imp_success: Boolean = false,
-    val success: Boolean = false,
+    val imp_success: Boolean? = false,
+    val success: Boolean? = false,
     val imp_uid: String?,
-    val merchant_uid: String,
-    val error_msg: String? = null
+    val merchant_uid: String?,
+    val error_msg: String? = null,
+    val error_code: String? = null,
 ) : Parcelable {
     companion object {
         fun makeSuccess(payment: Payment, prepareData: PrepareData? = null, msg: String): IamPortResponse {
@@ -32,7 +34,7 @@ data class IamPortResponse(
                 success = true,
                 imp_uid = prepareData?.impUid,
                 merchant_uid = payment.iamPortRequest.merchant_uid,
-                error_msg = msg
+                error_msg = msg,
             )
         }
 

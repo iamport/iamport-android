@@ -2,7 +2,9 @@ package com.iamport.sdk.presentation
 
 import android.app.Application
 import com.iamport.sdk.BuildConfig.DEBUG
+import com.iamport.sdk.domain.di.apiModule
 import com.iamport.sdk.domain.di.appModule
+import com.iamport.sdk.domain.di.httpClientModule
 import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.Foreground
 import com.orhanobut.logger.AndroidLogAdapter
@@ -38,7 +40,7 @@ class App : Application() {
         startKoin {
             logger(AndroidLogger(Level.DEBUG))
             androidContext(this@App)
-            modules(appModule)
+            modules(httpClientModule, apiModule, appModule)
         }
 
     }

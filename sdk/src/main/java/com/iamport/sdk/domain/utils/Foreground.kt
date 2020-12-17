@@ -21,10 +21,6 @@ object Foreground : ActivityLifecycleCallbacks {
 
     var isScreenOn: Boolean = true // 스크린 on/off 여부
 
-    var isHome : Boolean = false // 홈키 눌렀는지 여부
-
-    var enableForegroundService : Boolean = true // 폴링시
-
     enum class AppStatus {
         BACKGROUND,  // app is background
         RETURNED_TO_FOREGROUND,  // app returned to foreground(or first launch)
@@ -39,9 +35,6 @@ object Foreground : ActivityLifecycleCallbacks {
         app.registerActivityLifecycleCallbacks(this)
 
         // 스크린 on/off 감지 intent 필터
-        val screenFilter = IntentFilter(Intent.ACTION_SCREEN_OFF).apply {
-            addAction(Intent.ACTION_SCREEN_ON)
-        }
         app.registerReceiver(object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 when (intent?.action) {
@@ -50,13 +43,14 @@ object Foreground : ActivityLifecycleCallbacks {
                 }
                 d(intent?.action.toString())
             }
-        }, screenFilter)
+        }, IntentFilter(Intent.ACTION_SCREEN_OFF).apply {
+            addAction(Intent.ACTION_SCREEN_ON)
+        })
     }
 
 
     override fun onActivityCreated(activity: Activity, bundle: Bundle?) {}
     override fun onActivityStarted(activity: Activity) {
-        isHome = false
         isScreenOn = true
         if (++running == 1) {
             d("app is 포그라운드! 살아왔다")

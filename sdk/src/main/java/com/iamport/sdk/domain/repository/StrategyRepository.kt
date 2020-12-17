@@ -9,6 +9,7 @@ import com.iamport.sdk.domain.strategy.base.JudgeStrategy
 import com.iamport.sdk.domain.strategy.chai.ChaiStrategy
 import com.iamport.sdk.domain.strategy.webview.NiceTransWebViewStrategy
 import com.iamport.sdk.domain.strategy.webview.WebViewStrategy
+import com.orhanobut.logger.Logger
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -27,6 +28,13 @@ class StrategyRepository : KoinComponent {
      */
     enum class PaymenyKinds {
         CHAI, NICE, WEB
+    }
+
+    fun failSdkFinish(payment: Payment ) {
+        when(getPaymentKinds(payment)) {
+            PaymenyKinds.CHAI -> chaiStrategy.failFinish("사용자가 결제확인 서비스 종료하셨습니다")
+            else -> Logger.d("사용자가 결제확인 서비스 종료하셨습니다")
+        }
     }
 
     /**
@@ -72,4 +80,5 @@ class StrategyRepository : KoinComponent {
     fun getNiceTransWebViewClient(): NiceTransWebViewStrategy {
         return niceTransWebViewStrategy
     }
+
 }

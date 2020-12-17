@@ -2,6 +2,7 @@ package com.iamport.sdk.data.remote
 
 import com.google.gson.Gson
 import com.iamport.sdk.data.chai.response.ErrorResponse
+import com.orhanobut.logger.Logger.d
 import com.orhanobut.logger.Logger.i
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -37,7 +38,7 @@ object ApiHelper {
     private fun convertErrorBody(throwable: HttpException): ErrorResponse? {
         return try {
             throwable.response()?.errorBody()?.string()?.let {
-                i(it)
+                d(it)
                 Gson().fromJson(it, ErrorResponse::class.java)
             }
         } catch (exception: Exception) {

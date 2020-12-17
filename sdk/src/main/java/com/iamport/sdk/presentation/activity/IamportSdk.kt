@@ -1,6 +1,7 @@
 package com.iamport.sdk.presentation.activity
 
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
@@ -12,6 +13,7 @@ import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.data.sdk.ProvidePgPkg
+import com.iamport.sdk.domain.core.IamportReceiver
 import com.iamport.sdk.domain.service.ChaiService
 import com.iamport.sdk.domain.utils.*
 import com.iamport.sdk.domain.utils.Util.observeAlways
@@ -25,6 +27,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
+import org.koin.core.component.inject
 import java.util.*
 
 
@@ -35,7 +38,7 @@ internal class IamportSdk(
     val webViewLauncher: ActivityResultLauncher<Payment>?,
     val approvePayment: LiveData<Event<IamPortApprove>>,
     val close: LiveData<Event<Unit>>,
-    val catchHome: LiveData<Event<Unit>>,
+    val finish: LiveData<Event<Unit>>,
 ) : KoinComponent {
 
     private val hostHelper: HostHelper = HostHelper(activity, fragment)
@@ -45,10 +48,11 @@ internal class IamportSdk(
 
     private var paymentResultCallBack: ((IamPortResponse?) -> Unit)? = null // 콜백함수
     private var chaiApproveCallBack: ((IamPortApprove) -> Unit)? = null // 콜백함수
-    private val isPolling = MutableLiveData<Event<Boolean>>()
 
+    private val isPolling = MutableLiveData<Event<Boolean>>()
     private val preventOverlapRun = PreventOverlapRun() // 딜레이 호출
-    private var preventHome: Boolean = false
+
+    private val iamportReceiver: IamportReceiver by inject()
 
     init {
         viewModel = ViewModelProvider(hostHelper.viewModelStoreOwner, MainViewModelFactory(get(), get())).get(MainViewModel::class.java)
@@ -58,6 +62,7 @@ internal class IamportSdk(
         } else {
             fragment?.registerForActivityResult(ChaiContract()) { resultCallback() }
         }
+
         clearData()
     }
 
@@ -80,6 +85,9 @@ internal class IamportSdk(
             d("onDestroy")
             clearData()
             hostHelper.lifecycle.removeObserver(this)
+            runCatching {
+                hostHelper.context?.unregisterReceiver(iamportReceiver)
+            }
         }
     }
 
@@ -87,7 +95,14 @@ internal class IamportSdk(
      * BaseActivity 에서 onCreate 시 호출
      */
     fun initStart(payment: Payment, approveCallback: ((IamPortApprove) -> Unit)?, paymentResultCallBack: ((IamPortResponse?) -> Unit)?) {
-        i("HELLO I'MPORT SDK! ${Util.versionName(hostHelper)}")
+        i("HELLO I'MPORT SDK! ${Util.versionName(hostHelper.context)}")
+
+        IntentFilter().let {
+            it.addAction(CONST.BROADCAST_FOREGROUND_SERVICE)
+            it.addAction(CONST.BROADCAST_FOREGROUND_SERVICE_STOP)
+            hostHelper.context?.registerReceiver(iamportReceiver, it)
+        }
+
         clearData()
 
         this.chaiApproveCallBack = approveCallback
@@ -101,8 +116,6 @@ internal class IamportSdk(
 
         // 외부에서 종료
         close.observeAlways(hostHelper.lifecycleOwner, EventObserver { clearData() })
-
-//        catchHome.observeAlways(hostHelper.lifecycleOwner, EventObserver { updateCatchHome() })
     }
 
     /**
@@ -111,38 +124,33 @@ internal class IamportSdk(
     private fun observeViewModel(payment: Payment?) {
         d(GsonBuilder().setPrettyPrinting().create().toJson(payment))
         payment?.let { pay: Payment ->
+            hostHelper.lifecycleOwner.let { owner: LifecycleOwner ->
 
-            // 결제결과 옵저빙
-            viewModel.impResponse().observe(hostHelper.lifecycleOwner, EventObserver(this::sdkFinish))
+                // 외부에서 sdk 실패종료
+                finish.observeAlways(owner, EventObserver { viewModel.failSdkFinish(pay) })
 
-            // 웹뷰앱 열기
-            viewModel.webViewPayment().observe(hostHelper.lifecycleOwner, EventObserver(this::requestWebViewPayment))
+                // 결제결과 옵저빙
+                viewModel.impResponse().observe(owner, EventObserver(this::sdkFinish))
 
-            // 차이앱 열기
-            viewModel.chaiUri().observe(hostHelper.lifecycleOwner, EventObserver(this::openChaiApp))
+                // 웹뷰앱 열기
+                viewModel.webViewPayment().observe(owner, EventObserver(this::requestWebViewPayment))
 
-            // 차이폴링여부
-            viewModel.isPolling().observeAlways(
-                hostHelper.lifecycleOwner, EventObserver {
+                // 차이앱 열기
+                viewModel.chaiUri().observe(owner, EventObserver(this::openChaiApp))
+
+                // 차이폴링여부
+                viewModel.isPolling().observeAlways(owner, EventObserver {
                     updatePolling(it)
                     controlForegroundService(it)
-                }
-            )
+                })
 
-            // 차이 결제 상태 approve 처리
-            viewModel.chaiApprove().observeAlways(hostHelper.lifecycleOwner, EventObserver(this::chaiApprove))
+                // 차이 결제 상태 approve 처리
+                viewModel.chaiApprove().observeAlways(owner, EventObserver(this::chaiApprove))
 
+            }
             // 결제 시작
             preventOverlapRun.launch { requestPayment(pay) }
         }
-    }
-
-    // TODO: 12/11/20 시나리오 확인 필요
-    // 스킴 액티비티 죽었을 때, leave 가 불려서 home 으로 인식되는데
-    // 1. 앱이 끝나고 결제 되도 될지
-    // 2. 앱은 바로 결제 되지만, home 갔을 때 포그라운드 서비스 떠도 될 지
-    private fun updateCatchHome() {
-        Foreground.isHome = true
     }
 
     fun isPolling(): LiveData<Event<Boolean>> {
@@ -154,7 +162,8 @@ internal class IamportSdk(
     }
 
     private fun controlForegroundService(it: Boolean) {
-        if (!Foreground.enableForegroundService) {
+        if (!ChaiService.enableForegroundService) {
+            d("차이 폴링 포그라운드 서비스 실행하지 않음")
             return
         }
 
@@ -185,7 +194,7 @@ internal class IamportSdk(
      * 차이 앱 종료 콜백 감지
      */
     private fun resultCallback() {
-        i("Result Callback ChaiLauncher")
+        d("Result Callback ChaiLauncher")
         viewModel.checkChaiStatus()
         viewModel.receiveChaiCallBack = true
     }
@@ -193,13 +202,21 @@ internal class IamportSdk(
     /**
      * 결제 요청 실행
      */
-    private fun requestPayment(it: Payment) {
+    private fun requestPayment(payment: Payment) {
+        Payment.validator(payment).run {
+            if (!first) {
+                sdkFinish(second?.let { IamPortResponse.makeFail(payment, msg = it) })
+                return
+            }
+        }
+
         // 네트워크 연결 상태 체크
         if (!Util.isInternetAvailable(hostHelper.context)) {
-            sdkFinish(IamPortResponse.makeFail(it, msg = "네트워크 연결 안됨"))
+            sdkFinish(IamPortResponse.makeFail(payment, msg = "네트워크 연결 안됨"))
             return
         }
-        viewModel.judgePayment(it) // 뷰모델에 데이터 판단 요청(native or webview pg)
+
+        viewModel.judgePayment(payment) // 뷰모델에 데이터 판단 요청(native or webview pg)
     }
 
 
@@ -227,7 +244,8 @@ internal class IamportSdk(
      * 모든 결과 처리 및 SDK 종료
      */
     private fun sdkFinish(iamPortResponse: IamPortResponse?) {
-        i("명시적 sdkFinish ${iamPortResponse.toString()}")
+        i("SDK Finish")
+        d(iamPortResponse.toString())
         clearData()
         paymentResultCallBack?.invoke(iamPortResponse)
     }
@@ -258,7 +276,8 @@ internal class IamportSdk(
             i("Not found in intent package")
             when (val providePgPkg = intent.scheme?.let { ProvidePgPkg.from(it) }) {
                 null -> {
-                    i("Not found in intent schme :: ${intent.scheme}")
+                    i("Not found in intent schme")
+                    d("Not found in intent schme :: ${intent.scheme}")
                     return@run null
                 }
                 else -> providePgPkg.pkg
@@ -272,7 +291,7 @@ internal class IamportSdk(
      */
     private fun movePlayStore(intent: Intent) {
         getIntentPackage(intent)?.let {
-            i("movePlayStore :: $it")
+            d("movePlayStore :: $it")
             Intent(Intent.ACTION_VIEW, Uri.parse(Util.getMarketId(it))).run {
                 flags = Intent.FLAG_ACTIVITY_NO_USER_ACTION
                 if (hostHelper.mode == MODE.ACTIVITY) {

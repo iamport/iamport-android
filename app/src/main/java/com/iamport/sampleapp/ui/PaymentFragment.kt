@@ -2,18 +2,21 @@ package com.iamport.sampleapp.ui
 
 import android.app.AlertDialog.Builder
 import android.content.Context
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.activity.OnBackPressedCallback
 import com.google.gson.GsonBuilder
+import com.iamport.sampleapp.MerchantReceiver
 import com.iamport.sampleapp.PaymentResultData.result
 import com.iamport.sampleapp.R
 import com.iamport.sampleapp.databinding.PaymentFragmentBinding
 import com.iamport.sdk.data.sdk.*
 import com.iamport.sdk.domain.core.ICallbackPaymentResult
 import com.iamport.sdk.domain.core.Iamport
+import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.EventObserver
 import com.iamport.sdk.domain.utils.Util
 import com.orhanobut.logger.Logger.i
@@ -24,6 +27,7 @@ import java.util.*
 
 class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
     override val layoutResourceId: Int = R.layout.payment_fragment
+    private val receiver = MerchantReceiver()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,13 +36,32 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        registForegroundServiceReceiver(context)
         requireActivity().onBackPressedDispatcher.addCallback(this, backPressCallback)
     }
 
-    override fun onDetach() {
-        super.onDetach()
+    override fun onDestroy() {
+        super.onDestroy()
         Iamport.close()
         backPressCallback.remove()
+        this.context?.unregisterReceiver(receiver)
+    }
+
+    // 차이 폴링중에 포그라운드 서비스 생성
+    // (* 포그라운드 서비스 직접 구현시에는 enableService = false 로 설정하고,
+    // Iamport.isPolling()?.observe 에서 true 전달 받을 시점에, 직접 포그라운드 서비스 만들어 띄우시면 됩니다.)
+    private fun registForegroundServiceReceiver(context: Context) {
+
+        // enableService = true 시, 폴링중 포그라운드 서비스를 보여줍니다.
+        // enableFailStopButton = true 시, 포그라운드 서비스에서 중지 버튼 생성합니다.
+        Iamport.enableChaiPollingForegroundService(enableService = true, enableFailStopButton = true)
+
+        // 포그라운드 서비스 및 포그라운드 서비스 중지 버튼 클릭시 전달받는 broadcast 리시버
+        context.registerReceiver(receiver, IntentFilter().apply {
+            addAction(CONST.BROADCAST_FOREGROUND_SERVICE)
+            addAction(CONST.BROADCAST_FOREGROUND_SERVICE_STOP)
+        })
+
     }
 
     override fun initStart() {
@@ -53,7 +76,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
 
         val userCodeAdapter = ArrayAdapter(
             requireContext(), R.layout.support_simple_spinner_dropdown_item,
-            Util.DevUserCode.getUserCodes()
+            Util.getUserCodeList()
         )
 
         val pgAdapter = ArrayAdapter(
@@ -92,7 +115,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
     private fun onClickPayment() {
 
         val pg = PG.values()[viewDataBinding.pg.selectedItemPosition]
-        val payMethod = PayMethod.values()[viewDataBinding.pgMethod.selectedItemPosition]
+        val payMethod = PayMethod.from(viewDataBinding.pgMethod.selectedItem.toString())
 
         val paymentName = viewDataBinding.name.text.toString().trim()
         val merchantUid = viewDataBinding.merchantUid.text.toString().trim()
@@ -110,9 +133,9 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
             buyer_name = "남궁안녕"
         )
 
+        val userCode = Util.getUserCode(viewDataBinding.userCode.selectedItemPosition)
+        i("userCode :: $userCode")
         i(GsonBuilder().setPrettyPrinting().create().toJson(request))
-
-        val userCode = Util.DevUserCode.values()[viewDataBinding.userCode.selectedItemPosition].name
 
         /**
          * 결제요청 Type#1 ICallbackPaymentResult 구현을 통한 결제결과 callback
@@ -128,7 +151,6 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
             approveCallback = { approveCallback(it) },
             paymentResultCallback = { callBackListener.result(it) })
     }
-
 
     /**
      *  TODO 재고확인 등 최종결제를 위한 처리를 해주세요
@@ -148,7 +170,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
     private val callBackListener = object : ICallbackPaymentResult {
         override fun result(iamPortResponse: IamPortResponse?) {
             val resJson = GsonBuilder().setPrettyPrinting().create().toJson(iamPortResponse)
-            i("머천트 앱 결과 뿅\n$resJson")
+            i("결제 결과 콜백\n$resJson")
             result = iamPortResponse
             if (iamPortResponse != null) {
                 requireActivity().supportFragmentManager.beginTransaction()

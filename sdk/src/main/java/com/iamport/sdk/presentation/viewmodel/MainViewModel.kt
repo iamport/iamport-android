@@ -57,6 +57,10 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
         super.onCleared()
     }
 
+    fun failSdkFinish(payment: Payment) {
+        repository.failSdkFinish(payment)
+    }
+
     /**
      * 결제 데이터
      */

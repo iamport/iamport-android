@@ -10,9 +10,9 @@ import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortRequest
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.domain.service.ChaiService
 import com.iamport.sdk.domain.utils.PreventOverlapRun
 import com.iamport.sdk.domain.utils.Event
-import com.iamport.sdk.domain.utils.Foreground
 import com.iamport.sdk.presentation.activity.IamportSdk
 import com.iamport.sdk.presentation.contract.WebViewActivityContract
 import com.orhanobut.logger.Logger.d
@@ -30,12 +30,11 @@ object Iamport {
 
     private var approvePayment = MutableLiveData<Event<IamPortApprove>>()
     private var close = MutableLiveData<Event<Unit>>()
-    private var catchHome = MutableLiveData<Event<Unit>>()
+    private var finish = MutableLiveData<Event<Unit>>()
 
-    private var activity: ComponentActivity? = null
+    var activity: ComponentActivity? = null
     private var fragment: Fragment? = null
     private var preventOverlapRun: PreventOverlapRun? = null
-
 
     private fun clear() {
         fragment = null
@@ -43,6 +42,12 @@ object Iamport {
         iamportSdk = null
     }
 
+    private fun createInitialData() {
+        this.approvePayment = MutableLiveData()
+        this.close = MutableLiveData()
+        this.finish = MutableLiveData()
+        this.preventOverlapRun = PreventOverlapRun()
+    }
 
     /**
      * SDK Activity 열기 위한 Contract for Activity
@@ -51,17 +56,21 @@ object Iamport {
     fun init(componentActivity: ComponentActivity) {
         d("init")
         clear()
+        createInitialData()
+
         webViewLauncher = componentActivity.registerForActivityResult(WebViewActivityContract()) {
             callback(it)
         }
 
-        approvePayment = MutableLiveData()
-        close = MutableLiveData()
-        catchHome = MutableLiveData()
-        activity = componentActivity
-        iamportSdk =
-            IamportSdk(activity = componentActivity, webViewLauncher = webViewLauncher, approvePayment = approvePayment, close = close, catchHome = catchHome)
-        preventOverlapRun = PreventOverlapRun()
+        this.activity = componentActivity
+        this.iamportSdk =
+            IamportSdk(
+                activity = componentActivity,
+                webViewLauncher = webViewLauncher,
+                approvePayment = approvePayment,
+                close = close,
+                finish = finish
+            )
     }
 
     /**
@@ -71,16 +80,21 @@ object Iamport {
     fun init(fragment: Fragment) {
         d("init")
         clear()
+        createInitialData()
+
         webViewLauncher = fragment.registerForActivityResult(WebViewActivityContract()) {
             callback(it)
         }
 
-        approvePayment = MutableLiveData()
-        close = MutableLiveData()
-        catchHome = MutableLiveData()
         this.fragment = fragment
-        iamportSdk = IamportSdk(fragment = fragment, webViewLauncher = webViewLauncher, approvePayment = approvePayment, close = close, catchHome = catchHome)
-        preventOverlapRun = PreventOverlapRun()
+        this.activity = fragment.activity
+        this.iamportSdk = IamportSdk(
+            fragment = fragment,
+            webViewLauncher = webViewLauncher,
+            approvePayment = approvePayment,
+            close = close,
+            finish = finish
+        )
     }
 
     /**
@@ -98,16 +112,17 @@ object Iamport {
         close.value = (Event(Unit))
     }
 
-//    /**
-//     * 외부에서 SDK 홈키 캐치
-//     */
-//    fun catchUserLeave() {
-////        Foreground.isHome = true
-//        catchHome.value = (Event(Unit))
-//    }
+    /**
+     * 외부에서 SDK 실패 종료
+     */
+    @MainThread
+    fun failFinish() {
+        finish.value = (Event(Unit))
+    }
 
-    fun enableChaiPollingForegroundService(it: Boolean) {
-        Foreground.enableForegroundService = it
+    fun enableChaiPollingForegroundService(enableService: Boolean, enableFailStopButton: Boolean = false) {
+        ChaiService.enableForegroundService = enableService
+        ChaiService.enableForegroundServiceStopButton = enableFailStopButton
     }
 
     fun isPolling(): LiveData<Event<Boolean>>? {

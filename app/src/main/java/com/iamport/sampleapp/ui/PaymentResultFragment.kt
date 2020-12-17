@@ -27,6 +27,6 @@ class PaymentResultFragment : BaseFragment<ResultFragmentBinding>() {
         if (iamPortResponse == null) {
             return false
         }
-        return iamPortResponse.success || iamPortResponse.imp_success
+        return iamPortResponse.success == true || iamPortResponse.imp_success == true
     }
 }

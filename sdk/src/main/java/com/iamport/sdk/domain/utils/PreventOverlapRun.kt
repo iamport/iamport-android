@@ -17,7 +17,7 @@ class PreventOverlapRun {
             excuteTime = System.currentTimeMillis()
             hof()
         } else {
-            Logger.i("아직 딜레이야~")
+            Logger.d("아직 딜레이야~")
         }
     }
 }
