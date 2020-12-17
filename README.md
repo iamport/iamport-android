@@ -5,9 +5,9 @@
 
 안드로이드 네이티브 앱에서 결제 개발을 간편하게 도와주는 아임포트 SDK 입니다.
 
-- CHAI 간편결제는 Native 연동되어 있으며 (현재 staging 서버이므로 테스트만 가능)
+- CHAI 간편결제는 Native 연동되어 있습니다 (현재 staging 서버이므로 테스트만 가능)
 
-- 그외 PG 들은 WebView 기반으로 연동되어 있고 (실제 결제 가능) 
+- 그외 PG 들은 WebView 기반으로 연동되어 있습니다. (실제 결제 및 연동 가능) 
 
 - 추후 네이티브 순차적으로 연동 예정입니다. 
 
@@ -236,15 +236,6 @@
 3. build app
 
 ---
-
-[MainActivity.kt (Host Activity)](./app/src/main/java/com/iamport/sampleapp/ui/MainActivity.kt)
-
-```kotlin
-    override fun onUserLeaveHint() {
-        super.onUserLeaveHint()
-        Iamport.catchUserLeave() // TODO SDK 백그라운드 작업 중지를 위해서 onUserLeaveHint 에서 필수 호출!
-    }
-```
 
 [PaymentFragment.kt (결제 화면)](./app/src/main/java/com/iamport/sampleapp/ui/PaymentFragment.kt)
 
