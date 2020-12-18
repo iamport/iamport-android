@@ -106,6 +106,14 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
     fun judgePayment(payment: Payment) {
         viewModelScope.launch(job) {
             repository.judgeStrategy.judge(payment).run {
+
+                Payment.validator(third).run {
+                    if (!first) {
+                        bus.impResponse.postValue(Event(second?.let { IamPortResponse.makeFail(payment, msg = it) }))
+                        return@launch
+                    }
+                }
+
                 d("$this")
                 when (first) {
                     JudgeStrategy.JudgeKinds.CHAI -> second?.let { repository.chaiStrategy.doWork(it.pg_id, third) }
@@ -163,7 +171,7 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
             return
         }
 
-        if(receiveChaiCallBack) {
+        if (receiveChaiCallBack) {
             d("ignore checkChaiStatus cause receiveChaiCallBack")
             receiveChaiCallBack = false // 스킴 액티비티 종료시에 불릴 수 있기 때문에 초기화 해줘야함
             return
