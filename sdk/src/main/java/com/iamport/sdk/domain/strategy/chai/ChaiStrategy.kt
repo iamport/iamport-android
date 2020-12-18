@@ -86,11 +86,12 @@ open class ChaiStrategy : BaseStrategy() {
         return tryCount > CONST.TRY_OUT_COUNT
     }
 
-    // 배
+    // 백그라운드 또는 스크린 오프
     private fun isBgOrScreenOff(): Boolean {
         return Foreground.isBackground || !Foreground.isScreenOn
     }
 
+    // 백그라운드이면서 스크린 온
     private fun isBgAndScreenOn(): Boolean {
         return Foreground.isBackground && Foreground.isScreenOn
     }

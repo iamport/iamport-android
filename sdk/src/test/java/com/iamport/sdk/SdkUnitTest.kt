@@ -1,6 +1,9 @@
 package com.iamport.sdk
 
+import com.iamport.sdk.data.chai.request.PrepareRequest
+import com.iamport.sdk.data.chai.response.Prepare
 import com.iamport.sdk.data.remote.ApiHelper
+import com.iamport.sdk.data.remote.ChaiApi
 import com.iamport.sdk.data.remote.IamportApi
 import com.iamport.sdk.data.remote.ResultWrapper
 import com.iamport.sdk.data.sdk.IamPortRequest
@@ -8,9 +11,11 @@ import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.data.sdk.PayMethod
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.domain.repository.StrategyRepository
+import com.iamport.sdk.domain.strategy.base.JudgeStrategy
 import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.Util
-import com.iamport.sdk.presentation.activity.IamportSdk
+import com.iamport.sdk.presentation.viewmodel.MainViewModel
+import com.orhanobut.logger.Logger.i
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -22,49 +27,30 @@ import org.koin.test.inject
 
 class SdkUnitTest : AbstractKoinTest() {
 
+    private val viewModel: MainViewModel by inject()
     private val iamportApi: IamportApi by inject()
+    private val chaiApi: ChaiApi by inject()
     private val repository: StrategyRepository by inject()
 
-    private lateinit var iamportSdk: IamportSdk
 
     private suspend fun getUsers(userCode: String) {
         ApiHelper.safeApiCall(Dispatchers.IO) { iamportApi.getUsers(userCode) }.let {
             when (it) {
                 is ResultWrapper.Success -> {
-
                     val method = repository.judgeStrategy.javaClass.getDeclaredMethod("findDefaultUserData", ArrayList::class.java)
                     method.isAccessible = true
-                    println("userCode :: $userCode, default PG :: ${method.invoke(repository.judgeStrategy, it.value.data)}")
+                    i("userCode :: $userCode, default PG :: ${method.invoke(repository.judgeStrategy, it.value.data)}")
                     assertThat(true, `is`(true))
                 }
                 is ResultWrapper.GenericError -> {
-                    println("${it.code} ${it.error}")
+                    i("${it.code} ${it.error}")
                     assertThat(false, `is`(true))
                 }
                 is ResultWrapper.NetworkError -> {
-                    println(" ${it.error}")
+                    i(" ${it.error}")
                     assertThat(false, `is`(true))
                 }
             }
-        }
-    }
-
-
-    @Test
-    fun `개발 유저 코드 통신 테스트`() = runBlocking {
-
-        Util.DevUserCode.values().forEach {
-            delay(150)
-            getUsers(it.name)
-        }
-    }
-
-    @Test
-    fun `샘플 유저 코드 통신 테스트`() = runBlocking {
-
-        Util.SampleUserCode.values().forEach {
-            delay(150)
-            getUsers(it.name)
         }
     }
 
@@ -82,6 +68,66 @@ class SdkUnitTest : AbstractKoinTest() {
         return Payment(userCode, request)
     }
 
+
+    @Test
+    fun `remote 개발 유저 코드 통신 테스트`() = runBlocking {
+        Util.DevUserCode.values().forEach {
+            delay(150)
+            getUsers(it.name)
+        }
+    }
+
+    @Test
+    fun `remote 샘플 유저 코드 통신 테스트`() = runBlocking {
+
+        Util.SampleUserCode.values().forEach {
+            delay(150)
+            getUsers(it.name)
+        }
+    }
+
+
+    @Test
+    fun `remote getUsers 차이 판별 테스트`() = runBlocking {
+
+        val chaiPayment = getDefaultPayment().run {
+            copy(
+                userCode = Util.SampleUserCode.imp37739582.name,
+                iamPortRequest = iamPortRequest.copy(
+                    pg = PG.chai.getPgSting(),
+                    pay_method = PayMethod.trans,
+                )
+            )
+        }
+
+        val judge = repository.judgeStrategy.judge(chaiPayment)
+        assertThat(judge.first, `is`(JudgeStrategy.JudgeKinds.CHAI))
+    }
+
+    @Test
+    fun `remote 차이 prepare 테스트`() = runBlocking {
+
+        val chaiId = "15ef5fc6-43c8-4a27-b29f-e4a13897fc4c"
+        val chaiPayment = getDefaultPayment().run {
+            copy(
+                userCode = Util.SampleUserCode.imp37739582.name,
+                iamPortRequest = iamPortRequest.copy(
+                    pg = PG.chai.getPgSting(),
+                    pay_method = PayMethod.trans,
+                )
+            )
+        }
+
+        when (val resonse = ApiHelper.safeApiCall(Dispatchers.IO) { iamportApi.postPrepare(PrepareRequest.make(chaiId, chaiPayment)) }) {
+            is ResultWrapper.Success -> {
+                i("${resonse.value}")
+                assertThat(true, `is`(true))
+            }
+            else -> assertThat(false, `is`(true))
+        }
+    }
+
+
     @Test
     fun `가상계좌 유효성 실패 검증`() = runBlocking {
         val payment = getDefaultPayment().run {
@@ -92,10 +138,10 @@ class SdkUnitTest : AbstractKoinTest() {
                 )
             )
         }
-        println(payment)
+        i("$payment")
 
         Payment.validator(payment).run {
-            println("$second")
+            i("$second")
             assertThat(first, `is`(false))
             assertThat(second, `is`(CONST.ERR_PAYMENT_VALIDATOR_VBANK))
         }
@@ -113,10 +159,10 @@ class SdkUnitTest : AbstractKoinTest() {
                 )
             )
         }
-        println(payment)
+        i("$payment")
 
         Payment.validator(payment).run {
-            println("$second")
+            i("$second")
             assertThat(first, `is`(true))
         }
     }
@@ -132,10 +178,10 @@ class SdkUnitTest : AbstractKoinTest() {
                 )
             )
         }
-        println(payment)
+        i("$payment")
 
         Payment.validator(payment).run {
-            println("$second")
+            i("$second")
             assertThat(first, `is`(false))
             assertThat(second, `is`(CONST.ERR_PAYMENT_VALIDATOR_PHONE))
         }
@@ -153,10 +199,10 @@ class SdkUnitTest : AbstractKoinTest() {
                 )
             )
         }
-        println(payment)
+        i("$payment")
 
         Payment.validator(payment).run {
-            println("$second")
+            i("$second")
             assertThat(first, `is`(true))
         }
     }
@@ -173,10 +219,10 @@ class SdkUnitTest : AbstractKoinTest() {
                 )
             )
         }
-        println(payment)
+        i("$payment")
 
         Payment.validator(payment).run {
-            println("$second")
+            i("$second")
             assertThat(first, `is`(false))
             assertThat(second, `is`(CONST.ERR_PAYMENT_VALIDATOR_DANAL_VBANK))
         }
@@ -195,10 +241,10 @@ class SdkUnitTest : AbstractKoinTest() {
                 )
             )
         }
-        println(payment)
+        i("$payment")
 
         Payment.validator(payment).run {
-            println("$second")
+            i("$second")
             assertThat(first, `is`(true))
         }
     }
@@ -214,10 +260,10 @@ class SdkUnitTest : AbstractKoinTest() {
                 )
             )
         }
-        println(payment)
+        i("$payment")
 
         Payment.validator(payment).run {
-            println("$second")
+            i("$second")
             assertThat(first, `is`(false))
             assertThat(second, `is`(CONST.ERR_PAYMENT_VALIDATOR_PAYPAL))
         }
@@ -235,10 +281,10 @@ class SdkUnitTest : AbstractKoinTest() {
                 )
             )
         }
-        println(payment)
+        i("$payment")
 
         Payment.validator(payment).run {
-            println("$second")
+            i("$second")
             assertThat(first, `is`(true))
         }
     }

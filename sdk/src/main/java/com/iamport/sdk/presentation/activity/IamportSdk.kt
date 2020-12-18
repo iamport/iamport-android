@@ -19,14 +19,10 @@ import com.iamport.sdk.domain.utils.*
 import com.iamport.sdk.domain.utils.Util.observeAlways
 import com.iamport.sdk.presentation.contract.ChaiContract
 import com.iamport.sdk.presentation.viewmodel.MainViewModel
-import com.iamport.sdk.presentation.viewmodel.MainViewModelFactory
 import com.orhanobut.logger.Logger.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.compat.ViewModelCompat.viewModel
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.koin.core.component.inject
 import java.util.*
 
@@ -44,7 +40,9 @@ internal class IamportSdk(
     private val hostHelper: HostHelper = HostHelper(activity, fragment)
 
     private val launcherChai: ActivityResultLauncher<Pair<String, String>>? // 차이앱 런처
-    private val viewModel: MainViewModel // 요청할 뷰모델
+//    private val viewModel: MainViewModel // 요청할 뷰모델
+    private val viewModel: MainViewModel by viewModel(hostHelper.viewModelStoreOwner, MainViewModel::class.java) // 요청할 뷰모델 {
+
 
     private var paymentResultCallBack: ((IamPortResponse?) -> Unit)? = null // 콜백함수
     private var chaiApproveCallBack: ((IamPortApprove) -> Unit)? = null // 콜백함수
@@ -55,7 +53,7 @@ internal class IamportSdk(
     private val iamportReceiver: IamportReceiver by inject()
 
     init {
-        viewModel = ViewModelProvider(hostHelper.viewModelStoreOwner, MainViewModelFactory(get(), get())).get(MainViewModel::class.java)
+//        viewModel = ViewModelProvider(hostHelper.viewModelStoreOwner, MainViewModelFactory(get(), get())).get(MainViewModel::class.java)
 
         launcherChai = if (hostHelper.mode == MODE.ACTIVITY) {
             activity?.registerForActivityResult(ChaiContract()) { resultCallback() }
@@ -307,28 +305,4 @@ internal class IamportSdk(
         d("chai app version : ${Util.versionCode(hostHelper.context, chaiPackageName).toLong()}")
         return Util.versionCode(hostHelper.context, chaiPackageName).toLong() > CHAI.SINGLE_ACTIVITY_VERSION
     }
-
-    private fun repeatTopPackage() {
-        viewModel.viewModelScope.launch(Dispatchers.Default) {
-            repeat(10000) {
-                delay(2000)
-//                checkingTopPackage()
-            }
-        }
-    }
-
-//    private fun checkingTopPackage() {
-//        val am = hostHelper.context?.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-//
-//        val tasks = am.getRunningTasks(1)
-//        i("RunningTasks packageName ::: ${tasks[0].topActivity?.packageName}")
-//
-//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-//            for (task in am.appTasks) {
-//                i("top activity ::: ${task.taskInfo.topActivity?.className}")
-//                i("top packageName ::: ${task.taskInfo.topActivity?.packageName}")
-//            }
-//        }
-//    }
-
 }

@@ -5,6 +5,9 @@ import com.iamport.sdk.domain.di.appModule
 import com.iamport.sdk.domain.di.provideChaiApi
 import com.iamport.sdk.domain.di.provideIamportApi
 import com.iamport.sdk.domain.di.provideNiceApi
+import com.orhanobut.logger.AndroidLogAdapter
+import com.orhanobut.logger.Logger
+import com.orhanobut.logger.PrettyFormatStrategy
 import org.junit.Before
 import org.junit.Rule
 import org.junit.runner.RunWith
@@ -32,6 +35,11 @@ abstract class AbstractKoinTest : AutoCloseKoinTest() {
 
     @Before
     fun initKoin() {
+        val formatStrategy = PrettyFormatStrategy.newBuilder()
+            .logStrategy { priority, tag, message -> println(message) }
+            .build()
+        Logger.addLogAdapter(AndroidLogAdapter(formatStrategy))
+
         val mockApiModule by lazy {
             module {
                 single { provideIamportApi(get(), null) }
