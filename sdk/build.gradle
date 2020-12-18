@@ -68,7 +68,8 @@ dependencies {
     testImplementation Libs.robolectric
     testImplementation Libs.mokito_core
     testImplementation Libs.mokito_inline
-//    androidTestImplementation Libs.mokito_android
+    testImplementation Libs.mokito_android
+//    testImplementation Libs.mokito_kotlin
 
     testImplementation Libs.junit
     androidTestImplementation Libs.testJunit
@@ -91,6 +92,7 @@ dependencies {
 
     implementation Libs.koin_core
     testImplementation Libs.koin_test
+    implementation Libs.koin_core_ext
 //    androidTestImplementation Libs.koin_test
 
     // AndroidX Scope 생성 - 삭제 자동화

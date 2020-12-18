@@ -1,6 +1,5 @@
 package com.iamport.sdk
 
-import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.iamport.sdk.domain.di.appModule
 import com.iamport.sdk.domain.di.provideChaiApi
@@ -16,13 +15,20 @@ import org.koin.core.logger.Level
 import org.koin.dsl.module
 import org.koin.test.AutoCloseKoinTest
 import org.koin.test.mock.MockProviderRule
-import org.mockito.Mockito.mock
+import org.mockito.Mockito
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
+
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O_MR1])
-abstract class AbstractKoin : AutoCloseKoinTest() {
+@Config(sdk = [23])
+abstract class AbstractKoinTest : AutoCloseKoinTest() {
+
+//    @get:Rule
+//    val koinTestRule = KoinTestRule.create {
+//        printLogger(Level.DEBUG)
+//        modules(myModule)
+//    }
 
     @Before
     fun initKoin() {
@@ -40,12 +46,10 @@ abstract class AbstractKoin : AutoCloseKoinTest() {
             androidContext(ApplicationProvider.getApplicationContext())
             modules(mockApiModule, appModule)
         }
-
     }
 
     @get:Rule
     val mockProvider = MockProviderRule.create { clazz ->
-        mock(clazz.java)
+        Mockito.mock(clazz.java)
     }
-
 }

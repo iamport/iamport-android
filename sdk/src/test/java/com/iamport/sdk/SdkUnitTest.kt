@@ -1,6 +1,5 @@
 package com.iamport.sdk
 
-import android.os.Build
 import com.iamport.sdk.data.remote.ApiHelper
 import com.iamport.sdk.data.remote.IamportApi
 import com.iamport.sdk.data.remote.ResultWrapper
@@ -18,14 +17,10 @@ import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matchers.`is`
 import org.junit.Assert.assertThat
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.koin.test.inject
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 
-@RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.P])
-class SdkUnitTest : AbstractKoin() {
+
+class SdkUnitTest : AbstractKoinTest() {
 
     private val iamportApi: IamportApi by inject()
     private val repository: StrategyRepository by inject()
@@ -42,16 +37,22 @@ class SdkUnitTest : AbstractKoin() {
                     println("userCode :: $userCode, default PG :: ${method.invoke(repository.judgeStrategy, it.value.data)}")
                     assertThat(true, `is`(true))
                 }
-                is ResultWrapper.GenericError ->
+                is ResultWrapper.GenericError -> {
+                    println("${it.code} ${it.error}")
                     assertThat(false, `is`(true))
-                is ResultWrapper.NetworkError ->
+                }
+                is ResultWrapper.NetworkError -> {
+                    println(" ${it.error}")
                     assertThat(false, `is`(true))
+                }
             }
         }
     }
 
+
     @Test
     fun `개발 유저 코드 통신 테스트`() = runBlocking {
+
         Util.DevUserCode.values().forEach {
             delay(150)
             getUsers(it.name)
@@ -60,6 +61,7 @@ class SdkUnitTest : AbstractKoin() {
 
     @Test
     fun `샘플 유저 코드 통신 테스트`() = runBlocking {
+
         Util.SampleUserCode.values().forEach {
             delay(150)
             getUsers(it.name)
