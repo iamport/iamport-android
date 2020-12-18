@@ -95,6 +95,7 @@ class SdkUnitTest : AbstractKoin() {
         Payment.validator(payment).run {
             println("$second")
             assertThat(first, `is`(false))
+            assertThat(second, `is`(CONST.ERR_PAYMENT_VALIDATOR_VBANK))
         }
     }
 
@@ -134,6 +135,7 @@ class SdkUnitTest : AbstractKoin() {
         Payment.validator(payment).run {
             println("$second")
             assertThat(first, `is`(false))
+            assertThat(second, `is`(CONST.ERR_PAYMENT_VALIDATOR_PHONE))
         }
     }
 
@@ -165,6 +167,7 @@ class SdkUnitTest : AbstractKoin() {
                 iamPortRequest = iamPortRequest.copy(
                     pg = PG.danal_tpay.getPgSting(),
                     pay_method = PayMethod.vbank,
+                    vbank_due = "2020121211302",
                 )
             )
         }
@@ -173,6 +176,7 @@ class SdkUnitTest : AbstractKoin() {
         Payment.validator(payment).run {
             println("$second")
             assertThat(first, `is`(false))
+            assertThat(second, `is`(CONST.ERR_PAYMENT_VALIDATOR_DANAL_VBANK))
         }
     }
 
@@ -185,6 +189,7 @@ class SdkUnitTest : AbstractKoin() {
                     pg = PG.danal_tpay.getPgSting(),
                     pay_method = PayMethod.vbank,
                     vbank_due = "2020121211302",
+                    biz_num = "1234567890"
                 )
             )
         }
@@ -212,6 +217,7 @@ class SdkUnitTest : AbstractKoin() {
         Payment.validator(payment).run {
             println("$second")
             assertThat(first, `is`(false))
+            assertThat(second, `is`(CONST.ERR_PAYMENT_VALIDATOR_PAYPAL))
         }
     }
 

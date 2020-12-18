@@ -37,7 +37,7 @@ enum class PayMethod(val korName: String) : Parcelable {
 
     companion object {
         fun from(payMethodString: String): PayMethod {
-            return values().find { payMethodString.contains(it.name) } ?: card
+            return values().find { payMethodString == (it.name) } ?: card
         }
     }
 

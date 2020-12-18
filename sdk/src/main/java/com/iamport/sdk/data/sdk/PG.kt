@@ -43,7 +43,7 @@ enum class PG(val korName: String) {
 
     companion object {
         fun convertPG(pgString: String): PG? {
-            return values().find { pgString.contains(it.name) }
+            return values().find { pgString == (it.name) }
         }
 
         fun getPGNames(): List<String> {
