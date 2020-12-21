@@ -4,7 +4,6 @@ buildscript {
     ext.gradle_version = "4.1.1"
     ext.kotlin_version = "1.4.21"
     ext.koin_version = '2.2.1'
-    ext.android_maven_gradle_plugin = '2.1'
 
     repositories {
         google()
@@ -12,6 +11,7 @@ buildscript {
     }
 
     dependencies {
+        // gradle dependencyUpdates -Drevision=release
         classpath "com.github.ben-manes:gradle-versions-plugin:$gradle_versions_plugin"
 
         classpath "com.android.tools.build:gradle:$gradle_version"
