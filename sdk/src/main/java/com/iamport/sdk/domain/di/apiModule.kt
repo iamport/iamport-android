@@ -48,7 +48,7 @@ fun provideNiceApi(gson: Gson, client: OkHttpClient?): NiceApi {
 fun provideChaiApi(gson: Gson, client: OkHttpClient?): ChaiApi {
     return Retrofit.Builder()
 //        .baseUrl(if (BuildConfig.DEBUG) CONST.CHAI_SERVICE_STAGING_URL else CONST.CHAI_SERVICE_URL)
-        .baseUrl(CONST.CHAI_SERVICE_STAGING_URL)
+        .baseUrl(CONST.CHAI_SERVICE_URL)
         .addConverterFactory(GsonConverterFactory.create(gson)).apply {
             client?.let { client(it) }
         }
