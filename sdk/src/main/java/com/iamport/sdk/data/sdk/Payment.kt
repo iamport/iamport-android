@@ -17,25 +17,25 @@ data class Payment(val userCode: String, val iamPortRequest: IamPortRequest) : P
             payment.iamPortRequest.run {
                 if (pay_method == PayMethod.vbank) {
                     if (vbank_due.isNullOrBlank()) {
-                        return false to "가상계좌 결제는 만료일자(vbank_due) 항목 필수입니다 (YYYYMMDDhhmm 형식)"
+                        return false to CONST.ERR_PAYMENT_VALIDATOR_VBANK
                     }
                 }
 
                 if (pay_method == PayMethod.phone) {
                     if (digital == null) {
-                        return false to "휴대폰 소액결제는 digital 항목 필수입니다"
+                        return false to CONST.ERR_PAYMENT_VALIDATOR_PHONE
                     }
                 }
 
                 if (PG.convertPG(pg) == PG.danal_tpay && pay_method == PayMethod.vbank) {
                     if (biz_num.isNullOrBlank()) {
-                        return false to "다날 가상계좌 결제는 사업자 등록번호(biz_num) 항목 필수입니다 (계약된 사업자등록번호 10자리)"
+                        return false to CONST.ERR_PAYMENT_VALIDATOR_DANAL_VBANK
                     }
                 }
 
                 if (PG.convertPG(pg) == PG.paypal) {
                     if (m_redirect_url.isNullOrBlank() || m_redirect_url == CONST.IAMPORT_DUMMY_URL) {
-                        return false to "페이팔 결제는 m_redirect_url 항목 필수입니다"
+                        return false to CONST.ERR_PAYMENT_VALIDATOR_PAYPAL
                     }
                 }
             }

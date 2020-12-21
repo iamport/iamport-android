@@ -6,6 +6,7 @@ object Versions {
 
 
     const val mokito = "3.6.28"
+    const val mokito_kotlin= "2.2.0"
 
     const val junit = "4.13.1"
     const val testJunit = "1.1.2"
@@ -54,6 +55,8 @@ object Libs {
     const val mokito_core = "org.mockito:mockito-core:${Versions.mokito}"
     const val mokito_inline = "org.mockito:mockito-inline:${Versions.mokito}"
     const val mokito_android = "org.mockito:mockito-android:${Versions.mokito}"
+    const val mokito_kotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:${Versions.mokito_kotlin}"
+
 
     const val junit = "junit:junit:${Versions.junit}"
     const val testJunit = "androidx.test.ext:junit:${Versions.testJunit}"
@@ -76,6 +79,7 @@ object Libs {
     const val fragment_ktx = "androidx.fragment:fragment-ktx:${Versions.fragment_ktx}"
 
     const val koin_core = "org.koin:koin-core:${Versions.koin_version}"
+    const val koin_core_ext = "org.koin:koin-core-ext:${Versions.koin_version}"
     const val koin_test = "org.koin:koin-test:${Versions.koin_version}"
 
     // AndroidX Scope 생성 - 삭제 자동화
