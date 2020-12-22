@@ -87,7 +87,7 @@ object Util {
     /**
      * pg사별 지원하는 결제수단
      */
-    private fun getMappingPayMethod(pg: PG): Set<PayMethod> {
+    fun getMappingPayMethod(pg: PG): Set<PayMethod> {
         return when (pg) {
             html5_inicis -> defaultPayMethod + setOf(
                 PayMethod.samsung,

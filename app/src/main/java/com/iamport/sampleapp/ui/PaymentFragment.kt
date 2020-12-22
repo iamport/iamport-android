@@ -13,7 +13,10 @@ import com.iamport.sampleapp.MerchantReceiver
 import com.iamport.sampleapp.PaymentResultData.result
 import com.iamport.sampleapp.R
 import com.iamport.sampleapp.databinding.PaymentFragmentBinding
-import com.iamport.sdk.data.sdk.*
+import com.iamport.sdk.data.sdk.IamPortApprove
+import com.iamport.sdk.data.sdk.IamPortRequest
+import com.iamport.sdk.data.sdk.IamPortResponse
+import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.domain.core.ICallbackPaymentResult
 import com.iamport.sdk.domain.core.Iamport
 import com.iamport.sdk.domain.utils.CONST
@@ -115,7 +118,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
     private fun onClickPayment() {
 
         val pg = PG.values()[viewDataBinding.pg.selectedItemPosition]
-        val payMethod = PayMethod.from(viewDataBinding.pgMethod.selectedItem.toString())
+        val payMethod = Util.getMappingPayMethod(pg).elementAt(viewDataBinding.pgMethod.selectedItemPosition)
 
         val paymentName = viewDataBinding.name.text.toString().trim()
         val merchantUid = viewDataBinding.merchantUid.text.toString().trim()
