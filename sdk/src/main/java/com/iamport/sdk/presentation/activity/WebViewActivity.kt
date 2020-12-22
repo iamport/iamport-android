@@ -164,6 +164,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ko
      * 외부앱 열기
      */
     private fun openThirdPartyApp(it: Uri) {
+        d("openThirdPartyApp $it")
         Intent.parseUri(it.toString(), Intent.URI_INTENT_SCHEME)?.let { intent: Intent ->
             runCatching {
                 startActivity(intent)
