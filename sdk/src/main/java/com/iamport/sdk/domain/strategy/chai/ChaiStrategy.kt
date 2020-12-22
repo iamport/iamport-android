@@ -1,5 +1,6 @@
 package com.iamport.sdk.domain.strategy.chai
 
+import com.iamport.sdk.data.chai.CHAI
 import com.iamport.sdk.data.chai.request.OS
 import com.iamport.sdk.data.chai.request.PrepareRequest
 import com.iamport.sdk.data.chai.response.*
@@ -9,7 +10,10 @@ import com.iamport.sdk.data.remote.ChaiApi
 import com.iamport.sdk.data.remote.IamportApi
 import com.iamport.sdk.data.remote.ResultWrapper
 import com.iamport.sdk.data.remote.ResultWrapper.*
-import com.iamport.sdk.data.sdk.*
+import com.iamport.sdk.data.sdk.IamPortApprove
+import com.iamport.sdk.data.sdk.IamPortResponse
+import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.domain.di.provideChaiApi
 import com.iamport.sdk.domain.strategy.base.BaseStrategy
 import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.Event
@@ -19,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinApiExtension
+import org.koin.core.component.get
 import org.koin.core.component.inject
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -26,8 +31,8 @@ import java.util.concurrent.atomic.AtomicInteger
 @KoinApiExtension
 open class ChaiStrategy : BaseStrategy() {
 
-    private val chaiApi: ChaiApi by inject() // 차이 서버 API
     private val iamportApi: IamportApi by inject() // 아임포트 서버 API
+    private lateinit var chaiApi: ChaiApi // 차이 서버 API
 
     private lateinit var chaiId: String // 차이 PG 아이디
 
@@ -371,14 +376,17 @@ open class ChaiStrategy : BaseStrategy() {
     // * 3. chai 앱 실행
     private suspend fun processPrepare(prepare: Prepare) {
         withContext(Dispatchers.Main) {
-            if (prepare.code == 0) {
-                prepare.data.returnUrl?.let {
-                    bus.chaiUri.value = Event(it)
+            prepare.run {
+                if (code == 0) {
+                    data.run {
+                        prepareData = this
+                        chaiApi = provideChaiApi(mode == CHAI.MODE, get(), get()) // mode 에 따라 chaiApi 생성
+                        returnUrl?.let { bus.chaiUri.value = Event(it) }
+                    }
+                } else {
+                    w(msg)
+                    failureFinish(payment, prepareData, msg)
                 }
-                this@ChaiStrategy.prepareData = prepare.data
-            } else {
-                w(prepare.msg)
-                failureFinish(payment, prepareData, prepare.msg)
             }
         }
     }
