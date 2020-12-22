@@ -79,6 +79,7 @@ dependencies {
     implementation 'com.orhanobut:logger:2.2.0'
 
 //    implementation project(':sdk')
+    implementation 'com.github.iamport:iamport-android:0.0.3-dev01'
 //    implementation 'com.github.iamport:iamport-android:dev-SNAPSHOT'
-    implementation 'com.github.iamport:iamport-android:0.0.2'
 }
+
