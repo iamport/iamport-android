@@ -37,6 +37,7 @@ open class ChaiStrategy : BaseStrategy() {
     private var pollingId = AtomicInteger() // 폴링 중복호출 방지위한 아이디 인덱스
 
     private var tryCount = 0     // 폴링 타임아웃
+    private var clearStopPolling = false  // 클리어버전이므로 종료시 폴링 안함
 
     private var networkError: String? = null // 네트워크 에러
 
@@ -71,6 +72,7 @@ open class ChaiStrategy : BaseStrategy() {
         prepareData = null
         pollingId = AtomicInteger()
         tryCount = 0
+        clearStopPolling = false
         bus.isPolling.value = Event(false)
     }
 
@@ -188,8 +190,10 @@ open class ChaiStrategy : BaseStrategy() {
         }
 
         if (bus.chaiClearVersion) {
-            d("새버전이라서 폴링 안할건데? 초기화 할건데?")
-            clearData()
+            d("차이 싱글 액티비티이므로 종료시 폴링하지 않음")
+//            clearData()
+            // 12/22/20 user_cancled 같은 상태도 체크해야 해서 클리어 하면 안됨
+            clearStopPolling = true
             return
         }
 
@@ -342,6 +346,9 @@ open class ChaiStrategy : BaseStrategy() {
             waiting, prepared -> {
                 if (isTryOut()) { // 타임아웃
                     i("${CONST.TRY_OUT_MIN}분 이상 결제되지 않아 결제취소 처리합니다. 결제를 재시도 해주세요.")
+                    clearData()
+                } else if (clearStopPolling) { // 타임아웃
+                    i("클리어 앱 버전이므로 폴링 취소")
                     clearData()
                 } else {
                     if (isBgAndScreenOn()) {
