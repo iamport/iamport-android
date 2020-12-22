@@ -5,11 +5,11 @@
 
 안드로이드 네이티브 앱에서 결제 개발을 간편하게 도와주는 아임포트 SDK 입니다.
 
-- CHAI 간편결제는 Native 연동되어 있습니다 (현재 staging 서버이므로 테스트만 가능)
+- CHAI 간편결제는 Native 연동되어 있습니다.
 
-- 그외 PG 들은 WebView 기반으로 연동되어 있습니다. (실제 결제 및 연동 가능) 
+- 그외 PG 들은 WebView 기반으로 연동되어 있습니다.
 
-- 추후 네이티브 순차적으로 연동 예정입니다. 
+- 추후 순차적으로 타 간편결제들도 네이티브 연동 예정입니다. 
 
 --- 
 
@@ -34,9 +34,9 @@
 ```
 
 > app build.gradle 
-[$SDK-VERSION][5]
+[$SDK_VERSION][5]
 ```gradle
-  implementation 'com.github.iamport:iamport-android:$SDK-VERSION'
+  implementation 'com.github.iamport:iamport-android:$SDK_VERSION'
 ```
 
 [5]: https://github.com/iamport/iamport-android/releases
@@ -116,7 +116,7 @@
 > (해당 enableChaiPollingForegroundService(false, false) 를 Iamport.payment(결제 함수) 전에 호출해주시면 포그라운드 서비스를 등록하지 않습니다)
 
 ```kotlin
-        Iamport.enableChaiPollingForegroundService(enableService = true, enableFailStopButton = true)
+  Iamport.enableChaiPollingForegroundService(enableService = true, enableFailStopButton = true)
 ```
 
 
