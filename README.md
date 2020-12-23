@@ -85,16 +85,16 @@
 ```
 
 
-> (Optional) 차이 결제에서 approveCallback 이 있을 때 (최종 결제전 재고 확인 등이 필요할 때)
-
-> 콜백 전달 받은 후에 chaiPayment 함수 호출 
+### Optional 구현사항 for CHAI 결제
+> - 차이 결제에서 approveCallback 이 있을 때 (최종 결제전 재고 확인 등이 필요할 때)  
+콜백 전달 받은 후에 chaiPayment 함수 호출  
 (타임아웃 : CONST.CHAI_FINAL_PAYMENT_TIME_OUT_SEC)
 ```kotlin
   Iamport.chaiPayment(iamPortApprove) // 재고 등 확인 후, 차이 최종 결제 요청 실행.
 ```
 
 
-> (Optional) 차이 결제 폴링 여부 확인
+> - 차이 결제 폴링 여부 확인
 ```kotlin
   // 차이 결제 상태체크 폴링 여부를 확인하실 수 있습니다.
   Iamport.isPolling()?.observe(this, EventObserver {
@@ -107,20 +107,18 @@
 
 
 
-> (Optional) 차이 결제 폴링 중에는 포그라운드 서비스가 알람에 뜨게 됩니다.
-
->> enableService = true 라면, 폴링중 포그라운드 서비스를 보여줍니다.
-
->> enableFailStopButton = true 라면, 포그라운드 서비스에서 중지 버튼 생성합니다.
-
-> (해당 enableChaiPollingForegroundService(false, false) 를 Iamport.payment(결제 함수) 전에 호출해주시면 포그라운드 서비스를 등록하지 않습니다)
+> - 차이 결제 폴링 중에는 포그라운드 서비스가 알람에 뜨게 됩니다.  
+enableService = true 라면, 폴링중 포그라운드 서비스를 보여줍니다.  
+enableFailStopButton = true 라면, 포그라운드 서비스에서 중지 버튼 생성합니다.  
+(해당 enableChaiPollingForegroundService(false, false) 를 Iamport.payment(결제 함수) 전에 호출해주시면 포그라운드 서비스를 등록하지 않습니다)
 
 ```kotlin
   Iamport.enableChaiPollingForegroundService(enableService = true, enableFailStopButton = true)
 ```
 
 
-> (Optional) 포그라운드 서비스 알람 및 중지 버튼 클릭시 동작을 아래 값의 브로드 캐스트 리시버를 통해 캐치할 수 있습니다.
+> - 포그라운드 서비스 알람 및 중지 버튼 클릭시 동작을   
+아래 값의 브로드 캐스트 리시버를 통해 캐치할 수 있습니다.
 
 [샘플앱의 예시 MerchantReceiver.kt](./app/src/main/java/com/iamport/sampleapp/MerchantReceiver.kt)
 
@@ -129,13 +127,14 @@
   const val BROADCAST_FOREGROUND_SERVICE_STOP = "com.iamport.sdk.broadcast.fgservice.stop"
 ```
 
-(* 포그라운드 서비스 직접 구현시에는 enableService = false 로 설정하고, Iamport.isPolling()?.observe 에서 true 전달 받을 시점에, 직접 포그라운드 서비스 만들어 띄우시면 됩니다.)
+- (포그라운드 서비스 직접 구현시에는 enableService = false 로 설정하고,  
+Iamport.isPolling()?.observe 에서 true 전달 받을 시점에, 직접 포그라운드 서비스 만들어 띄우시면 됩니다.)
 
 ---
 
-자바 프로젝트는 이쪽을 참조해주세요
+## 자바 프로젝트는 아래 [펼쳐보기] 를 참조해주세요
 <details>
-<summary>JAVA usage 펼쳐보기</summary>
+<summary>펼쳐보기</summary>
 
 ### JAVA usage
 
@@ -186,7 +185,8 @@
 ```
 
 
-> (Optional) 차이 결제에서 approveCallback 이 있을 때 (최종 결제전 재고 확인 등이 필요할 때)
+### Optional 구현사항 for CHAI 결제
+> - 차이 결제에서 approveCallback 이 있을 때 (최종 결제전 재고 확인 등이 필요할 때)
 ```java
   Iamport.INSTANCE.chaiPayment(iamPortApprove) // 재고 등 확인 후, 차이 최종 결제 요청 실행.
 ```
@@ -194,7 +194,7 @@
 [4]: https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib
 
 
-> (Optional) 차이폴링 여부 확인
+> - 차이 결제 폴링 여부 확인
 ```java
   Iamport.INSTANCE.isPolling().observe(this, EventObserver -> {
       i("차이 폴링? :: " + it)
@@ -204,13 +204,13 @@
 ```
 
 
-> (Optional) 차이 결제 폴링 중에는 포그라운드 서비스가 알람에 뜨게 됩니다.
+> - 차이 결제 폴링 중에는 포그라운드 서비스가 알람에 뜨게 됩니다.  
 ```java
   Iamport.INSTANCE.enableChaiPollingForegroundService(true, true)
 ```
 
 
-> (Optional) 포그라운드 서비스 알람 및 중지 버튼 클릭시 동작을 아래 값의 브로드 캐스트 리시버를 통해 캐치할 수 있습니다.
+> - 포그라운드 서비스 알람 및 중지 버튼 클릭시 동작을 아래 값의 브로드 캐스트 리시버를 통해 캐치할 수 있습니다.
 ```kotlin
   const val BROADCAST_FOREGROUND_SERVICE = "com.iamport.sdk.broadcast.fgservice"
   const val BROADCAST_FOREGROUND_SERVICE_STOP = "com.iamport.sdk.broadcast.fgservice.stop"
