@@ -148,13 +148,14 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
     }
 
     /**
-     * 차이 결제 스테이터스 확인 with 폴링
+     * ON_STOP시 차이 결제 스테이터스 확인 with 폴링
      */
     fun pollingChaiStatus() {
         if (!playChai) {
             d("ignore pollingChaiStatus cause playChai")
             return
         }
+        
         viewModelScope.launch(job) {
             d("백그라운드라서 폴링 시도")
             repository.chaiStrategy.requestPollingChaiStatus()
@@ -163,7 +164,7 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
 
 
     /**
-     * 차이 결제 스테이터스 확인
+     * ON_START시 차이 결제 스테이터스 확인
      */
     fun checkChaiStatus() {
         if (!playChai) {
@@ -181,5 +182,13 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
             d("차이앱 종료돼서 차이 결제 상태 체크")
             repository.chaiStrategy.requestCheckChaiStatus()
         }
+    }
+
+    /**
+     * ResultCallback시 차이 결제 스테이터스 확인
+     */
+    fun checkChaiStatusForResultCallback() {
+        checkChaiStatus()
+        receiveChaiCallBack = true
     }
 }

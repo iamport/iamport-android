@@ -193,8 +193,7 @@ internal class IamportSdk(
      */
     private fun resultCallback() {
         d("Result Callback ChaiLauncher")
-        viewModel.checkChaiStatus()
-        viewModel.receiveChaiCallBack = true
+        viewModel.checkChaiStatusForResultCallback()
     }
 
     /**

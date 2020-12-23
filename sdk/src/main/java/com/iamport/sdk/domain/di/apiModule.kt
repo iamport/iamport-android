@@ -45,10 +45,9 @@ fun provideNiceApi(gson: Gson, client: OkHttpClient?): NiceApi {
         .create(NiceApi::class.java)
 }
 
-fun provideChaiApi(gson: Gson, client: OkHttpClient?): ChaiApi {
+fun provideChaiApi(isStaging: Boolean, gson: Gson, client: OkHttpClient?): ChaiApi {
     return Retrofit.Builder()
-//        .baseUrl(if (BuildConfig.DEBUG) CONST.CHAI_SERVICE_STAGING_URL else CONST.CHAI_SERVICE_URL)
-        .baseUrl(CONST.CHAI_SERVICE_STAGING_URL)
+        .baseUrl(if (isStaging) CONST.CHAI_SERVICE_STAGING_URL else CONST.CHAI_SERVICE_URL)
         .addConverterFactory(GsonConverterFactory.create(gson)).apply {
             client?.let { client(it) }
         }
@@ -64,6 +63,6 @@ val httpClientModule = module {
 @OptIn(KoinApiExtension::class)
 val apiModule = module {
     single { provideIamportApi(get(), get()) }
-    single { provideChaiApi(get(), get()) }
+//    single { provideChaiApi(false, get(), get()) }
     single { provideNiceApi(get(), get()) }
 }
