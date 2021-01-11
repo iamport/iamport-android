@@ -26,13 +26,13 @@ class StrategyRepository : KoinComponent {
     /**
      * 실제로 앱 띄울 결제 타입
      */
-    enum class PaymenyKinds {
+    enum class PaymentKinds {
         CHAI, NICE, WEB
     }
 
     fun failSdkFinish(payment: Payment ) {
         when(getPaymentKinds(payment)) {
-            PaymenyKinds.CHAI -> chaiStrategy.failFinish("사용자가 결제확인 서비스 종료하셨습니다")
+            PaymentKinds.CHAI -> chaiStrategy.failFinish("사용자가 결제확인 서비스 종료하셨습니다")
             else -> Logger.d("사용자가 결제확인 서비스 종료하셨습니다")
         }
     }
@@ -41,7 +41,7 @@ class StrategyRepository : KoinComponent {
      * PG 와 PayMethod 로 결제 타입하여 가져옴
      * @return PaymenyKinds
      */
-    private fun getPaymentKinds(payment: Payment): PaymenyKinds {
+    private fun getPaymentKinds(payment: Payment): PaymentKinds {
 
         fun isChaiPayment(pgPair: Pair<PG, PayMethod>): Boolean {
             return pgPair.first == PG.chai
@@ -55,24 +55,24 @@ class StrategyRepository : KoinComponent {
         request.pgEnum?.let {
             Pair(it, request.pay_method).let { pair: Pair<PG, PayMethod> ->
                 return when {
-                    isChaiPayment(pair) -> PaymenyKinds.CHAI
-                    isNiceTransPayment(pair) -> PaymenyKinds.NICE
-                    else -> PaymenyKinds.WEB
+                    isChaiPayment(pair) -> PaymentKinds.CHAI
+                    isNiceTransPayment(pair) -> PaymentKinds.NICE
+                    else -> PaymentKinds.WEB
                 }
             }
-        } ?: run { return PaymenyKinds.WEB } // default WEB
+        } ?: run { return PaymentKinds.WEB } // default WEB
     }
 
     fun getWebViewStrategy(payment: Payment): IStrategy {
         return when (getPaymentKinds(payment)) {
-            PaymenyKinds.NICE -> niceTransWebViewStrategy
+            PaymentKinds.NICE -> niceTransWebViewStrategy
             else -> webViewStrategy
         }
     }
 
     fun getWebViewClient(payment: Payment): WebViewClient {
         return when (getPaymentKinds(payment)) {
-            PaymenyKinds.NICE -> niceTransWebViewStrategy
+            PaymentKinds.NICE -> niceTransWebViewStrategy
             else -> webViewStrategy
         }
     }
