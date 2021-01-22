@@ -67,8 +67,8 @@ class JudgeStrategy : BaseStrategy(), KoinComponent {
         }
 
         Logger.d("userDataList :: $userDataList")
-
-        return when (val user = userDataList.find { it.pg_provider?.getPgSting() == payment.iamPortRequest.pg }) {
+        val myPg = payment.iamPortRequest.pg.split(".")[0]
+        return when (val user = userDataList.find { it.pg_provider?.getPgSting() == myPg }) {
             null -> defUser.let { getPgTriple(it, replacePG(it.pg_provider!!, payment)) } // user 를 찾지 못하면 디폴트 값 사용
 
             else -> getPgTriple(user, payment)
