@@ -43,7 +43,7 @@ abstract class AbstractKoinTest : AutoCloseKoinTest() {
         val mockApiModule by lazy {
             module {
                 single { provideIamportApi(get(), null) }
-                single { provideChaiApi(get(), null) }
+                single { provideChaiApi(false, get(),null) }
                 single { provideNiceApi(get(), null) }
             }
         }
