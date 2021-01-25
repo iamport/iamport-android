@@ -49,7 +49,7 @@
 
   // 일반적인 경우
   // 사용하시는 안드로이드 어플리케이션 클래스에 추가하세요
-  class ExampleApplication : Application() {
+  class BaseApplication : Application() {
     override fun onCreate() {
         ..
         Iamport.create(this)
@@ -164,10 +164,10 @@ Iamport.isPolling()?.observe 에서 true 전달 받을 시점에, 직접 포그�
 ### JAVA usage
 
 > 자바 프로젝트에선 app build.gradle 에서 kotin-stblib 추가가 필요합니다
-[$코틀린_버전][4]
+[$코틀린-버전][4]
 
 ```gradle 
-  implementation "org.jetbrains.kotlin:kotlin-stdlib:$코틀린_버전"
+  implementation "org.jetbrains.kotlin:kotlin-stdlib:$코틀린-버전"
 ```
 
 > 필수구현 사항. SDK 제공 api 별 설명은 위의 [KOTLIN usage][6] 를 참고하세요.
