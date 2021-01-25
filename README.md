@@ -34,9 +34,9 @@
 ```
 
 > app build.gradle 
-[$SDK_VERSION][5]
+[$SDK-VERSION][5]
 ```gradle
-  implementation 'com.github.iamport:iamport-android:$SDK_VERSION'
+  implementation 'com.github.iamport:iamport-android:$SDK-VERSION'
 ```
 
 [5]: https://github.com/iamport/iamport-android/releases
@@ -45,6 +45,31 @@
 ### KOTLIN usage
 
 > 필수구현 사항
+```kotlin
+
+  // 일반적인 경우
+  // 사용하시는 안드로이드 어플리케이션 클래스에 추가하세요
+  class ExampleApplication : Application() {
+    override fun onCreate() {
+        ..
+        Iamport.create(this)
+    }
+  }
+    
+   // DI 로 koin 을 사용하시는 경우 
+   // 생성된 koinApplication 을 파라미터로 넘겨주셔야 합니다
+   class BaseApplication : Application() {
+    override fun onCreate() {
+        ..   
+        val koinApp = startKoin { .. }
+        Iamport.create(this, koinApp)
+    }
+    
+    // KoinApplication 이 필요한 경우
+    Iamport.getKoinApplition() 
+}
+
+```
 ```kotlin
 
   // SDK 초기화
@@ -150,6 +175,31 @@ Iamport.isPolling()?.observe 에서 true 전달 받을 시점에, 직접 포그�
 [6]:https://github.com/iamport/iamport-android#kotlin-usage
 
 ```java
+  // 일반적인 경우
+  // 사용하시는 안드로이드 어플리케이션 클래스에 추가하세요
+  public class BaseApplication extends Application {
+      @Override
+      public void onCreate() {
+          ..
+          Iamport.INSTANCE.create(this, null);
+      }
+  }
+
+   // DI 로 koin 을 사용하시는 경우 
+   // 생성된 koinApplication 을 파라미터로 넘겨주셔야 합니다
+    public class BaseApplication extends Application {
+        @Override
+        public void onCreate() {
+            ..
+            KoinApplication koinApp = ..
+            Iamport.INSTANCE.create(this, koinApp);
+        }
+    }
+
+```
+
+
+```java
 
   @Override
   public void onCreate() {
@@ -236,6 +286,24 @@ Iamport.isPolling()?.observe 에서 true 전달 받을 시점에, 직접 포그�
 3. build app
 
 ---
+
+[BaseApplication.kt (SDK 생성)](./app/src/main/java/com/iamport/sampleapp/BaseApplication.kt)
+
+```kotlin
+    override fun onCreate() {
+        super.onCreate()
+        Iamport.create(this)
+
+        /**
+         * DI 로 KOIN 사용시 아래와 같이 사용
+        val koinApp = startKoin {
+            logger(AndroidLogger(Level.DEBUG))
+            androidContext(this@BaseApplication)
+        }
+        Iamport.create(this, koinApp)
+         */
+    }
+```
 
 [PaymentFragment.kt (결제 화면)](./app/src/main/java/com/iamport/sampleapp/ui/PaymentFragment.kt)
 
