@@ -13,6 +13,8 @@ import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortRequest
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.domain.di.IamportKoinContext
+import com.iamport.sdk.domain.di.IamportKoinContext.koinApp
 import com.iamport.sdk.domain.di.apiModule
 import com.iamport.sdk.domain.di.appModule
 import com.iamport.sdk.domain.di.httpClientModule
@@ -29,6 +31,7 @@ import com.orhanobut.logger.Logger.d
 import com.orhanobut.logger.PrettyFormatStrategy
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.logger.AndroidLogger
+import org.koin.core.KoinApplication
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
@@ -73,10 +76,21 @@ object Iamport {
         return isCreated
     }
 
+    fun getKoinApplition(): KoinApplication? {
+        return koinApp
+    }
+
     /**
      * Application instance 를 통해 SDK 생명주기 감지, DI 초기화
      */
-    fun create(app: Application) {
+    fun create(app: Application, koinApp: KoinApplication? = null) {
+
+        IamportKoinContext.koinApp = koinApp
+            ?: startKoin {
+                logger(AndroidLogger(Level.DEBUG))
+                androidContext(app)
+                modules(httpClientModule, apiModule, appModule)
+            }
 
         Foreground.init(app)
 
@@ -95,12 +109,6 @@ object Iamport {
                 .build()
         }
         Logger.addLogAdapter(AndroidLogAdapter(formatStrategy))
-
-        startKoin {
-            logger(AndroidLogger(Level.DEBUG))
-            androidContext(app)
-            modules(httpClientModule, apiModule, appModule)
-        }
 
         isCreated = true
         d("Create IAMPORT SDK")

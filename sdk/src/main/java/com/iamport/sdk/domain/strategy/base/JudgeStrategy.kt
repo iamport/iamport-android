@@ -7,14 +7,14 @@ import com.iamport.sdk.data.remote.IamportApi
 import com.iamport.sdk.data.remote.ResultWrapper
 import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.orhanobut.logger.Logger
 import kotlinx.coroutines.Dispatchers
 import org.koin.core.component.KoinApiExtension
-import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 @KoinApiExtension
-class JudgeStrategy : BaseStrategy(), KoinComponent {
+class JudgeStrategy : BaseStrategy(), IamportKoinComponent {
 
     // 유저 정보 판단 결과 타입
     enum class JudgeKinds {

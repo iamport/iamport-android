@@ -14,6 +14,7 @@ import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.data.sdk.ProvidePgPkg
 import com.iamport.sdk.domain.core.IamportReceiver
+import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.service.ChaiService
 import com.iamport.sdk.domain.utils.*
 import com.iamport.sdk.domain.utils.Util.observeAlways
@@ -22,7 +23,6 @@ import com.iamport.sdk.presentation.viewmodel.MainViewModel
 import com.orhanobut.logger.Logger.*
 import org.koin.androidx.viewmodel.compat.ViewModelCompat.viewModel
 import org.koin.core.component.KoinApiExtension
-import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.*
 
@@ -35,7 +35,7 @@ internal class IamportSdk(
     val approvePayment: LiveData<Event<IamPortApprove>>,
     val close: LiveData<Event<Unit>>,
     val finish: LiveData<Event<Unit>>,
-) : KoinComponent {
+) : IamportKoinComponent {
 
     private val hostHelper: HostHelper = HostHelper(activity, fragment)
 
