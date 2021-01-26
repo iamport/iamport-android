@@ -5,6 +5,6 @@ import com.iamport.sdk.data.sdk.PG
 data class UserData(
     val pg_provider: PG?, // TODO: 2020-12-15 015 nullable 로 오는데.. 확인필요..
     val pg_id: String,
-    val sandbox: Boolean,
+    val sandbox: Boolean?,
     val type: String,
 )
