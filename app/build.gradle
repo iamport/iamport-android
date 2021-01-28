@@ -90,6 +90,7 @@ dependencies {
 // Koin AndroidX Experimental features
     implementation "org.koin:koin-androidx-ext:$koin_version"
 
+    implementation project(':sdk')
 //    implementation 'com.github.iamport:iamport-android:dev-SNAPSHOT'
 }
 
