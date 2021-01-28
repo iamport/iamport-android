@@ -1,5 +1,7 @@
 package com.iamport.sdk.presentation.activity
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
@@ -40,7 +42,8 @@ internal class IamportSdk(
     private val hostHelper: HostHelper = HostHelper(activity, fragment)
 
     private val launcherChai: ActivityResultLauncher<Pair<String, String>>? // 차이앱 런처
-//    private val viewModel: MainViewModel // 요청할 뷰모델
+
+    //    private val viewModel: MainViewModel // 요청할 뷰모델
     private val viewModel: MainViewModel by viewModel(hostHelper.viewModelStoreOwner, MainViewModel::class.java) // 요청할 뷰모델 {
 
 
@@ -50,7 +53,23 @@ internal class IamportSdk(
     private val isPolling = MutableLiveData<Event<Boolean>>()
     private val preventOverlapRun = PreventOverlapRun() // 딜레이 호출
 
+    // 포그라운드 서비스 관련 BroadcastReceiver
     private val iamportReceiver: IamportReceiver by inject()
+
+    // 스크린 on/off 감지 BroadcastReceiver
+    private val screenBrReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            when (intent?.action) {
+                Intent.ACTION_SCREEN_ON -> Foreground.isScreenOn = true
+                Intent.ACTION_SCREEN_OFF -> Foreground.isScreenOn = false
+            }
+            d(intent?.action.toString())
+        }
+    }
+
+    private val screenBrFilter = IntentFilter(Intent.ACTION_SCREEN_OFF).apply {
+        addAction(Intent.ACTION_SCREEN_ON)
+    }
 
     init {
 //        viewModel = ViewModelProvider(hostHelper.viewModelStoreOwner, MainViewModelFactory(get(), get())).get(MainViewModel::class.java)
@@ -85,6 +104,7 @@ internal class IamportSdk(
             hostHelper.lifecycle.removeObserver(this)
             runCatching {
                 hostHelper.context?.unregisterReceiver(iamportReceiver)
+                hostHelper.context?.applicationContext?.unregisterReceiver(screenBrReceiver)
             }
         }
     }
@@ -98,6 +118,7 @@ internal class IamportSdk(
         IntentFilter().let {
             it.addAction(CONST.BROADCAST_FOREGROUND_SERVICE)
             it.addAction(CONST.BROADCAST_FOREGROUND_SERVICE_STOP)
+            hostHelper.context?.applicationContext?.registerReceiver(screenBrReceiver, screenBrFilter)
             hostHelper.context?.registerReceiver(iamportReceiver, it)
         }
 
