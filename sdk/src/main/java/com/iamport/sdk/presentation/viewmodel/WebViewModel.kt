@@ -6,17 +6,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.repository.StrategyRepository
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.WebViewLiveDataEventBus
 import com.orhanobut.logger.Logger.d
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinApiExtension
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 @KoinApiExtension
-class WebViewModel(private val bus: WebViewLiveDataEventBus, private val repository: StrategyRepository) : BaseViewModel(), KoinComponent {
+class WebViewModel(private val bus: WebViewLiveDataEventBus, private val repository: StrategyRepository) : BaseViewModel(), IamportKoinComponent {
 
     override fun onCleared() {
         d("onCleared")

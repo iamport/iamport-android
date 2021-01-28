@@ -1,22 +1,40 @@
 package com.iamport.sdk.domain.core
 
+import android.app.Application
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.MainThread
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.iamport.sdk.BuildConfig.DEBUG
 import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortRequest
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.domain.di.IamportKoinContext
+import com.iamport.sdk.domain.di.IamportKoinContext.koinApp
+import com.iamport.sdk.domain.di.apiModule
+import com.iamport.sdk.domain.di.appModule
+import com.iamport.sdk.domain.di.httpClientModule
 import com.iamport.sdk.domain.service.ChaiService
-import com.iamport.sdk.domain.utils.PreventOverlapRun
+import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.Event
+import com.iamport.sdk.domain.utils.Foreground
+import com.iamport.sdk.domain.utils.PreventOverlapRun
 import com.iamport.sdk.presentation.activity.IamportSdk
 import com.iamport.sdk.presentation.contract.WebViewActivityContract
+import com.orhanobut.logger.AndroidLogAdapter
+import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Logger.d
+import com.orhanobut.logger.PrettyFormatStrategy
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.logger.AndroidLogger
+import org.koin.core.KoinApplication
 import org.koin.core.component.KoinApiExtension
+import org.koin.core.context.startKoin
+import org.koin.core.logger.Level
 
 
 object Iamport {
@@ -32,9 +50,11 @@ object Iamport {
     private var close = MutableLiveData<Event<Unit>>()
     private var finish = MutableLiveData<Event<Unit>>()
 
-    var activity: ComponentActivity? = null
+    private var activity: ComponentActivity? = null
     private var fragment: Fragment? = null
     private var preventOverlapRun: PreventOverlapRun? = null
+
+    private var isCreated = false
 
     private fun clear() {
         fragment = null
@@ -49,12 +69,63 @@ object Iamport {
         this.preventOverlapRun = PreventOverlapRun()
     }
 
+    private fun iamportCreated(): Boolean {
+        if (!isCreated) {
+            Log.e(CONST.IAMPORT_LOG, "IAMPORT SDK was not created. Please initialize it in Application class")
+        }
+        return isCreated
+    }
+
+    fun getKoinApplition(): KoinApplication? {
+        return koinApp
+    }
+
+    /**
+     * Application instance 를 통해 SDK 생명주기 감지, DI 초기화
+     */
+    fun create(app: Application, koinApp: KoinApplication? = null) {
+
+        IamportKoinContext.koinApp = koinApp
+            ?: startKoin {
+                logger(AndroidLogger(Level.DEBUG))
+                androidContext(app)
+                modules(httpClientModule, apiModule, appModule)
+            }
+
+        Foreground.init(app)
+
+        val logBuilder = PrettyFormatStrategy.newBuilder()
+        val formatStrategy: PrettyFormatStrategy = if (DEBUG) {
+            logBuilder
+                .methodCount(3)
+                .tag(CONST.IAMPORT_LOG)
+                .build()
+        } else {
+            logBuilder
+                .showThreadInfo(false)  // (Optional) Whether to show thread info or not. Default true
+                .methodCount(0)         // (Optional) How many method line to show. Default 2
+                .methodOffset(5)        // (Optional) Hides internal method calls up to offset. Default 5
+                .tag(CONST.IAMPORT_LOG)
+                .build()
+        }
+        Logger.addLogAdapter(AndroidLogAdapter(formatStrategy))
+
+        isCreated = true
+        d("Create IAMPORT SDK")
+    }
+
     /**
      * SDK Activity 열기 위한 Contract for Activity
      * @param componentActivity : Host Activity
      */
     fun init(componentActivity: ComponentActivity) {
-        d("init")
+
+        if (!iamportCreated()) {
+            return
+        }
+
+        d("INITIALIZE IAMPORT SDK for activity")
+
         clear()
         createInitialData()
 
@@ -78,7 +149,13 @@ object Iamport {
      * @param fragment : Host Fragment
      */
     fun init(fragment: Fragment) {
-        d("init")
+
+        if (!iamportCreated()) {
+            return
+        }
+
+        d("INITIALIZE IAMPORT SDK for fragment")
+
         clear()
         createInitialData()
 

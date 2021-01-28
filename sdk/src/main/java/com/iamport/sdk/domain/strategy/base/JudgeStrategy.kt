@@ -7,14 +7,14 @@ import com.iamport.sdk.data.remote.IamportApi
 import com.iamport.sdk.data.remote.ResultWrapper
 import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.orhanobut.logger.Logger
 import kotlinx.coroutines.Dispatchers
 import org.koin.core.component.KoinApiExtension
-import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 @KoinApiExtension
-class JudgeStrategy : BaseStrategy(), KoinComponent {
+class JudgeStrategy : BaseStrategy(), IamportKoinComponent {
 
     // 유저 정보 판단 결과 타입
     enum class JudgeKinds {
@@ -67,8 +67,17 @@ class JudgeStrategy : BaseStrategy(), KoinComponent {
         }
 
         Logger.d("userDataList :: $userDataList")
-        val myPg = payment.iamPortRequest.pg.split(".")[0]
-        return when (val user = userDataList.find { it.pg_provider?.getPgSting() == myPg }) {
+        val split = payment.iamPortRequest.pg.split(".")
+        val myPg = split[0]
+        val user = userDataList.find {
+            if (split.size > 1) {
+                it.pg_provider?.getPgSting() == myPg && it.pg_id == split[1]
+            } else {
+                it.pg_provider?.getPgSting() == myPg
+            }
+        }
+
+        return when (user) {
             null -> defUser.let { getPgTriple(it, replacePG(it.pg_provider!!, payment)) } // user 를 찾지 못하면 디폴트 값 사용
 
             else -> getPgTriple(user, payment)

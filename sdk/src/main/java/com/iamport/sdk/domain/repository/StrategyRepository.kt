@@ -4,6 +4,7 @@ import android.webkit.WebViewClient
 import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.data.sdk.PayMethod
 import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.strategy.base.IStrategy
 import com.iamport.sdk.domain.strategy.base.JudgeStrategy
 import com.iamport.sdk.domain.strategy.chai.ChaiStrategy
@@ -11,11 +12,10 @@ import com.iamport.sdk.domain.strategy.webview.NiceTransWebViewStrategy
 import com.iamport.sdk.domain.strategy.webview.WebViewStrategy
 import com.orhanobut.logger.Logger
 import org.koin.core.component.KoinApiExtension
-import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 @KoinApiExtension
-class StrategyRepository : KoinComponent {
+class StrategyRepository : IamportKoinComponent {
 
     val judgeStrategy: JudgeStrategy by inject() // 결제 중 BG 폴링하는 차이 전략
     val chaiStrategy: ChaiStrategy by inject() // 결제 중 BG 폴링하는 차이 전략

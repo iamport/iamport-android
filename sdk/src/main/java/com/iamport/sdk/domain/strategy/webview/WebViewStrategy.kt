@@ -1,6 +1,8 @@
 package com.iamport.sdk.domain.strategy.webview
 
+import android.net.Uri
 import android.os.Build
+import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import androidx.annotation.RequiresApi
@@ -21,6 +23,19 @@ open class WebViewStrategy : BaseWebViewStrategy() {
         bus.openWebView.postValue(Event(payment))
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
+    override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
+        request?.url?.let {
+            if (isPaymentOver(it)) {
+                paymentOver(it)
+            } else {
+                super.onReceivedError(view, request, error)
+            }
+        } ?: run {
+            super.onReceivedError(view, request, error)
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
 
@@ -33,13 +48,20 @@ open class WebViewStrategy : BaseWebViewStrategy() {
             }
 
             if (isPaymentOver(it)) {
-                val response = Util.getQueryStringToImpResponse(it, gson)
-                d("paymentOver :: $response")
-                sdkFinish(response)
+                paymentOver(it)
                 return true
             }
         }
 
         return super.shouldOverrideUrlLoading(view, request)
     }
+
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
+    fun paymentOver(uri: Uri) {
+        val response = Util.getQueryStringToImpResponse(uri, gson)
+        d("paymentOver :: $response")
+        sdkFinish(response)
+    }
+
+
 }

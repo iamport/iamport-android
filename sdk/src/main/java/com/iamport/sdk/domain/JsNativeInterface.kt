@@ -4,14 +4,14 @@ import android.webkit.JavascriptInterface
 import com.google.gson.Gson
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.WebViewLiveDataEventBus
 import com.orhanobut.logger.Logger
 import org.koin.core.component.KoinApiExtension
-import org.koin.core.component.KoinComponent
 
 @KoinApiExtension
-class JsNativeInterface(val payment: Payment, val gson: Gson, private val bus: WebViewLiveDataEventBus) : KoinComponent {
+class JsNativeInterface(val payment: Payment, val gson: Gson, private val bus: WebViewLiveDataEventBus) : IamportKoinComponent {
 
     /**
      * 아임포트 JS SDK 에게 유저코드 전달§

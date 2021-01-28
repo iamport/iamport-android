@@ -13,6 +13,7 @@ import com.iamport.sdk.data.sdk.ProvidePgPkg
 import com.iamport.sdk.databinding.WebviewActivityBinding
 import com.iamport.sdk.domain.IamportWebChromeClient
 import com.iamport.sdk.domain.JsNativeInterface
+import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.EventObserver
 import com.iamport.sdk.domain.utils.Util
@@ -22,11 +23,10 @@ import com.orhanobut.logger.Logger.*
 import org.koin.android.ext.android.get
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.component.KoinApiExtension
-import org.koin.core.component.KoinComponent
 
 
 @KoinApiExtension
-class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), KoinComponent {
+class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), IamportKoinComponent {
 
     override val layoutResourceId: Int = R.layout.webview_activity
     override val viewModel: WebViewModel by viewModel()
