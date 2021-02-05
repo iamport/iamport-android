@@ -7,6 +7,6 @@ enum class ChaiPaymentStatus {
     confirmed, partial_confirmed;
 
     companion object {
-        fun from(s: String): ChaiPaymentStatus? = values().find { it.name == s }
+        fun from(displayStatus: String): ChaiPaymentStatus? = values().find { it.name == displayStatus }
     }
 }

@@ -290,6 +290,7 @@ open class ChaiStrategy : BaseStrategy() {
                 return
             }
 
+            // TODO approved 한번 더 체크하는거 필요할까?
             when (val response =
                 apiGetChaiStatus(idempotencyKey.toString(), publicAPIKey.toString(), paymentId.toString())) {
                 is NetworkError -> failureFinish(payment, prepareData, "NetworkError ${response.error}")
@@ -341,7 +342,7 @@ open class ChaiStrategy : BaseStrategy() {
         }
         tryCount++
 
-        when (ChaiPaymentStatus.from(chaiPayment.status)) {
+        when (ChaiPaymentStatus.from(chaiPayment.displayStatus)) {
             approved -> confirmMerchant(payment, data)
 
             confirmed -> successFinish(payment, prepareData, "가맹점 측 결제 승인 완료 (결제 성공) ${chaiPayment.status}")

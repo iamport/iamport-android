@@ -34,8 +34,11 @@ class JsNativeInterface(val payment: Payment, val gson: Gson, private val bus: W
      */
     @JavascriptInterface
     fun customCallback(response: String) {
-        val impRes = gson.fromJson(response, IamPortResponse::class.java)
-        Logger.d("customCallback paymentover :: $impRes")
-        bus.impResponse.postValue(Event(impRes))
+        Logger.d("customCallback response :: $response")
+        runCatching {
+            val impRes = gson.fromJson(response, IamPortResponse::class.java)
+            Logger.d("customCallback paymentover :: $impRes")
+            bus.impResponse.postValue(Event(impRes))
+        }
     }
 }

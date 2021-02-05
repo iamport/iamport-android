@@ -9,17 +9,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Logger.d
 
 
 object Foreground : ActivityLifecycleCallbacks {
-
-    var appStatus: AppStatus? = null
-
-    val isBackground: Boolean // 백그라운드 여부
-        get() = appStatus!!.ordinal == AppStatus.BACKGROUND.ordinal
-
-    var isScreenOn: Boolean = true // 스크린 on/off 여부
 
     enum class AppStatus {
         BACKGROUND,  // app is background
@@ -27,27 +21,26 @@ object Foreground : ActivityLifecycleCallbacks {
         FOREGROUND, // app is foreground
     }
 
+    var application: Application? = null
+    var appStatus: AppStatus? = null
+
+    val isBackground: Boolean // 백그라운드 여부
+        get() = appStatus!!.ordinal == AppStatus.BACKGROUND.ordinal
+
+    var isScreenOn: Boolean = true // 스크린 on/off 여부
+
+
     // running activity count
     private var running = 0
 
+
     fun init(app: Application) {
+        application = app
+
         // 생명주기 콜백
-        app.registerActivityLifecycleCallbacks(this)
-
-        // 스크린 on/off 감지 intent 필터
-        app.registerReceiver(object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                when (intent?.action) {
-                    Intent.ACTION_SCREEN_ON -> isScreenOn = true
-                    Intent.ACTION_SCREEN_OFF -> isScreenOn = false
-                }
-                d(intent?.action.toString())
-            }
-        }, IntentFilter(Intent.ACTION_SCREEN_OFF).apply {
-            addAction(Intent.ACTION_SCREEN_ON)
-        })
+        application?.registerActivityLifecycleCallbacks(this)
+//        application?.unregisterActivityLifecycleCallbacks(this) // https://stackoverflow.com/questions/17865187/what-is-the-proper-way-to-unregister-activity-lifecycle-callbacks/23299321
     }
-
 
     override fun onActivityCreated(activity: Activity, bundle: Bundle?) {}
     override fun onActivityStarted(activity: Activity) {
@@ -72,5 +65,6 @@ object Foreground : ActivityLifecycleCallbacks {
 
     override fun onActivitySaveInstanceState(activity: Activity, bundle: Bundle) {}
     override fun onActivityDestroyed(activity: Activity) {}
+
 
 }
