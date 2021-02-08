@@ -48,30 +48,15 @@ data class IamPortRequest(
         fun builder() = Builder()
 
         class Builder {
-            var pg: String
-                get() {
-                    return pg
-                }
-                set(value) {
-                    pg = value
-                }
+            lateinit var pg: String
+            lateinit var merchant_uid: String
+            lateinit var amount: String
+
             var pay_method: PayMethod = PayMethod.card // 명세상 필수인지 불명확함, default card
             var escrow: Boolean? = null // default false
-            var merchant_uid: String
-                get() {
-                    return merchant_uid
-                }
-                set(value) {
-                    merchant_uid = value
-                }// default "random"
+
             var name: String? = null
-            var amount: String
-                get() {
-                    return amount
-                }
-                set(value) {
-                    amount = value
-                }
+
             var custom_data: String? = null // 명세상 불명확
             var tax_free: String? = null
             var currency: Currency? = null // default KRW, 페이팔은 USD 이어야 함
