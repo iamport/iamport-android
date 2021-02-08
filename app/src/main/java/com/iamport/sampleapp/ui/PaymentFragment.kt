@@ -128,7 +128,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
          * SDK 에 결제 요청할 데이터 구성
          */
         val request = IamPortRequest(
-            pg = pg.getPgSting(storeId = ""),           // PG 사
+            pg = pg.makePgRawName(storeId = ""),           // PG 사
             pay_method = payMethod,                     // 결제수단
             name = paymentName,                         // 주문명
             merchant_uid = merchantUid,                 // 주문번호

@@ -71,9 +71,9 @@ class JudgeStrategy : BaseStrategy(), IamportKoinComponent {
         val myPg = split[0]
         val user = userDataList.find {
             if (split.size > 1) {
-                it.pg_provider?.getPgSting() == myPg && it.pg_id == split[1]
+                it.pg_provider?.makePgRawName() == myPg && it.pg_id == split[1]
             } else {
-                it.pg_provider?.getPgSting() == myPg
+                it.pg_provider?.makePgRawName() == myPg
             }
         }
 
@@ -102,7 +102,7 @@ class JudgeStrategy : BaseStrategy(), IamportKoinComponent {
      * payment PG 를 default PG 로 수정함
      */
     private fun replacePG(pg: PG, payment: Payment): Payment {
-        val iamPortRequest = payment.iamPortRequest.copy(pg = pg.getPgSting())
+        val iamPortRequest = payment.iamPortRequest.copy(pg = pg.makePgRawName())
         return payment.copy(iamPortRequest = iamPortRequest)
     }
 
