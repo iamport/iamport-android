@@ -80,11 +80,15 @@ object Iamport {
         return koinApp
     }
 
+    fun create(app: Application) {
+        createWithKoin(app)
+    }
+
     /**
      * Application instance 를 통해 SDK 생명주기 감지, DI 초기화
      */
     // TODO Application 사용하지 않는 방안 모색
-    fun create(app: Application, koinApp: KoinApplication? = null) {
+    fun createWithKoin(app: Application, koinApp: KoinApplication? = null) {
 
         IamportKoinContext.koinApp = koinApp
             ?: startKoin {
