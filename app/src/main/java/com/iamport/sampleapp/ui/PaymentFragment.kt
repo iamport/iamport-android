@@ -4,6 +4,7 @@ import android.app.AlertDialog.Builder
 import android.content.Context
 import android.content.IntentFilter
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -22,7 +23,6 @@ import com.iamport.sdk.domain.core.Iamport
 import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.EventObserver
 import com.iamport.sdk.domain.utils.Util
-import com.orhanobut.logger.Logger.i
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -106,11 +106,11 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
     private fun onPolling() {
         // 차이 결제 상태체크 폴링 여부를 확인하실 수 있습니다.
         Iamport.isPolling()?.observe(this, EventObserver {
-            i("차이 폴링? :: $it")
+            Log.i("SAMPLE", "차이 폴링? :: $it")
         })
 
         // 또는, 폴링 상태를 보고 싶을 때 명시적으로 호출
-        i("isPolling? ${Iamport.isPollingValue()}")
+        Log.i("SAMPLE", "isPolling? ${Iamport.isPollingValue()}")
     }
 
 
@@ -137,8 +137,8 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
         )
 
         val userCode = Util.getUserCode(viewDataBinding.userCode.selectedItemPosition)
-        i("userCode :: $userCode")
-        i(GsonBuilder().setPrettyPrinting().create().toJson(request))
+        Log.i("SAMPLE", "userCode :: $userCode")
+        Log.i("SAMPLE", GsonBuilder().setPrettyPrinting().create().toJson(request))
 
         /**
          * 결제요청 Type#1 ICallbackPaymentResult 구현을 통한 결제결과 callback
@@ -164,7 +164,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
         val secUnit = 1000L
         val sec = 1
         GlobalScope.launch {
-            i("재고확인 합니다~~")
+            Log.i("SAMPLE", "재고확인 합니다~~")
             delay(sec * secUnit) // sec 초간 재고확인 프로세스를 가정합니다
             Iamport.chaiPayment(iamPortApprove) // TODO: 상태 확인 후 SDK 에 최종결제 요청
         }
@@ -173,7 +173,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
     private val callBackListener = object : ICallbackPaymentResult {
         override fun result(iamPortResponse: IamPortResponse?) {
             val resJson = GsonBuilder().setPrettyPrinting().create().toJson(iamPortResponse)
-            i("결제 결과 콜백\n$resJson")
+            Log.i("SAMPLE", "결제 결과 콜백\n$resJson")
             result = iamPortResponse
             if (iamPortResponse != null) {
                 requireActivity().supportFragmentManager.beginTransaction()
@@ -210,7 +210,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
                 }
                 // 취소버튼 눌렀을때 동작
                 .setNegativeButton(android.R.string.cancel) { _, _ ->
-                    i("닫기")
+                    Log.i("SAMPLE", "닫기")
                 }
                 .create()
                 .show()
