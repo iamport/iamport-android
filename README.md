@@ -103,7 +103,7 @@
 
   // 결제요청
   Iamport.payment("imp123456", request,
-      approveCallback = { /* (Optional) 차이 최종 결제전 콜백 함수. */ },
+      approveCallback = { /* (Optional) CHAI 최종 결제전 콜백 함수. */ },
       paymentResultCallback = { /* 최종 결제 후 콜백함수 */ })
       
 
@@ -226,7 +226,7 @@ Iamport.isPolling()?.observe 에서 true 전달 받을 시점에, 직접 포그�
 
   Iamport.INSTANCE.payment("imp123456", request, 
     iamPortApprove -> {
-      // (Optional) 차이 최종 결제전 콜백 함수.
+      // (Optional) CHAI 최종 결제전 콜백 함수.
       return Unit.INSTANCE;
   }, iamPortResponse -> {
       // 최종 결제 후 콜백함수
