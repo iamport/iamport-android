@@ -32,7 +32,10 @@ data class IamPortRequest(
     val m_redirect_url: String? = CONST.IAMPORT_DUMMY_URL, // 콜백
     val app_scheme: String? = null, // 명세상 nullable 이나, RN 에서 필수
     val biz_num: String? = null,
-    val popup: Boolean? = null // 명세상 없으나, RN 에 있음
+    val popup: Boolean? = null,
+    val naverPopupMode: Boolean? = null,
+    val naverUseCfm: String? = null,
+    val naverProducts: List<ProductItem>? = null
 ) : Parcelable {
 
     /**
@@ -74,6 +77,10 @@ data class IamPortRequest(
             var app_scheme: String? = null // 명세상 nullable 이나, RN 에서 필수
             var biz_num: String? = null
             var popup: Boolean? = null // 명세상 없으나, RN 에 있음
+
+            var naverPopupMode: Boolean? = null
+            var naverUseCfm: String? = null
+            var naverProducts: List<ProductItem>? = null
 
             fun pg(pg: String) = apply {
                 this.pg = pg
@@ -167,6 +174,18 @@ data class IamPortRequest(
                 this.popup = popup
             }
 
+            fun naverPopupMode(naverPopupMode: Boolean) = apply {
+                this.naverPopupMode = naverPopupMode
+            }
+
+            fun naverProducts(naverProducts: List<ProductItem>) = apply {
+                this.naverProducts = naverProducts
+            }
+
+            fun naverUseCfm(naverUseCfm: String) = apply {
+                this.naverUseCfm = naverUseCfm
+            }
+
             fun build() = IamPortRequest(
                 pg,
                 pay_method,
@@ -190,7 +209,9 @@ data class IamPortRequest(
                 m_redirect_url,
                 app_scheme,
                 biz_num,
-                popup
+                popup,
+                naverPopupMode,
+                naverUseCfm, naverProducts
             )
         }
     }
