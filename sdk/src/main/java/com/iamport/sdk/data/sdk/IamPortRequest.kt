@@ -29,7 +29,7 @@ data class IamPortRequest(
     val display: CardQuota? = null,
     val digital: Boolean? = null, // default false
     val vbank_due: String? = null, // YYYYMMDDhhmm
-    val m_redirect_url: String? = CONST.IAMPORT_DUMMY_URL, // 콜백
+    val m_redirect_url: String? = CONST.IAMPORT_DETECT_URL, // 콜백
     val app_scheme: String? = null, // 명세상 nullable 이나, RN 에서 필수
     val biz_num: String? = null,
     val popup: Boolean? = null,
@@ -73,7 +73,7 @@ data class IamPortRequest(
             var display: CardQuota? = null
             var digital: Boolean? = null // default false
             var vbank_due: String? = null // YYYYMMDDhhmm
-            var m_redirect_url: String? = CONST.IAMPORT_DUMMY_URL // 콜백
+            var m_redirect_url: String? = CONST.IAMPORT_DETECT_URL // 콜백
             var app_scheme: String? = null // 명세상 nullable 이나, RN 에서 필수
             var biz_num: String? = null
             var popup: Boolean? = null // 명세상 없으나, RN 에 있음

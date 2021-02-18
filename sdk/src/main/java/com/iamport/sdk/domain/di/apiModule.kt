@@ -37,7 +37,7 @@ fun provideIamportApi(gson: Gson, client: OkHttpClient?): IamportApi {
 
 fun provideNiceApi(gson: Gson, client: OkHttpClient?): NiceApi {
     return Retrofit.Builder()
-        .baseUrl("${CONST.IAMPORT_DUMMY_URL}/")
+        .baseUrl("${CONST.IAMPORT_DETECT_URL}/")
         .addConverterFactory(GsonConverterFactory.create(gson)).apply {
             client?.let { client(it) }
         }
