@@ -33,11 +33,11 @@ data class Payment(val userCode: String, val iamPortRequest: IamPortRequest) : P
                     }
                 }
 
-                if (PG.convertPG(pg) == PG.paypal) {
-                    if (m_redirect_url.isNullOrBlank() || m_redirect_url == CONST.IAMPORT_DETECT_URL) {
-                        return false to CONST.ERR_PAYMENT_VALIDATOR_PAYPAL
-                    }
-                }
+//                if (PG.convertPG(pg) == PG.paypal) {
+//                    if (m_redirect_url.isNullOrBlank() || m_redirect_url == CONST.IAMPORT_DETECT_URL) {
+//                        return false to CONST.ERR_PAYMENT_VALIDATOR_PAYPAL
+//                    }
+//                }
             }
 
             return true to null

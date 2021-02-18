@@ -50,6 +50,6 @@ object CONST {
     const val ERR_PAYMENT_VALIDATOR_VBANK = "가상계좌 결제는 만료일자(vbank_due) 항목 필수입니다 (YYYYMMDDhhmm 형식)"
     const val ERR_PAYMENT_VALIDATOR_PHONE = "휴대폰 소액결제는 digital 항목 필수입니다"
     const val ERR_PAYMENT_VALIDATOR_DANAL_VBANK = "다날 가상계좌 결제는 사업자 등록번호(biz_num) 항목 필수입니다 (계약된 사업자등록번호 10자리)"
-    const val ERR_PAYMENT_VALIDATOR_PAYPAL = "페이팔 결제는 m_redirect_url 항목 필수입니다"
+//    const val ERR_PAYMENT_VALIDATOR_PAYPAL = "페이팔 결제는 m_redirect_url 항목 필수입니다"
 
 }
