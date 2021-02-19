@@ -34,7 +34,6 @@ internal class IamportSdk(
     val activity: ComponentActivity? = null,
     val fragment: Fragment? = null,
     val webViewLauncher: ActivityResultLauncher<Payment>?,
-    val approvePayment: LiveData<Event<IamPortApprove>>,
     val close: LiveData<Event<Unit>>,
     val finish: LiveData<Event<Unit>>,
 ) : IamportKoinComponent {
@@ -130,9 +129,6 @@ internal class IamportSdk(
         hostHelper.lifecycle.addObserver(lifecycleObserver)
         observeViewModel(payment) // 관찰할 LiveData
 
-        // 차이 최종결제 요청
-        approvePayment.observeAlways(hostHelper.lifecycleOwner, EventObserver { viewModel.requestApprovePayments(it) })
-
         // 외부에서 종료
         close.observeAlways(hostHelper.lifecycleOwner, EventObserver { clearData() })
     }
@@ -164,7 +160,7 @@ internal class IamportSdk(
                 })
 
                 // 차이 결제 상태 approve 처리
-                viewModel.chaiApprove().observeAlways(owner, EventObserver(this::chaiApprove))
+                viewModel.chaiApprove().observeAlways(owner, EventObserver(this::askApproveFromChai))
 
             }
             // 결제 시작
@@ -201,12 +197,17 @@ internal class IamportSdk(
         }
     }
 
-    private fun chaiApprove(approve: IamPortApprove) {
+    private fun askApproveFromChai(approve: IamPortApprove) {
         chaiApproveCallBack?.run {
             invoke(approve)
         } ?: run {
-            viewModel.requestApprovePayments(approve)
+            requestApprovePayments(approve)
         }
+    }
+
+    // 차이 최종 결제 요청
+    fun requestApprovePayments(approve: IamPortApprove) {
+        viewModel.requestApprovePayments(approve)
     }
 
     /**

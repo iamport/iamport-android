@@ -143,16 +143,16 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
         /**
          * 결제요청 Type#1 ICallbackPaymentResult 구현을 통한 결제결과 callback
          */
-//        Iamport.payment(userCode, request, paymentResultCallback = callBackListener)
 //        Iamport.payment(userCode, request, approveCallback = { approveCallback(it) }, paymentResultCallback = callBackListener)
+//        Iamport.payment(userCode, request, paymentResultCallback = callBackListener)
 
         /**
          * 결제요청 Type#2 함수 호출을 통한 결제결과 callbck
          */
-//        Iamport.payment(userCode, request) { callBackListener.result(it) }
-        Iamport.payment(userCode, request,
-            approveCallback = { approveCallback(it) },
-            paymentResultCallback = { callBackListener.result(it) })
+//        Iamport.payment(userCode, request,
+//            approveCallback = { approveCallback(it) },
+//            paymentResultCallback = { callBackListener.result(it) })
+        Iamport.payment(userCode, request) { callBackListener.result(it) }
     }
 
     /**
@@ -166,7 +166,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
         GlobalScope.launch {
             Log.i("SAMPLE", "재고확인 합니다~~")
             delay(sec * secUnit) // sec 초간 재고확인 프로세스를 가정합니다
-            Iamport.chaiPayment(iamPortApprove) // TODO: 상태 확인 후 SDK 에 최종결제 요청
+            Iamport.approvePayment(iamPortApprove) // TODO: 상태 확인 후 SDK 에 최종결제 요청
         }
     }
 

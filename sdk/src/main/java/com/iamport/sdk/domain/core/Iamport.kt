@@ -46,9 +46,8 @@ object Iamport {
     private var impCallbackFunction: ((IamPortResponse?) -> Unit)? = null // 결제결과 callbck type#2 함수 호출
     private var approveCallback: ((IamPortApprove) -> Unit)? = null // 차이 결제 상태 approve 콜백
 
-    private var approvePayment = MutableLiveData<Event<IamPortApprove>>()
-    private var close = MutableLiveData<Event<Unit>>()
-    private var finish = MutableLiveData<Event<Unit>>()
+    private var close = MutableLiveData<Event<Unit>>() // FIXME 라이브데이터 쓸 이유가 있나? sdk?.close() 하면 되자너
+    private var finish = MutableLiveData<Event<Unit>>() // FIXME 라이브데이터 쓸 이유가 있나? sdk?.finish() 하면 되자너
 
     private var activity: ComponentActivity? = null
     private var fragment: Fragment? = null
@@ -63,7 +62,6 @@ object Iamport {
     }
 
     private fun createInitialData() {
-        this.approvePayment = MutableLiveData()
         this.close = MutableLiveData()
         this.finish = MutableLiveData()
         this.preventOverlapRun = PreventOverlapRun()
@@ -143,7 +141,6 @@ object Iamport {
             IamportSdk(
                 activity = componentActivity,
                 webViewLauncher = webViewLauncher,
-                approvePayment = approvePayment,
                 close = close,
                 finish = finish
             )
@@ -173,7 +170,6 @@ object Iamport {
         this.iamportSdk = IamportSdk(
             fragment = fragment,
             webViewLauncher = webViewLauncher,
-            approvePayment = approvePayment,
             close = close,
             finish = finish
         )
@@ -182,8 +178,8 @@ object Iamport {
     /**
      * 외부에서 차이 최종결제 요청
      */
-    fun chaiPayment(approve: IamPortApprove) {
-        approvePayment.postValue(Event(approve))
+    fun approvePayment(approve: IamPortApprove) {
+        iamportSdk?.requestApprovePayments(approve)
     }
 
     /**
