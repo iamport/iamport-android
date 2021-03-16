@@ -62,7 +62,7 @@
     override fun onCreate() {
         ..   
         val koinApp = startKoin { .. }
-        Iamport.create(this, koinApp)
+        Iamport.createWithKoin(this, koinApp)
     }
     
     // KoinApplication 이 필요한 경우
@@ -103,8 +103,8 @@
 
   // 결제요청
   Iamport.payment("imp123456", request,
-      approveCallback = { /* (Optional) 차이 최종 결제전 콜백 함수. */ },
-      paymentResultCallback = { /* 최종 결제 후 콜백함수 */ })
+      approveCallback = { /* (Optional) CHAI 최종 결제전 콜백 함수. */ },
+      paymentResultCallback = { /* 최종 결제결과 콜백 함수. */ })
       
 
 ```
@@ -192,7 +192,7 @@ Iamport.isPolling()?.observe 에서 true 전달 받을 시점에, 직접 포그�
         public void onCreate() {
             ..
             KoinApplication koinApp = ..
-            Iamport.INSTANCE.create(this, koinApp);
+            Iamport.INSTANCE.createWithKoin(this, koinApp);
         }
     }
 
@@ -226,10 +226,10 @@ Iamport.isPolling()?.observe 에서 true 전달 받을 시점에, 직접 포그�
 
   Iamport.INSTANCE.payment("imp123456", request, 
     iamPortApprove -> {
-      // (Optional) 차이 최종 결제전 콜백 함수.
+      // (Optional) CHAI 최종 결제전 콜백 함수.
       return Unit.INSTANCE;
   }, iamPortResponse -> {
-      // 최종 결제 후 콜백함수
+      // 최종 결제결과 콜백 함수.
       return Unit.INSTANCE;
   });
 ```

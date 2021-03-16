@@ -87,7 +87,7 @@ open class BaseWebViewStrategy : WebViewClient(), IStrategy, IamportKoinComponen
      * 결제 끝났는지 여부
      */
     protected fun isPaymentOver(uri: Uri): Boolean {
-        return uri.toString().contains(CONST.IAMPORT_DUMMY_URL)
+        return uri.toString().contains(CONST.IAMPORT_DETECT_URL)
     }
 
 }

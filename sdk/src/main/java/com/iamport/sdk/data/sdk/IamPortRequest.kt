@@ -29,10 +29,13 @@ data class IamPortRequest(
     val display: CardQuota? = null,
     val digital: Boolean? = null, // default false
     val vbank_due: String? = null, // YYYYMMDDhhmm
-    val m_redirect_url: String? = CONST.IAMPORT_DUMMY_URL, // 콜백
+    private val m_redirect_url: String? = CONST.IAMPORT_DETECT_URL, // 콜백
     val app_scheme: String? = null, // 명세상 nullable 이나, RN 에서 필수
     val biz_num: String? = null,
-    val popup: Boolean? = null // 명세상 없으나, RN 에 있음
+    val popup: Boolean? = null,
+    val naverPopupMode: Boolean? = null,
+    val naverUseCfm: String? = null,
+    val naverProducts: List<ProductItem>? = null
 ) : Parcelable {
 
     /**
@@ -48,30 +51,15 @@ data class IamPortRequest(
         fun builder() = Builder()
 
         class Builder {
-            var pg: String
-                get() {
-                    return pg
-                }
-                set(value) {
-                    pg = value
-                }
+            lateinit var pg: String
+            lateinit var merchant_uid: String
+            lateinit var amount: String
+
             var pay_method: PayMethod = PayMethod.card // 명세상 필수인지 불명확함, default card
             var escrow: Boolean? = null // default false
-            var merchant_uid: String
-                get() {
-                    return merchant_uid
-                }
-                set(value) {
-                    merchant_uid = value
-                }// default "random"
+
             var name: String? = null
-            var amount: String
-                get() {
-                    return amount
-                }
-                set(value) {
-                    amount = value
-                }
+
             var custom_data: String? = null // 명세상 불명확
             var tax_free: String? = null
             var currency: Currency? = null // default KRW, 페이팔은 USD 이어야 함
@@ -85,10 +73,14 @@ data class IamPortRequest(
             var display: CardQuota? = null
             var digital: Boolean? = null // default false
             var vbank_due: String? = null // YYYYMMDDhhmm
-            var m_redirect_url: String? = CONST.IAMPORT_DUMMY_URL // 콜백
+            var m_redirect_url: String? = CONST.IAMPORT_DETECT_URL // 콜백
             var app_scheme: String? = null // 명세상 nullable 이나, RN 에서 필수
             var biz_num: String? = null
             var popup: Boolean? = null // 명세상 없으나, RN 에 있음
+
+            var naverPopupMode: Boolean? = null
+            var naverUseCfm: String? = null
+            var naverProducts: List<ProductItem>? = null
 
             fun pg(pg: String) = apply {
                 this.pg = pg
@@ -166,7 +158,7 @@ data class IamPortRequest(
                 this.vbank_due = vbank_due
             }
 
-            fun m_redirect_url(m_redirect_url: String) = apply {
+            private fun m_redirect_url(m_redirect_url: String) = apply {
                 this.m_redirect_url = m_redirect_url
             }
 
@@ -180,6 +172,18 @@ data class IamPortRequest(
 
             fun popup(popup: Boolean) = apply {
                 this.popup = popup
+            }
+
+            fun naverPopupMode(naverPopupMode: Boolean) = apply {
+                this.naverPopupMode = naverPopupMode
+            }
+
+            fun naverProducts(naverProducts: List<ProductItem>) = apply {
+                this.naverProducts = naverProducts
+            }
+
+            fun naverUseCfm(naverUseCfm: String) = apply {
+                this.naverUseCfm = naverUseCfm
             }
 
             fun build() = IamPortRequest(
@@ -205,7 +209,9 @@ data class IamPortRequest(
                 m_redirect_url,
                 app_scheme,
                 biz_num,
-                popup
+                popup,
+                naverPopupMode,
+                naverUseCfm, naverProducts
             )
         }
     }

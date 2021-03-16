@@ -1,7 +1,6 @@
 package com.iamport.sdk
 
 import com.iamport.sdk.data.chai.request.PrepareRequest
-import com.iamport.sdk.data.chai.response.Prepare
 import com.iamport.sdk.data.remote.ApiHelper
 import com.iamport.sdk.data.remote.ChaiApi
 import com.iamport.sdk.data.remote.IamportApi
@@ -57,7 +56,7 @@ class SdkUnitTest : AbstractKoinTest() {
     private fun getDefaultPayment(): Payment {
         val userCode = "12345"
         val request = IamPortRequest(
-            pg = PG.kcp.getPgSting(),
+            pg = PG.kcp.makePgRawName(),
             pay_method = PayMethod.card,
             name = "주문명001",
             merchant_uid = "주문번호001",
@@ -94,7 +93,7 @@ class SdkUnitTest : AbstractKoinTest() {
             copy(
                 userCode = Util.SampleUserCode.imp37739582.name,
                 iamPortRequest = iamPortRequest.copy(
-                    pg = PG.chai.getPgSting(),
+                    pg = PG.chai.makePgRawName(),
                     pay_method = PayMethod.trans,
                 )
             )
@@ -112,7 +111,7 @@ class SdkUnitTest : AbstractKoinTest() {
             copy(
                 userCode = Util.SampleUserCode.imp37739582.name,
                 iamPortRequest = iamPortRequest.copy(
-                    pg = PG.chai.getPgSting(),
+                    pg = PG.chai.makePgRawName(),
                     pay_method = PayMethod.trans,
                 )
             )
@@ -133,7 +132,7 @@ class SdkUnitTest : AbstractKoinTest() {
         val payment = getDefaultPayment().run {
             copy(
                 iamPortRequest = iamPortRequest.copy(
-                    pg = PG.kcp.getPgSting(),
+                    pg = PG.kcp.makePgRawName(),
                     pay_method = PayMethod.vbank,
                 )
             )
@@ -153,7 +152,7 @@ class SdkUnitTest : AbstractKoinTest() {
         val payment = getDefaultPayment().run {
             copy(
                 iamPortRequest = iamPortRequest.copy(
-                    pg = PG.kcp.getPgSting(),
+                    pg = PG.kcp.makePgRawName(),
                     pay_method = PayMethod.vbank,
                     vbank_due = "2020121211302",
                 )
@@ -173,7 +172,7 @@ class SdkUnitTest : AbstractKoinTest() {
         val payment = getDefaultPayment().run {
             copy(
                 iamPortRequest = iamPortRequest.copy(
-                    pg = PG.kcp.getPgSting(),
+                    pg = PG.kcp.makePgRawName(),
                     pay_method = PayMethod.phone,
                 )
             )
@@ -193,7 +192,7 @@ class SdkUnitTest : AbstractKoinTest() {
         val payment = getDefaultPayment().run {
             copy(
                 iamPortRequest = iamPortRequest.copy(
-                    pg = PG.kcp.getPgSting(),
+                    pg = PG.kcp.makePgRawName(),
                     pay_method = PayMethod.phone,
                     digital = true,
                 )
@@ -213,7 +212,7 @@ class SdkUnitTest : AbstractKoinTest() {
         val payment = getDefaultPayment().run {
             copy(
                 iamPortRequest = iamPortRequest.copy(
-                    pg = PG.danal_tpay.getPgSting(),
+                    pg = PG.danal_tpay.makePgRawName(),
                     pay_method = PayMethod.vbank,
                     vbank_due = "2020121211302",
                 )
@@ -234,7 +233,7 @@ class SdkUnitTest : AbstractKoinTest() {
         val payment = getDefaultPayment().run {
             copy(
                 iamPortRequest = iamPortRequest.copy(
-                    pg = PG.danal_tpay.getPgSting(),
+                    pg = PG.danal_tpay.makePgRawName(),
                     pay_method = PayMethod.vbank,
                     vbank_due = "2020121211302",
                     biz_num = "1234567890"
@@ -255,7 +254,7 @@ class SdkUnitTest : AbstractKoinTest() {
         val payment = getDefaultPayment().run {
             copy(
                 iamPortRequest = iamPortRequest.copy(
-                    pg = PG.paypal.getPgSting(),
+                    pg = PG.paypal.makePgRawName(),
                     pay_method = PayMethod.card,
                 )
             )
@@ -275,7 +274,7 @@ class SdkUnitTest : AbstractKoinTest() {
         val payment = getDefaultPayment().run {
             copy(
                 iamPortRequest = iamPortRequest.copy(
-                    pg = PG.paypal.getPgSting(),
+                    pg = PG.paypal.makePgRawName(),
                     pay_method = PayMethod.card,
                     m_redirect_url = CONST.IAMPORT_PROD_URL,
                 )
