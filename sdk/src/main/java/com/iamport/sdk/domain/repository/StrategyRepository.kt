@@ -8,6 +8,7 @@ import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.strategy.base.IStrategy
 import com.iamport.sdk.domain.strategy.base.JudgeStrategy
 import com.iamport.sdk.domain.strategy.chai.ChaiStrategy
+import com.iamport.sdk.domain.strategy.webview.CertificationWebViewStrategy
 import com.iamport.sdk.domain.strategy.webview.NiceTransWebViewStrategy
 import com.iamport.sdk.domain.strategy.webview.WebViewStrategy
 import com.orhanobut.logger.Logger
@@ -23,6 +24,8 @@ class StrategyRepository : IamportKoinComponent {
     private val webViewStrategy: WebViewStrategy by inject() // webview 사용하는 pg
     private val niceTransWebViewStrategy: NiceTransWebViewStrategy by inject() //
 
+    private val certificationWebViewStrategy: CertificationWebViewStrategy by inject() //
+
     /**
      * 실제로 앱 띄울 결제 타입
      */
@@ -30,8 +33,8 @@ class StrategyRepository : IamportKoinComponent {
         CHAI, NICE, WEB
     }
 
-    fun failSdkFinish(payment: Payment ) {
-        when(getPaymentKinds(payment)) {
+    fun failSdkFinish(payment: Payment) {
+        when (getPaymentKinds(payment)) {
             PaymentKinds.CHAI -> chaiStrategy.failFinish("사용자가 결제확인 서비스 종료하셨습니다")
             else -> Logger.d("사용자가 결제확인 서비스 종료하셨습니다")
         }
@@ -51,15 +54,16 @@ class StrategyRepository : IamportKoinComponent {
             return pgPair.first == PG.nice && pgPair.second == PayMethod.trans
         }
 
-        val request = payment.iamPortRequest
-        request.pgEnum?.let {
-            Pair(it, request.pay_method).let { pair: Pair<PG, PayMethod> ->
-                return when {
-                    isChaiPayment(pair) -> PaymentKinds.CHAI
-                    isNiceTransPayment(pair) -> PaymentKinds.NICE
-                    else -> PaymentKinds.WEB
+        payment.iamPortRequest?.let { request ->
+            request.pgEnum?.let {
+                Pair(it, request.pay_method).let { pair: Pair<PG, PayMethod> ->
+                    return when {
+                        isChaiPayment(pair) -> PaymentKinds.CHAI
+                        isNiceTransPayment(pair) -> PaymentKinds.NICE
+                        else -> PaymentKinds.WEB
+                    }
                 }
-            }
+            } ?: run { return PaymentKinds.WEB } // default WEB
         } ?: run { return PaymentKinds.WEB } // default WEB
     }
 

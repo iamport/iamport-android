@@ -2,6 +2,7 @@ package com.iamport.sdk.data.sdk
 
 import android.os.Parcelable
 import com.iamport.sdk.domain.utils.CONST
+import com.orhanobut.logger.Logger
 import kotlinx.parcelize.Parcelize
 
 // 가상계좌 -> vbank_due 입력
@@ -9,12 +10,48 @@ import kotlinx.parcelize.Parcelize
 // 그냥 휴대폰 소액결제 -> digital 필수입력
 // 페이팔 -> m_redirect_url 필수
 @Parcelize
-data class Payment(val userCode: String, val iamPortRequest: IamPortRequest) : Parcelable {
+data class Payment(
+    val userCode: String,
+    val tierCode: String? = null,
+    val iamPortRequest: IamPortRequest? = null,
+    val iamPortCertification: IamPortCertification? = null
+) : Parcelable {
+
+    enum class STATUS {
+        PAYMENT, CERT, ERROR
+    }
+
+    fun getStatus(): STATUS {
+
+        if (iamPortCertification == null && iamPortRequest == null) {
+            Logger.e("ERR : iamPortCertification & iamPortRequest NULL")
+            return STATUS.ERROR
+        }
+
+        return iamPortCertification?.run {
+            STATUS.CERT
+        } ?: run {
+            STATUS.PAYMENT
+        }
+    }
+
+    fun getMerchantUid(): String {
+        return when(getStatus()) {
+            STATUS.PAYMENT -> iamPortRequest?.merchant_uid ?: CONST.EMPTY_STR
+            STATUS.CERT -> iamPortCertification?.merchant_uid ?: CONST.EMPTY_STR
+            STATUS.ERROR -> "ERR : iamPortCertification & iamPortRequest NULL"
+        }
+    }
 
     companion object {
         fun validator(payment: Payment): Pair<Boolean, String?> {
 
-            payment.iamPortRequest.run {
+            if (payment.iamPortCertification == null && payment.iamPortRequest == null) {
+                Logger.e("ERR : iamPortCertification & iamPortRequest NULL")
+                return false to "ERR : iamPortCertification & iamPortRequest NULL"
+            }
+
+            payment.iamPortRequest?.run {
                 if (pay_method == PayMethod.vbank) {
                     if (vbank_due.isNullOrBlank()) {
                         return false to CONST.ERR_PAYMENT_VALIDATOR_VBANK
@@ -40,7 +77,7 @@ data class Payment(val userCode: String, val iamPortRequest: IamPortRequest) : P
 //                }
             }
 
-            return true to null
+            return true to CONST.PASS_PAYMENT_VALIDATOR
         }
     }
 }

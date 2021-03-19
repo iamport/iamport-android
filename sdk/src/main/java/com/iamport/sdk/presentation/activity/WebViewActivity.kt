@@ -101,6 +101,8 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
 
             viewModel.impResponse().observe(this, EventObserver(this::sdkFinish))
 
+            viewModel.jsMethodData().observe(this, EventObserver(this::evaluateJS))
+
             viewModel.startPayment(pay)
         }
     }
@@ -133,7 +135,6 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
             }
         }
     }
-
 
     /**
      * 모든 결과 처리 및 SDK 종료
@@ -225,5 +226,13 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
             webChromeClient = IamportWebChromeClient()
         }
     }
+
+    private fun evaluateJS(jsMethod: String) {
+        d("evaluateJS => $jsMethod")
+        viewDataBinding.webview.run {
+            this.loadUrl(jsMethod)
+        }
+    }
+
 
 }

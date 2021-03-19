@@ -5,9 +5,12 @@ import com.iamport.sdk.data.chai.response.Users
 import com.iamport.sdk.data.remote.ApiHelper
 import com.iamport.sdk.data.remote.IamportApi
 import com.iamport.sdk.data.remote.ResultWrapper
+import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.domain.di.IamportKoinComponent
+import com.iamport.sdk.domain.utils.CONST
+import com.iamport.sdk.domain.utils.Event
 import com.orhanobut.logger.Logger
 import kotlinx.coroutines.Dispatchers
 import org.koin.core.component.KoinApiExtension
@@ -18,7 +21,7 @@ class JudgeStrategy : BaseStrategy(), IamportKoinComponent {
 
     // 유저 정보 판단 결과 타입
     enum class JudgeKinds {
-        CHAI, WEB, EMPTY
+        CHAI, WEB, CERT, ERROR
     }
 
     private val iamportApi: IamportApi by inject() // 아임포트 서버 API
@@ -56,18 +59,41 @@ class JudgeStrategy : BaseStrategy(), IamportKoinComponent {
 
         // 유저 PG 정보 아예 없으면 실패처리
         if (userDataList.isNullOrEmpty()) {
-            failureFinish(payment, msg = "Not found PG [ ${payment.iamPortRequest.pg} ] and any PG in your info.")
-            return Triple(JudgeKinds.EMPTY, null, payment)
+            failureFinish(payment, msg = "Not found PG [ ${payment.iamPortRequest?.pg} ] and any PG in your info.")
+            return Triple(JudgeKinds.ERROR, null, payment)
         }
 
-        val defUser = findDefaultUserData(userDataList)
-        if (defUser == null) {
+        // 1. 본인인증의 경우 판단 (현재 있는지 없는지만 판단)
+
+        when (payment.getStatus()) {
+            Payment.STATUS.CERT -> {
+                val defCertUser = userDataList.find {
+                    it.pg_provider != null && it.type == CONST.USER_TYPE_CERTIFICATION
+                } ?: run {
+                    failureFinish(payment = payment, msg = "본인인증 설정 또는 가입을 먼저 해주세요.")
+                    return Triple(JudgeKinds.ERROR, null, payment)
+                }
+
+                return Triple(JudgeKinds.CERT, defCertUser, payment)
+            }
+            Payment.STATUS.ERROR -> {
+                failureFinish(payment = payment, msg = "judge :: payment status ERROR")
+                return Triple(JudgeKinds.ERROR, null, payment)
+            }
+        }
+
+        // 2. 결제요청의 경우 판단
+        val defUser = findDefaultUserData(userDataList) ?: run {
             failureFinish(payment, msg = "Not found Default PG. All PG empty.")
-            return Triple(JudgeKinds.EMPTY, null, payment)
+            return Triple(JudgeKinds.ERROR, null, payment)
         }
 
         Logger.d("userDataList :: $userDataList")
-        val split = payment.iamPortRequest.pg.split(".")
+        val split = payment.iamPortRequest?.pg?.split(".") ?: run {
+            failureFinish(payment = payment, msg = "Not found My PG.")
+            return Triple(JudgeKinds.ERROR, null, payment)
+        }
+
         val myPg = split[0]
         val user = userDataList.find {
             if (split.size > 1) {
@@ -85,7 +111,7 @@ class JudgeStrategy : BaseStrategy(), IamportKoinComponent {
     }
 
     private fun findDefaultUserData(userDataList: ArrayList<UserData>): UserData? {
-        return userDataList.find { it.pg_provider != null }
+        return userDataList.find { it.pg_provider != null && it.type == CONST.USER_TYPE_PAYMENT }
     }
 
     /**
@@ -102,7 +128,7 @@ class JudgeStrategy : BaseStrategy(), IamportKoinComponent {
      * payment PG 를 default PG 로 수정함
      */
     private fun replacePG(pg: PG, payment: Payment): Payment {
-        val iamPortRequest = payment.iamPortRequest.copy(pg = pg.makePgRawName())
+        val iamPortRequest = payment.iamPortRequest?.copy(pg = pg.makePgRawName())
         return payment.copy(iamPortRequest = iamPortRequest)
     }
 

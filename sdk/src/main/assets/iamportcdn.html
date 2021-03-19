@@ -1,27 +1,49 @@
 <html>
-<head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body>
-<!-- 현재 콜백은 불필요 할 듯 onPageFinished 쓰니까..! -->
-    <script type="text/javascript">
-        console.log("Wait cdn-iamport-sdk...");
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log("Load finish cdn-iamport-sdk...");
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <script type="text/javascript">
+            console.log("Wait cdn-iamport-sdk...");
 
-            var userCode = IAMPORT.getUserCode()
-            var impRequest = IAMPORT.getRequestParams()
+            document.addEventListener('DOMContentLoaded', () => {
+                console.log("Load finish cdn-iamport-sdk...");
+                IAMPORT.startWorkingSdk()
+            });
+
+            function dLog(log) {
+    <!--            console.log(log)-->
+                IAMPORT.debugConsoleLog(log)
+            }
 
             function callback(response) {
-               IAMPORT.customCallback(JSON.stringify(response))
-             }
+                dLog(response)
+                IAMPORT.customCallback(JSON.stringify(response))
+            }
 
-            IMP.init(userCode);
-            IMP.request_pay(JSON.parse(impRequest), callback);
-        });
-    </script>
-    <script defer type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
-    <script defer type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.1.8.js"></script>
-</body>
+            function init(userCode) {
+                dLog("init userCode :: " + userCode)
+                IMP.init(userCode);
+            }
+
+            function agency(userCode, tierCode) {
+                dLog("agency userCode :: " + userCode + ", tierCode :: " + tierCode)
+                IMP.agency(userCode, tierCode);
+            }
+
+            function requestPay(impRequest) {
+                dLog("requestPay :: " + impRequest)
+                IMP.request_pay(JSON.parse(impRequest), callback);
+            }
+
+            function certification(impCertification) {
+                dLog("certification :: " + impCertification)
+                IMP.certification(JSON.parse(impCertification), callback);
+            }
+
+        </script>
+        <script defer type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+        <script defer type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.1.8.js"></script>
+    </body>
 </html>
