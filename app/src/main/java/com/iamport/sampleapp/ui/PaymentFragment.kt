@@ -14,10 +14,7 @@ import com.iamport.sampleapp.MerchantReceiver
 import com.iamport.sampleapp.PaymentResultData.result
 import com.iamport.sampleapp.R
 import com.iamport.sampleapp.databinding.PaymentFragmentBinding
-import com.iamport.sdk.data.sdk.IamPortApprove
-import com.iamport.sdk.data.sdk.IamPortRequest
-import com.iamport.sdk.data.sdk.IamPortResponse
-import com.iamport.sdk.data.sdk.PG
+import com.iamport.sdk.data.sdk.*
 import com.iamport.sdk.domain.core.ICallbackPaymentResult
 import com.iamport.sdk.domain.core.Iamport
 import com.iamport.sdk.domain.utils.CONST
@@ -73,6 +70,10 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
             onClickPayment()
         }
 
+        viewDataBinding.certificationButton.setOnClickListener {
+            onClickCertification()
+        }
+
         viewDataBinding.backButton.setOnClickListener {
             backPressCallback.handleOnBackPressed()
         }
@@ -111,6 +112,19 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
 
         // 또는, 폴링 상태를 보고 싶을 때 명시적으로 호출
         Log.i("SAMPLE", "isPolling? ${Iamport.isPollingValue()}")
+    }
+
+    fun onClickCertification() {
+        val userCode = "imp00357859"
+        val certification = IamPortCertification(
+            merchant_uid = "muid_aos_123123",
+            min_age = 19,
+            name = "김준혁",
+            phone = "010-4597-5833",
+            company = "유어포트",
+        )
+
+        Iamport.certification(userCode, certification) { callBackListener.result(it) }
     }
 
 
@@ -152,6 +166,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
 //        Iamport.payment(userCode, request,
 //            approveCallback = { approveCallback(it) },
 //            paymentResultCallback = { callBackListener.result(it) })
+
         Iamport.payment(userCode, request) { callBackListener.result(it) }
     }
 
