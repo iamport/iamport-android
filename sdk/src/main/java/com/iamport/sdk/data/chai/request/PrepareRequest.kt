@@ -6,6 +6,7 @@ import com.iamport.sdk.data.sdk.PayMethod
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.Util
+import com.orhanobut.logger.Logger
 
 // * method : POST
 //* content-type : application/json
@@ -39,9 +40,9 @@ data class PrepareRequest(
         /**
          * 차이 앱에 요청하기 위한 리퀘스트 객체 생성
          */
-        fun make(chaiId: String, payment: Payment): PrepareRequest {
+        fun make(chaiId: String, payment: Payment): PrepareRequest? {
             val empty = CONST.EMPTY_STR
-            return payment.iamPortRequest.run {
+            return payment.iamPortRequest?.run {
                 PrepareRequest(
                     escrow = false,
                     amount = amount,
@@ -62,6 +63,9 @@ data class PrepareRequest(
                     confirm_url = null,
                     _extra = Extra(native = OS.aos, bypass = empty)
                 )
+            } ?: run {
+                Logger.d("PrepareRequest, make, iamPortRequest is null")
+                null
             }
         }
     }

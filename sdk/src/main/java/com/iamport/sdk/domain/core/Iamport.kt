@@ -9,10 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.iamport.sdk.BuildConfig.DEBUG
-import com.iamport.sdk.data.sdk.IamPortApprove
-import com.iamport.sdk.data.sdk.IamPortRequest
-import com.iamport.sdk.data.sdk.IamPortResponse
-import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.data.sdk.*
 import com.iamport.sdk.domain.di.IamportKoinContext
 import com.iamport.sdk.domain.di.IamportKoinContext.koinApp
 import com.iamport.sdk.domain.di.apiModule
@@ -234,12 +231,36 @@ object Iamport {
      * @param ((IamPortApprove?) -> Unit)? : (옵셔널) 차이 최종 결제 요청전 콜백
      * @param (IamPortResponse?) -> Unit: ICallbackPaymentResult? : 결제결과 callbck type#2 함수 호출
      */
+    fun certification(
+        userCode: String, iamPortCertification: IamPortCertification, resultCallback: (IamPortResponse?) -> Unit
+    ) {
+        preventOverlapRun?.launch {
+            coreCertification(userCode, iamPortCertification, resultCallback)
+        }
+    }
+
+    /**
+     * 결제 요청
+     * @param ((IamPortApprove?) -> Unit)? : (옵셔널) 차이 최종 결제 요청전 콜백
+     * @param (IamPortResponse?) -> Unit: ICallbackPaymentResult? : 결제결과 callbck type#2 함수 호출
+     */
     fun payment(
         userCode: String, iamPortRequest: IamPortRequest, approveCallback: ((IamPortApprove) -> Unit)? = null, paymentResultCallback: (IamPortResponse?) -> Unit
     ) {
         preventOverlapRun?.launch {
             corePayment(userCode, iamPortRequest, approveCallback, paymentResultCallback)
         }
+    }
+
+    @KoinApiExtension
+    internal fun coreCertification(
+        userCode: String,
+        iamPortCertification: IamPortCertification,
+        paymentResultCallback: ((IamPortResponse?) -> Unit)?
+    ) {
+        this.impCallbackFunction = paymentResultCallback
+
+        iamportSdk?.initStart(Payment(userCode, iamPortCertification = iamPortCertification), paymentResultCallback)
     }
 
     @KoinApiExtension
@@ -252,6 +273,6 @@ object Iamport {
         this.approveCallback = approveCallback
         this.impCallbackFunction = paymentResultCallback
 
-        iamportSdk?.initStart(Payment(userCode, iamPortRequest), approveCallback, paymentResultCallback)
+        iamportSdk?.initStart(Payment(userCode, iamPortRequest = iamPortRequest), approveCallback, paymentResultCallback)
     }
 }

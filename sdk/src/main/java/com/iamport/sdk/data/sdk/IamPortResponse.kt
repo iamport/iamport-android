@@ -33,7 +33,7 @@ data class IamPortResponse(
                 imp_success = true,
                 success = true,
                 imp_uid = prepareData?.impUid,
-                merchant_uid = payment.iamPortRequest.merchant_uid,
+                merchant_uid = payment.getMerchantUid(),
                 error_msg = msg,
             )
         }
@@ -43,7 +43,7 @@ data class IamPortResponse(
                 imp_success = false,
                 success = false,
                 imp_uid = prepareData?.impUid,
-                merchant_uid = payment.iamPortRequest.merchant_uid,
+                merchant_uid = payment.getMerchantUid(),
                 error_msg = msg
             )
         }

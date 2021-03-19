@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">아임포트쇼핑</string>
     <string name="buy">결제</string>
+    <string name="certification">본인인증</string>
 </resources>

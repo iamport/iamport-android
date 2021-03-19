@@ -19,7 +19,7 @@ data class IamPortApprove(
         fun make(payment: Payment, data: PrepareData): IamPortApprove {
             return IamPortApprove(
                 userCode = payment.userCode,
-                merchantUid = payment.iamPortRequest.merchant_uid,
+                merchantUid = payment.getMerchantUid(),
                 paymentId = data.paymentId,
                 impUid = data.impUid,
                 idempotencyKey = data.idempotencyKey,
