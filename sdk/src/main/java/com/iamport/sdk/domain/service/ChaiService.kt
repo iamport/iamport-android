@@ -46,10 +46,10 @@ open class ChaiService : Service() {
 
         channelRegister()
 
-        val icon = R.drawable.chuck_ic_search_white_24dp
+        val icon = R.drawable.ic_find
         val title = "결제를 확인중 입니다"
 
-        val stopIcon = R.drawable.chuck_ic_delete_white_24dp
+        val stopIcon = R.drawable.ic_delete
         val stopTitle = "결제를 중지하시려면 아래로 당겨주세요"
         val stopBtnName = "중지"
 

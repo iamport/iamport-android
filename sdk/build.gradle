@@ -120,6 +120,6 @@ dependencies {
     // loading animation
     implementation Libs.spinKit
 
-    implementation Libs.chuck
+    debugImplementation Libs.chuck
     releaseImplementation Libs.releaseChuck
 }
