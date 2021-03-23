@@ -8,6 +8,7 @@ import com.iamport.sdk.data.remote.NiceApi
 import com.iamport.sdk.domain.utils.CONST
 import com.readystatesoftware.chuck.ChuckInterceptor
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.core.component.KoinApiExtension
 import org.koin.dsl.module
 import retrofit2.Retrofit
@@ -20,7 +21,11 @@ fun provideOkHttpClient(context: Context?): OkHttpClient? {
             .connectTimeout(20, TimeUnit.MINUTES)
             .readTimeout(20, TimeUnit.SECONDS)
             .writeTimeout(20, TimeUnit.SECONDS)
-            .addInterceptor(ChuckInterceptor(it)).build()
+//            .addInterceptor(ChuckInterceptor(it))
+            .addInterceptor(HttpLoggingInterceptor().apply {
+                level = HttpLoggingInterceptor.Level.BASIC
+            })
+            .build()
     } ?: run { null }
 }
 
