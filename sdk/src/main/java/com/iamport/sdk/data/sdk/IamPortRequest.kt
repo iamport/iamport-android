@@ -14,6 +14,7 @@ data class IamPortRequest(
     val pay_method: PayMethod = PayMethod.card, // 명세상 필수인지 불명확함, default card
     val escrow: Boolean? = null, // default false
     val merchant_uid: String, // default "random"
+    val customer_uid: String? = null, // 정기결제용
     val name: String? = null,
     val amount: String,
     val custom_data: String? = null, // 명세상 불명확
@@ -58,6 +59,7 @@ data class IamPortRequest(
             var pay_method: PayMethod = PayMethod.card // 명세상 필수인지 불명확함, default card
             var escrow: Boolean? = null // default false
 
+            var customer_uid: String? = null
             var name: String? = null
 
             var custom_data: String? = null // 명세상 불명확
@@ -100,6 +102,10 @@ data class IamPortRequest(
 
             fun name(name: String) = apply {
                 this.name = name
+            }
+
+            fun customer_uid(customer_uid: String) = apply {
+                this.customer_uid = customer_uid
             }
 
             fun amount(amount: String) = apply {
@@ -191,6 +197,7 @@ data class IamPortRequest(
                 pay_method,
                 escrow,
                 merchant_uid,
+                customer_uid,
                 name,
                 amount,
                 custom_data,
