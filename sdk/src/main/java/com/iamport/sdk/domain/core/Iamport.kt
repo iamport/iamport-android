@@ -23,15 +23,15 @@ import com.iamport.sdk.domain.utils.PreventOverlapRun
 import com.iamport.sdk.presentation.activity.IamportSdk
 import com.iamport.sdk.presentation.contract.WebViewActivityContract
 import com.orhanobut.logger.AndroidLogAdapter
+import com.orhanobut.logger.BuildConfig
 import com.orhanobut.logger.Logger
-import com.orhanobut.logger.Logger.d
+import com.orhanobut.logger.Logger.*
 import com.orhanobut.logger.PrettyFormatStrategy
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.logger.AndroidLogger
 import org.koin.core.KoinApplication
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.context.startKoin
-import org.koin.core.logger.Level
 
 
 object Iamport {
@@ -87,7 +87,7 @@ object Iamport {
 
         IamportKoinContext.koinApp = koinApp
             ?: startKoin {
-                logger(AndroidLogger(Level.DEBUG))
+                logger(AndroidLogger())
                 androidContext(app)
                 modules(httpClientModule, apiModule, appModule)
             }
@@ -108,10 +108,24 @@ object Iamport {
                 .tag(CONST.IAMPORT_LOG)
                 .build()
         }
-        Logger.addLogAdapter(AndroidLogAdapter(formatStrategy))
+
+        addLogAdapter(object : AndroidLogAdapter(formatStrategy) {
+            override fun isLoggable(priority: Int, tag: String?): Boolean {
+                if (!DEBUG && priority <= Logger.DEBUG) {
+                    return false
+                }
+                return true
+            }
+        })
 
         isCreated = true
         d("Create IAMPORT SDK")
+
+//        v("LOG TEST VERBOSE")
+//        d("LOG TEST DEBUG")
+//        i("LOG TEST INFO")
+//        w("LOG TEST WANRING")
+//        e("LOG TEST ERROR")
     }
 
     /**
