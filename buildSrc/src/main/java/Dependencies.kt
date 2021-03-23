@@ -24,7 +24,7 @@ object Versions {
 
     const val koin_version = "2.2.2"
     const val retrofit_version = "2.9.0"
-    const val logging_interceptor = "4.7.1"
+    const val logging_interceptor = "4.9.0"
 
     // Gson
     const val gson = "2.8.6"
