@@ -16,7 +16,7 @@ class BaseApplication : Application() {
         /**
          * DI 로 KOIN 사용시 아래와 같이 사용
         val koinApp = startKoin {
-            logger(AndroidLogger(Level.DEBUG))
+            logger(AndroidLogger())
             androidContext(this@BaseApplication)
         }
         Iamport.create(this, koinApp)
