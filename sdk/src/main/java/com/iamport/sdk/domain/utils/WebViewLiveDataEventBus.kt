@@ -25,7 +25,4 @@ open class WebViewLiveDataEventBus {
     // 결제 완료 콜백
     val impResponse = MutableLiveData<Event<IamPortResponse?>>()
 
-    // 결제 완료 콜백
-    val jsMethod = MutableLiveData<Event<String>>()
-
 }

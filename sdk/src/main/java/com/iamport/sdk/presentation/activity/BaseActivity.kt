@@ -11,9 +11,13 @@ import androidx.databinding.ViewDataBinding
 import com.google.android.material.snackbar.Snackbar
 import com.iamport.sdk.BuildConfig
 import com.iamport.sdk.data.sdk.IamPortResponse
+import com.iamport.sdk.domain.utils.BaseCoroutineScope
+import com.iamport.sdk.domain.utils.UICoroutineScope
 import com.iamport.sdk.presentation.viewmodel.BaseViewModel
 
-abstract class BaseActivity<T : ViewDataBinding, R : BaseViewModel> : AppCompatActivity() {
+abstract class BaseActivity<T : ViewDataBinding, R : BaseViewModel>
+@JvmOverloads constructor(scope: BaseCoroutineScope = UICoroutineScope()) :
+    AppCompatActivity(), BaseCoroutineScope by scope {
 
     lateinit var viewDataBinding: T
     abstract val viewModel: R
@@ -29,6 +33,11 @@ abstract class BaseActivity<T : ViewDataBinding, R : BaseViewModel> : AppCompatA
 
         snackbarObserving()
         initStart()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        releaseCoroutine()
     }
 
     abstract fun sdkFinish(iamPortResponse: IamPortResponse?)
