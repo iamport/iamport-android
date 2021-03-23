@@ -15,7 +15,7 @@ object CONST {
     const val NICE_PG_PROVIDER = "nice"
 
     // 이 url 로 감지되면, 결제완료 콜백이란 의미 + 붙은 파라미터로 결제결과 처리
-    const val IAMPORT_DETECT_URL = "http://detectchangingwebview/iamport"
+    const val IAMPORT_DETECT_URL = "http://a-detectchangingwebview/iamport"
 
     const val IAMPORT_PROD_URL = "https://service.iamport.kr" // 테스트도 상용서버에서
 //    const val IAMPORT_TEST_URL = "https://kicc.iamport.kr"
@@ -47,6 +47,12 @@ object CONST {
     const val BROADCAST_FOREGROUND_SERVICE_STOP = "com.iamport.sdk.broadcast.fgservice.stop"
 
 
+    const val USER_TYPE_PAYMENT = "payment"
+    const val USER_TYPE_CERTIFICATION = "certification"
+
+
+    // payment 객체 validation 관련
+    const val PASS_PAYMENT_VALIDATOR = "성공"
     const val ERR_PAYMENT_VALIDATOR_VBANK = "가상계좌 결제는 만료일자(vbank_due) 항목 필수입니다 (YYYYMMDDhhmm 형식)"
     const val ERR_PAYMENT_VALIDATOR_PHONE = "휴대폰 소액결제는 digital 항목 필수입니다"
     const val ERR_PAYMENT_VALIDATOR_DANAL_VBANK = "다날 가상계좌 결제는 사업자 등록번호(biz_num) 항목 필수입니다 (계약된 사업자등록번호 10자리)"

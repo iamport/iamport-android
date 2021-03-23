@@ -298,7 +298,7 @@ Iamport.isPolling()?.observe 에서 true 전달 받을 시점에, 직접 포그�
         /**
          * DI 로 KOIN 사용시 아래와 같이 사용
         val koinApp = startKoin {
-            logger(AndroidLogger(Level.DEBUG))
+            logger(AndroidLogger())
             androidContext(this@BaseApplication)
         }
         Iamport.create(this, koinApp)
@@ -337,7 +337,7 @@ Iamport.isPolling()?.observe 에서 true 전달 받을 시점에, 직접 포그�
     private fun onClickPayment() {
         ..
         val request = IamPortRequest(
-            pg = pg.getPgSting(storeId = ""),           // PG 사
+            pg = pg.getPgSting(pgId = ""),              // PG 사
             pay_method = payMethod,                     // 결제수단
             name = paymentName,                         // 주문명
             merchant_uid = merchantUid,                 // 주문번호

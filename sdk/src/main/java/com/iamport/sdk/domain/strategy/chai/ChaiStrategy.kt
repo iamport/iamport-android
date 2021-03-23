@@ -120,11 +120,15 @@ open class ChaiStrategy : BaseStrategy() {
         super.doWork(payment)
         d("doWork! $payment")
 //        * 2. IMP 서버에 결제시작 요청 (+ chai id)
-        when (val response = apiPostPrepare(PrepareRequest.make(chaiId, payment))) {
-            is NetworkError -> failureFinish(payment, prepareData, "NetworkError ${response.error}")
-            is GenericError -> failureFinish(payment, prepareData, "GenericError ${response.code} ${response.error}")
+        PrepareRequest.make(chaiId, payment)?.let {
+            when (val response = apiPostPrepare(it)) {
+                is NetworkError -> failureFinish(payment, prepareData, "NetworkError ${response.error}")
+                is GenericError -> failureFinish(payment, prepareData, "GenericError ${response.code} ${response.error}")
 
-            is Success -> processPrepare(response.value)
+                is Success -> processPrepare(response.value)
+            }
+        } ?: run {
+            failureFinish(payment, prepareData, "cannot make PrepareRequest")
         }
     }
 
@@ -313,7 +317,7 @@ open class ChaiStrategy : BaseStrategy() {
      */
     private fun matchApproveData(approve: IamPortApprove): Boolean {
         return approve.run {
-            payment.userCode == userCode && payment.iamPortRequest.merchant_uid == merchantUid
+            payment.userCode == userCode && payment.getMerchantUid() == merchantUid
                     && prepareData?.paymentId == paymentId && prepareData?.impUid == impUid
                     && prepareData?.idempotencyKey == idempotencyKey && prepareData?.publicAPIKey == publicAPIKey
         }

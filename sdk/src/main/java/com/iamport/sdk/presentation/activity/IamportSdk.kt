@@ -111,8 +111,33 @@ internal class IamportSdk(
     /**
      * BaseActivity 에서 onCreate 시 호출
      */
+    fun initStart(payment: Payment, paymentResultCallBack: ((IamPortResponse?) -> Unit)?) {
+        i("HELLO I'MPORT SDK! for cert")
+
+
+        IntentFilter().let {
+            it.addAction(CONST.BROADCAST_FOREGROUND_SERVICE)
+            it.addAction(CONST.BROADCAST_FOREGROUND_SERVICE_STOP)
+            hostHelper.context?.applicationContext?.registerReceiver(screenBrReceiver, screenBrFilter)
+            hostHelper.context?.registerReceiver(iamportReceiver, it)
+        }
+
+        clearData()
+
+        this.paymentResultCallBack = paymentResultCallBack
+
+        hostHelper.lifecycle.addObserver(lifecycleObserver)
+        observeCertification(payment) // 관찰할 LiveData
+
+        // 외부에서 종료
+        close.observeAlways(hostHelper.lifecycleOwner, EventObserver { clearData() })
+    }
+
+    /**
+     * BaseActivity 에서 onCreate 시 호출
+     */
     fun initStart(payment: Payment, approveCallback: ((IamPortApprove) -> Unit)?, paymentResultCallBack: ((IamPortResponse?) -> Unit)?) {
-        i("HELLO I'MPORT SDK! ${Util.versionName(hostHelper.context)}")
+        i("HELLO I'MPORT SDK! for payment")
 
         IntentFilter().let {
             it.addAction(CONST.BROADCAST_FOREGROUND_SERVICE)
@@ -136,37 +161,56 @@ internal class IamportSdk(
     /**
      * 관찰할 LiveData 옵저빙
      */
-    private fun observeViewModel(payment: Payment?) {
+    private fun observeViewModel(payment: Payment) {
         d(GsonBuilder().setPrettyPrinting().create().toJson(payment))
-        payment?.let { pay: Payment ->
-            hostHelper.lifecycleOwner.let { owner: LifecycleOwner ->
+        hostHelper.lifecycleOwner.let { owner: LifecycleOwner ->
 
-                // 외부에서 sdk 실패종료
-                finish.observeAlways(owner, EventObserver { viewModel.failSdkFinish(pay) })
+            // 외부에서 sdk 실패종료
+            finish.observeAlways(owner, EventObserver { viewModel.failSdkFinish(payment) })
 
-                // 결제결과 옵저빙
-                viewModel.impResponse().observe(owner, EventObserver(this::sdkFinish))
+            // 결제결과 옵저빙
+            viewModel.impResponse().observe(owner, EventObserver(this::sdkFinish))
 
-                // 웹뷰앱 열기
-                viewModel.webViewPayment().observe(owner, EventObserver(this::requestWebViewPayment))
+            // 웹뷰앱 열기
+            viewModel.webViewPayment().observe(owner, EventObserver(this::requestWebViewPayment))
 
-                // 차이앱 열기
-                viewModel.chaiUri().observe(owner, EventObserver(this::openChaiApp))
+            // 차이앱 열기
+            viewModel.chaiUri().observe(owner, EventObserver(this::openChaiApp))
 
-                // 차이폴링여부
-                viewModel.isPolling().observeAlways(owner, EventObserver {
-                    updatePolling(it)
-                    controlForegroundService(it)
-                })
+            // 차이폴링여부
+            viewModel.isPolling().observeAlways(owner, EventObserver {
+                updatePolling(it)
+                controlForegroundService(it)
+            })
 
-                // 차이 결제 상태 approve 처리
-                viewModel.chaiApprove().observeAlways(owner, EventObserver(this::askApproveFromChai))
+            // 차이 결제 상태 approve 처리
+            viewModel.chaiApprove().observeAlways(owner, EventObserver(this::askApproveFromChai))
 
-            }
-            // 결제 시작
-            preventOverlapRun.launch { requestPayment(pay) }
         }
+
+        // 결제 시작
+        preventOverlapRun.launch { requestPayment(payment) }
     }
+
+
+    private fun observeCertification(payment: Payment) {
+        d(GsonBuilder().setPrettyPrinting().create().toJson(payment))
+        hostHelper.lifecycleOwner.let { owner: LifecycleOwner ->
+
+            // 외부에서 sdk 실패종료
+            finish.observeAlways(owner, EventObserver { viewModel.failSdkFinish(payment) })
+
+            // 결제결과 옵저빙
+            viewModel.impResponse().observe(owner, EventObserver(this::sdkFinish))
+
+            // 웹뷰앱 열기
+            viewModel.webViewPayment().observe(owner, EventObserver(this::requestWebViewPayment))
+        }
+
+        // 본인인증 요청
+        preventOverlapRun.launch { requestCertification(payment) }
+    }
+
 
     fun isPolling(): LiveData<Event<Boolean>> {
         return isPolling
@@ -238,13 +282,26 @@ internal class IamportSdk(
         viewModel.judgePayment(payment) // 뷰모델에 데이터 판단 요청(native or webview pg)
     }
 
+    /**
+     * 결제 요청 실행
+     */
+    private fun requestCertification(payment: Payment) {
+        // 네트워크 연결 상태 체크
+        if (!Util.isInternetAvailable(hostHelper.context)) {
+            sdkFinish(IamPortResponse.makeFail(payment, msg = "네트워크 연결 안됨"))
+            return
+        }
+
+        viewModel.judgePayment(payment) // 뷰모델에 데이터 판단 요청(native or webview pg)
+    }
+
 
     /**
      * 웹뷰 결제 요청 실행
      */
     private fun requestWebViewPayment(it: Payment) {
         clearData()
-        webViewLauncher?.launch(Payment(it.userCode, it.iamPortRequest))
+        webViewLauncher?.launch(it)
     }
 
 

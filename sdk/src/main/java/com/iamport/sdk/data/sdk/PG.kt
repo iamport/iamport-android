@@ -37,8 +37,8 @@ enum class PG(val korName: String) {
     payple("페이플"), alipay("알리페이"),
     bluewalnut("bluewalnut"); /*, inicis("이니시스ActiveX결제창"), syrup("시럽페이");*/
 
-    fun makePgRawName(storeId: String? = null): String {
-        return "${this.name}${if (!storeId.isNullOrBlank()) ".${storeId}" else CONST.EMPTY_STR}"
+    fun makePgRawName(pgId: String? = null): String {
+        return "${this.name}${if (!pgId.isNullOrBlank()) ".${pgId}" else CONST.EMPTY_STR}"
     }
 
     companion object {

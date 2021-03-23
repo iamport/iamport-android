@@ -117,7 +117,8 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
                 d("$this")
                 when (first) {
                     JudgeStrategy.JudgeKinds.CHAI -> second?.let { repository.chaiStrategy.doWork(it.pg_id, third) }
-                    JudgeStrategy.JudgeKinds.WEB -> bus.webViewPayment.postValue(Event(third))
+                    JudgeStrategy.JudgeKinds.WEB,
+                    JudgeStrategy.JudgeKinds.CERT -> bus.webViewPayment.postValue(Event(third))
                     else -> Logger.e("판단불가 $third")
                 }
             }
@@ -155,7 +156,7 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
             d("ignore pollingChaiStatus cause playChai")
             return
         }
-        
+
         viewModelScope.launch(job) {
             d("백그라운드라서 폴링 시도")
             repository.chaiStrategy.requestPollingChaiStatus()

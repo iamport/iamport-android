@@ -14,10 +14,7 @@ import com.iamport.sampleapp.MerchantReceiver
 import com.iamport.sampleapp.PaymentResultData.result
 import com.iamport.sampleapp.R
 import com.iamport.sampleapp.databinding.PaymentFragmentBinding
-import com.iamport.sdk.data.sdk.IamPortApprove
-import com.iamport.sdk.data.sdk.IamPortRequest
-import com.iamport.sdk.data.sdk.IamPortResponse
-import com.iamport.sdk.data.sdk.PG
+import com.iamport.sdk.data.sdk.*
 import com.iamport.sdk.domain.core.ICallbackPaymentResult
 import com.iamport.sdk.domain.core.Iamport
 import com.iamport.sdk.domain.utils.CONST
@@ -73,6 +70,10 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
             onClickPayment()
         }
 
+        viewDataBinding.certificationButton.setOnClickListener {
+            onClickCertification()
+        }
+
         viewDataBinding.backButton.setOnClickListener {
             backPressCallback.handleOnBackPressed()
         }
@@ -113,6 +114,19 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
         Log.i("SAMPLE", "isPolling? ${Iamport.isPollingValue()}")
     }
 
+    fun onClickCertification() {
+        val userCode = "imp00357859"
+        val certification = IamPortCertification(
+            merchant_uid = "muid_aos_123123",
+            min_age = 19,
+            name = "김준혁",
+            phone = "010-4597-5833",
+            company = "유어포트",
+        )
+
+        Iamport.certification(userCode, certification) { callBackListener.result(it) }
+    }
+
 
     // 결제 버튼 클릭
     private fun onClickPayment() {
@@ -128,7 +142,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
          * SDK 에 결제 요청할 데이터 구성
          */
         val request = IamPortRequest(
-            pg = pg.makePgRawName(storeId = ""),           // PG 사
+            pg = pg.makePgRawName(pgId = ""),           // PG 사
             pay_method = payMethod,                     // 결제수단
             name = paymentName,                         // 주문명
             merchant_uid = merchantUid,                 // 주문번호
@@ -152,6 +166,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
 //        Iamport.payment(userCode, request,
 //            approveCallback = { approveCallback(it) },
 //            paymentResultCallback = { callBackListener.result(it) })
+
         Iamport.payment(userCode, request) { callBackListener.result(it) }
     }
 

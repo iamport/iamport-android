@@ -4,13 +4,13 @@ apply plugin: 'kotlin-parcelize'
 
 android {
     compileSdkVersion 30
-    buildToolsVersion "30.0.2"
+    buildToolsVersion "30.0.3"
 
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 30
-        versionCode 210219002 // yymmdd000
-        versionName "0.0.6-dev05" // prod(x.y.z), dev(x.y.z-dev00)
+        versionCode 210323007 // yymmdd000
+        versionName "0.0.6-dev14" // prod(x.y.z), dev(x.y.z-dev00)
         multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -120,6 +120,6 @@ dependencies {
     // loading animation
     implementation Libs.spinKit
 
-    implementation Libs.chuck
-    releaseImplementation Libs.releaseChuck
+//    debugImplementation Libs.chuck
+//    releaseImplementation Libs.releaseChuck
 }

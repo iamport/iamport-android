@@ -134,6 +134,16 @@
             />
 
         <Button
+            android:id="@+id/certification_button"
+            android:layout_width="80dp"
+            android:layout_height="70dp"
+            android:layout_marginBottom="30dp"
+            android:text="@string/certification"
+            app:layout_constraintBottom_toTopOf="@id/payment_button"
+            app:layout_constraintLeft_toRightOf="@+id/back_button"/>
+
+
+        <Button
             android:id="@+id/payment_button"
             android:layout_width="300dp"
             android:layout_height="70dp"

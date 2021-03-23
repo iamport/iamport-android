@@ -1,9 +1,8 @@
 object Versions {
     const val multidex = "2.0.1"
-    const val kotlin_stdlib_jdk = "1.4.21"
+    const val kotlin_stdlib_jdk = "1.4.31"
     const val core_ktx = "1.3.2"
     const val appcompat = "1.2.0"
-
 
     const val mokito = "3.6.28"
     const val mokito_kotlin= "2.2.0"
@@ -18,14 +17,14 @@ object Versions {
     const val constraintlayout = "2.0.4"
     const val lifecycle_extensions = "2.2.0"
 
-    const val material = "1.3.0-alpha04"
+    const val material = "1.4.0-alpha01"
 
-    const val activity_ktx = "1.2.0-beta02"
-    const val fragment_ktx = "1.3.0-beta02"
+    const val activity_ktx = "1.3.0-alpha04"
+    const val fragment_ktx = "1.3.1"
 
-    const val koin_version = "2.2.1"
+    const val koin_version = "2.2.2"
     const val retrofit_version = "2.9.0"
-    const val logging_interceptor = "4.7.1"
+    const val logging_interceptor = "4.9.0"
 
     // Gson
     const val gson = "2.8.6"
@@ -41,7 +40,7 @@ object Versions {
     // loading animation
     const val spinKit = "1.4.0"
 
-    const val chuck = "1.1.0"
+//    const val chuck = "1.1.0"
     const val robolectric = "4.3"
 }
 
@@ -108,8 +107,8 @@ object Libs {
     // loading animation
     const val spinKit = "com.github.ybq:Android-SpinKit:${Versions.spinKit}"
 
-    const val chuck = "com.readystatesoftware.chuck:library:${Versions.chuck}"
-    const val releaseChuck = "com.readystatesoftware.chuck:library-no-op:${Versions.chuck}"
+//    const val chuck = "com.readystatesoftware.chuck:library:${Versions.chuck}"
+//    const val releaseChuck = "com.readystatesoftware.chuck:library-no-op:${Versions.chuck}"
 
 }
 
