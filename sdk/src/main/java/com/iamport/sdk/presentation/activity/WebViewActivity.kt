@@ -49,7 +49,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
      * BaseActivity 에서 onCreate 시 호출
      */
     override fun initStart() {
-        i("HELLO I'MPORT WebView SDK! ${Util.versionName(this)}")
+        i("HELLO I'MPORT WebView SDK!")
 
         initLoading()
 
