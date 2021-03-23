@@ -2,11 +2,11 @@ package com.iamport.sdk.domain.di
 
 import android.content.Context
 import com.google.gson.Gson
+import com.iamport.sdk.BuildConfig
 import com.iamport.sdk.data.remote.ChaiApi
 import com.iamport.sdk.data.remote.IamportApi
 import com.iamport.sdk.data.remote.NiceApi
 import com.iamport.sdk.domain.utils.CONST
-import com.readystatesoftware.chuck.ChuckInterceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.core.component.KoinApiExtension
@@ -15,16 +15,19 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
+
 fun provideOkHttpClient(context: Context?): OkHttpClient? {
     return context?.let {
         OkHttpClient.Builder()
             .connectTimeout(20, TimeUnit.MINUTES)
             .readTimeout(20, TimeUnit.SECONDS)
-            .writeTimeout(20, TimeUnit.SECONDS)
-//            .addInterceptor(ChuckInterceptor(it))
-            .addInterceptor(HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BASIC
-            })
+            .writeTimeout(20, TimeUnit.SECONDS).apply {
+                if (BuildConfig.DEBUG) {
+                    addInterceptor(HttpLoggingInterceptor().apply {
+                        level = HttpLoggingInterceptor.Level.BODY
+                    })
+                }
+            }
             .build()
     } ?: run { null }
 }

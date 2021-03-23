@@ -40,7 +40,7 @@ object Versions {
     // loading animation
     const val spinKit = "1.4.0"
 
-    const val chuck = "1.1.0"
+//    const val chuck = "1.1.0"
     const val robolectric = "4.3"
 }
 
@@ -107,8 +107,8 @@ object Libs {
     // loading animation
     const val spinKit = "com.github.ybq:Android-SpinKit:${Versions.spinKit}"
 
-    const val chuck = "com.readystatesoftware.chuck:library:${Versions.chuck}"
-    const val releaseChuck = "com.readystatesoftware.chuck:library-no-op:${Versions.chuck}"
+//    const val chuck = "com.readystatesoftware.chuck:library:${Versions.chuck}"
+//    const val releaseChuck = "com.readystatesoftware.chuck:library-no-op:${Versions.chuck}"
 
 }
 
