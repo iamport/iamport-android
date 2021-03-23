@@ -112,7 +112,7 @@ internal class IamportSdk(
      * BaseActivity 에서 onCreate 시 호출
      */
     fun initStart(payment: Payment, paymentResultCallBack: ((IamPortResponse?) -> Unit)?) {
-        i("HELLO I'MPORT SDK! ${Util.versionName(hostHelper.context)}")
+        i("HELLO I'MPORT SDK! for cert")
 
 
         IntentFilter().let {
@@ -137,7 +137,7 @@ internal class IamportSdk(
      * BaseActivity 에서 onCreate 시 호출
      */
     fun initStart(payment: Payment, approveCallback: ((IamPortApprove) -> Unit)?, paymentResultCallBack: ((IamPortResponse?) -> Unit)?) {
-        i("HELLO I'MPORT SDK! ${Util.versionName(hostHelper.context)}")
+        i("HELLO I'MPORT SDK! for payment")
 
         IntentFilter().let {
             it.addAction(CONST.BROADCAST_FOREGROUND_SERVICE)

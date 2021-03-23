@@ -195,11 +195,11 @@ object Util {
         observeForever(observer)
     }
 
-    fun versionName(context: Context?, name: String? = null): String {
-        return context?.run {
-            packageManager.getPackageInfo(name ?: packageName, 0)?.versionName
-        } ?: kotlin.run { CONST.EMPTY_STR }
-    }
+//    fun versionName(context: Context?, name: String? = null): String {
+//        return context?.run {
+//            packageManager.getPackageInfo(name ?: packageName, 0)?.versionName
+//        } ?: kotlin.run { CONST.EMPTY_STR }
+//    }
 
     fun versionCode(context: Context?, name: String? = null): Number {
         return context?.run {
@@ -211,6 +211,7 @@ object Util {
                 }
             }
         } ?: kotlin.run { 0L }
+
     }
 
 }
