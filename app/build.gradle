@@ -103,6 +103,6 @@ dependencies {
     implementation "org.koin:koin-androidx-ext:$koin_version"
 
     implementation project(':sdk')
-//    implementation 'com.github.iamport:iamport-android:0.0.6-dev04'
+//    implementation 'com.github.iamport:iamport-android:v0.0.6-dev15'
 }
 
