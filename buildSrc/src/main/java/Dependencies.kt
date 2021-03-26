@@ -42,6 +42,8 @@ object Versions {
 
 //    const val chuck = "1.1.0"
     const val robolectric = "4.3"
+
+    const val serialization = "1.1.0"
 }
 
 object Libs {
@@ -106,6 +108,8 @@ object Libs {
 
     // loading animation
     const val spinKit = "com.github.ybq:Android-SpinKit:${Versions.spinKit}"
+
+    const val serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.serialization}"
 
 //    const val chuck = "com.readystatesoftware.chuck:library:${Versions.chuck}"
 //    const val releaseChuck = "com.readystatesoftware.chuck:library-no-op:${Versions.chuck}"

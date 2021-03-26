@@ -5,12 +5,15 @@ import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.Util
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 /**
  * SDK 에 결제 요청할 데이터
  * https://docs.iamport.kr/tech/imp?lang=ko#param
  */
+
 @Parcelize
+@Serializable
 data class IamPortRequest(
     val pg: String,
     val pay_method: PayMethod = PayMethod.card, // 명세상 필수인지 불명확함, default card

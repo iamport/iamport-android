@@ -2,12 +2,14 @@ package com.iamport.sdk.data.sdk
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 /**
  * for naverpay
  */
 
 @Parcelize
+@Serializable
 data class ProductItem(
     val categoryType: String,
     val categoryId: String,
