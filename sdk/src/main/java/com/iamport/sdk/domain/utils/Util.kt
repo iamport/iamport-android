@@ -214,4 +214,8 @@ object Util {
 
     }
 
+    fun getRedirectUrl(str: String): String {
+        return "${CONST.IAMPORT_DETECT_SCHEME}${CONST.IAMPORT_DETECT_ADDRESS}/${str}"
+    }
+
 }

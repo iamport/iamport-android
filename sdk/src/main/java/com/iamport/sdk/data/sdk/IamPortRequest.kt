@@ -2,6 +2,8 @@ package com.iamport.sdk.data.sdk
 
 import android.os.Parcelable
 import com.iamport.sdk.domain.utils.CONST
+import com.iamport.sdk.domain.utils.Util
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 /**
@@ -30,7 +32,7 @@ data class IamPortRequest(
     val display: CardQuota? = null,
     val digital: Boolean? = null, // default false
     val vbank_due: String? = null, // YYYYMMDDhhmm
-    private val m_redirect_url: String? = CONST.IAMPORT_DETECT_URL, // 콜백
+    private var m_redirect_url: String? = Platform.native.redirectUrl, // 콜백
     val app_scheme: String? = null, // 명세상 nullable 이나, RN 에서 필수
     val biz_num: String? = null,
     val popup: Boolean? = null,
@@ -42,9 +44,26 @@ data class IamPortRequest(
     /**
      * string pg 으로 enum PG 가져옴
      */
+    @IgnoredOnParcel
     val pgEnum: PG?
         get() {
             return PG.convertPG(pg)
+        }
+
+    @IgnoredOnParcel
+    var platform: String? = null
+        set(value) {
+            value?.let { it ->
+                Platform.convertPlatform(it)?.let { p ->
+                    m_redirect_url = p.redirectUrl
+                } ?: run {
+                    m_redirect_url = Util.getRedirectUrl(it)
+                }
+            }
+            field = null
+        }
+        get() {
+            return null
         }
 
     companion object {
@@ -223,5 +242,4 @@ data class IamPortRequest(
         }
     }
 }
-
 
