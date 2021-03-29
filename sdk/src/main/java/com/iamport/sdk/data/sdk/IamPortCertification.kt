@@ -3,11 +3,13 @@ package com.iamport.sdk.data.sdk
 import android.os.Parcelable
 import com.iamport.sdk.domain.utils.CONST
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 /**
  * https://docs.iamport.kr/tech/mobile-authentication
  */
 @Parcelize
+@Serializable
 data class IamPortCertification(
     val merchant_uid: String,
     val min_age: Int? = null,
