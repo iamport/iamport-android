@@ -2,6 +2,8 @@ package com.iamport.sdk.data.sdk
 
 import android.os.Parcelable
 import com.iamport.sdk.domain.utils.CONST
+import com.iamport.sdk.domain.utils.Util
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
@@ -30,5 +32,22 @@ data class IamPortCertification(
     //  ReactNative / Ionic 등 앱 내 local html을 통해 IMP.certification()이 호출되는 경우에는 URL 도메인을 인식할 수 없으므로 본 파라메터 지정이 권장됩니다.(지정하지 않으면 아임포트라고 전달합니다)
     //  운영하시는 서비스의 대표 도메인 URL(예시 : https://www.iamport.co.kr) 또는 서비스 명칭(예시 : 아임포트)을 지정하시면 됩니다.
     val company: String? = null,
-    private val m_redirect_url: String = CONST.IAMPORT_DETECT_URL
-) : Parcelable
+    private var m_redirect_url: String? = Platform.native.redirectUrl
+) : Parcelable {
+
+    @IgnoredOnParcel
+    var platform: String? = null
+        set(value) {
+            value?.let { it ->
+                Platform.convertPlatform(it)?.let { p ->
+                    m_redirect_url = p.redirectUrl
+                } ?: run {
+                    m_redirect_url = Util.getRedirectUrl(it)
+                }
+            }
+            field = null
+        }
+        get() {
+            return null
+        }
+}
