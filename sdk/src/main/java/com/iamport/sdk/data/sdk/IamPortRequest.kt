@@ -41,7 +41,9 @@ data class IamPortRequest(
     val popup: Boolean? = null,
     val naverPopupMode: Boolean? = null,
     val naverUseCfm: String? = null,
-    val naverProducts: List<ProductItem>? = null
+    val naverProducts: List<ProductItem>? = null,
+    private val niceMobileV2 : Boolean = true
+
 ) : Parcelable {
 
     /**
@@ -97,7 +99,7 @@ data class IamPortRequest(
             var display: CardQuota? = null
             var digital: Boolean? = null // default false
             var vbank_due: String? = null // YYYYMMDDhhmm
-            var m_redirect_url: String? = CONST.IAMPORT_DETECT_URL // 콜백
+            private var m_redirect_url: String? = Platform.native.redirectUrl // 콜백
             var app_scheme: String? = null // 명세상 nullable 이나, RN 에서 필수
             var biz_num: String? = null
             var popup: Boolean? = null // 명세상 없으나, RN 에 있음
@@ -105,6 +107,7 @@ data class IamPortRequest(
             var naverPopupMode: Boolean? = null
             var naverUseCfm: String? = null
             var naverProducts: List<ProductItem>? = null
+            private val niceMobileV2 : Boolean = true
 
             fun pg(pg: String) = apply {
                 this.pg = pg
@@ -186,9 +189,9 @@ data class IamPortRequest(
                 this.vbank_due = vbank_due
             }
 
-            private fun m_redirect_url(m_redirect_url: String) = apply {
-                this.m_redirect_url = m_redirect_url
-            }
+//            private fun m_redirect_url(m_redirect_url: String) = apply {
+//                this.m_redirect_url = m_redirect_url
+//            }
 
             fun app_scheme(app_scheme: String) = apply {
                 this.app_scheme = app_scheme
