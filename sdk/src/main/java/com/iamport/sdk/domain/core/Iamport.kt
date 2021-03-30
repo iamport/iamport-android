@@ -32,6 +32,7 @@ import org.koin.android.logger.AndroidLogger
 import org.koin.core.KoinApplication
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
 
 
 object Iamport {
@@ -85,6 +86,7 @@ object Iamport {
     // TODO Application 사용하지 않는 방안 모색
     fun createWithKoin(app: Application, koinApp: KoinApplication? = null) {
 
+        stopKoin()
         IamportKoinContext.koinApp = koinApp
             ?: startKoin {
                 logger(AndroidLogger())
