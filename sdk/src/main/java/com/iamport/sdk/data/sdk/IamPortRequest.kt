@@ -25,7 +25,7 @@ data class IamPortRequest(
     val custom_data: String? = null, // 명세상 불명확
     val tax_free: String? = null,
     val currency: Currency? = null, // default KRW, 페이팔은 USD 이어야 함
-    val language: String? = null, // default "ko"
+    val language: String? = null, // default "ko", en, zh, jp => TODO validator 에 추가
     val buyer_name: String? = null,
     val buyer_tel: String? = null,
     val buyer_email: String? = null,
