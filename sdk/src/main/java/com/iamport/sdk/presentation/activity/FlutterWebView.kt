@@ -1,12 +1,21 @@
 package com.iamport.sdk.presentation.activity
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
+import android.util.Log
 import android.view.View
+import android.webkit.CookieManager
+import android.webkit.WebSettings
+import android.webkit.WebView
 import android.widget.ProgressBar
+import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.viewModelScope
 import com.google.gson.GsonBuilder
+import com.iamport.sdk.BuildConfig
 import com.iamport.sdk.R
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
@@ -14,6 +23,7 @@ import com.iamport.sdk.data.sdk.ProvidePgPkg
 import com.iamport.sdk.databinding.WebviewActivityBinding
 import com.iamport.sdk.domain.IamportWebChromeClient
 import com.iamport.sdk.domain.JsNativeInterface
+import com.iamport.sdk.domain.core.Iamport
 import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.utils.*
 import com.iamport.sdk.presentation.contract.BankPayContract
@@ -23,22 +33,27 @@ import kotlinx.coroutines.*
 import org.koin.android.ext.android.get
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.component.KoinApiExtension
+import org.koin.core.component.get
 
 
 @KoinApiExtension
-class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), IamportKoinComponent {
+class FlutterWebView @JvmOverloads constructor(scope: BaseCoroutineScope = UICoroutineScope()) :
+    IamportKoinComponent, BaseCoroutineScope by scope {
 
-    override val layoutResourceId: Int = R.layout.webview_activity
-    override val viewModel: WebViewModel by viewModel()
+    //    override val layoutResourceId: Int = R.layout.webview_activity
+//    override val viewModel: WebViewModel by viewModel()
+    private val viewModel: WebViewModel = WebViewModel(get(), get())
 
-    private lateinit var loading: ProgressBar
+    //    private lateinit var loading: ProgressBar
     private var payment: Payment? = null
+    private var activity: ComponentActivity? = null
+    private var webview: WebView? = null
 
     /**
      * 뱅크페이 앱 열기 위한 런처
      */
     private var launcherBankPay =
-        registerForActivityResult(BankPayContract()) { res: Pair<String, String>? ->
+        activity?.registerForActivityResult(BankPayContract()) { res: Pair<String, String>? ->
             res?.let {
                 loadingVisible(true)
                 viewModel.processBankPayPayment(res)
@@ -48,31 +63,33 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
     /**
      * BaseActivity 에서 onCreate 시 호출
      */
-    override fun initStart() {
+    fun initStart(activity: ComponentActivity, webview: WebView, payment: Payment) {
         i("HELLO I'MPORT WebView SDK!")
-
         initLoading()
 
         // intent 로 부터 전달받은 Payment 객체
-        val bundle = intent.getBundleExtra(CONST.CONTRACT_INPUT)
-        payment = bundle?.getParcelable(CONST.BUNDLE_PAYMENT)
+//        val bundle = intent.getBundleExtra(CONST.CONTRACT_INPUT)
+//        payment = bundle?.getParcelable(CONST.BUNDLE_PAYMENT)
 
+        this.payment = payment
+        this.webview = webview
+
+        onBackPressed()
         observeViewModel(payment) // 관찰할 LiveData
     }
 
-    override fun onNewIntent(intent: Intent?) {
-        d("onNewIntent")
-        super.onNewIntent(intent)
-        this.intent = intent
-//        removeObserveViewModel(payment)
-        initStart()
-    }
+//    fun onNewIntent(intent: Intent?) {
+//        d("onNewIntent")
+//        this.intent = intent
+////        removeObserveViewModel(payment)
+//        initStart()
+//    }
 
     /**
      * 로딩 UI 초기화
      */
     private fun initLoading() {
-        loading = viewDataBinding.loading as ProgressBar
+//        loading = viewDataBinding.loading as ProgressBar
         loadingVisible(true)
     }
 
@@ -82,7 +99,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
      */
     private fun updateAlpha(isWebViewPG: Boolean) {
         val alpha = if (isWebViewPG) 1.0F else 0.0F
-        viewDataBinding.webviewActivity.alpha = alpha
+//        viewDataBinding.webviewActivity.alpha = alpha
     }
 
     /**
@@ -91,17 +108,18 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
     private fun observeViewModel(payment: Payment?) {
         d(GsonBuilder().setPrettyPrinting().create().toJson(payment))
         payment?.let { pay: Payment ->
+            activity?.run {
+                viewModel.payment().observe(this, EventObserver(this@FlutterWebView::requestPayment))
+                viewModel.loading().observe(this, EventObserver(this@FlutterWebView::loadingVisible))
 
-            viewModel.payment().observe(this, EventObserver(this::requestPayment))
-            viewModel.loading().observe(this, EventObserver(this::loadingVisible))
+                viewModel.openWebView().observe(this, EventObserver(this@FlutterWebView::openWebView))
+                viewModel.niceTransRequestParam().observe(this, EventObserver(this@FlutterWebView::openNiceTransApp))
+                viewModel.thirdPartyUri().observe(this, EventObserver(this@FlutterWebView::openThirdPartyApp))
 
-            viewModel.openWebView().observe(this, EventObserver(this::openWebView))
-            viewModel.niceTransRequestParam().observe(this, EventObserver(this::openNiceTransApp))
-            viewModel.thirdPartyUri().observe(this, EventObserver(this::openThirdPartyApp))
+                viewModel.impResponse().observe(this, EventObserver(this@FlutterWebView::sdkFinish))
 
-            viewModel.impResponse().observe(this, EventObserver(this::sdkFinish))
-
-            viewModel.startPayment(pay)
+                viewModel.startPayment(pay)
+            }
         }
     }
 
@@ -109,7 +127,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
      * 로딩 프로그래스 visible 여부
      */
     private fun loadingVisible(visible: Boolean) {
-        loading.visibility = if (visible) View.VISIBLE else View.INVISIBLE
+//        loading.visibility = if (visible) View.VISIBLE else View.INVISIBLE
     }
 
     /**
@@ -117,32 +135,43 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
      */
     private fun requestPayment(it: Payment) {
         loadingVisible(true)
-        if (!Util.isInternetAvailable(this)) {
-            sdkFinish(IamPortResponse.makeFail(it, msg = "네트워크 연결 안됨"))
-            return
+        activity?.run {
+            if (!Util.isInternetAvailable(this)) {
+                sdkFinish(IamPortResponse.makeFail(it, msg = "네트워크 연결 안됨"))
+                return
+            }
         }
         viewModel.requestPayment(it)
     }
 
-    override fun onBackPressed() {
-        viewDataBinding.webview.run {
-            if (canGoBack()) {
-                goBack()
-            } else {
-                super.onBackPressed()
+
+    private val backPressCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            webview?.run {
+                if (canGoBack()) {
+                    goBack()
+                } else {
+                    activity?.onBackPressed()
+                }
             }
+        }
+    }
+
+    fun onBackPressed() {
+        activity?.run {
+            activity?.onBackPressedDispatcher?.addCallback(this, backPressCallback)
         }
     }
 
     /**
      * 모든 결과 처리 및 SDK 종료
      */
-    override fun sdkFinish(iamPortResponse: IamPortResponse?) {
+    fun sdkFinish(iamPortResponse: IamPortResponse?) {
         w("명시적 sdkFinish ${iamPortResponse.toString()}")
         loadingVisible(false)
-        setResult(Activity.RESULT_OK,
+        activity?.setResult(Activity.RESULT_OK,
             Intent().apply { putExtra(CONST.CONTRACT_OUTPUT, iamPortResponse) })
-        this.finish()
+        activity?.finish()
     }
 
     /**
@@ -150,10 +179,10 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
      */
     private fun openNiceTransApp(it: String) {
         runCatching {
-            launcherBankPay.launch(it) // 뱅크페이 앱 실행
+            launcherBankPay?.launch(it) // 뱅크페이 앱 실행
         }.onFailure {
             // 뱅크페이 앱 패키지는 하드코딩
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Util.getMarketId(ProvidePgPkg.BANKPAY.pkg))))
+            activity?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Util.getMarketId(ProvidePgPkg.BANKPAY.pkg))))
         }
         loadingVisible(false)
     }
@@ -166,7 +195,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
         d("openThirdPartyApp $it")
         Intent.parseUri(it.toString(), Intent.URI_INTENT_SCHEME)?.let { intent: Intent ->
             runCatching {
-                startActivity(intent)
+                activity?.startActivity(intent)
             }.onFailure {
                 movePlayStore(intent)
             }
@@ -193,7 +222,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
 
         if (!pkg.isNullOrBlank()) {
             d("movePlayStore :: $pkg")
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Util.getMarketId(pkg))))
+            activity?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Util.getMarketId(pkg))))
         }
     }
 
@@ -208,17 +237,17 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
             val js = "javascript:$jsMethod"
             d("evaluateJS => $js")
             launch {
-                viewDataBinding.webview.run {
+                webview?.run {
                     this.loadUrl(js)
                 }
             }
         }
 
-//        setTheme(R.style.Theme_AppCompat_Transparent_NoActionBar)
+//        activity?.setTheme(R.style.Theme_AppCompat_Transparent_NoActionBar)
         updateAlpha(true)
         loadingVisible(true)
 
-        viewDataBinding.webview.run {
+        webview?.run {
             fitsSystemWindows = true
             settingsWebView(this)
             setLayerType(View.LAYER_TYPE_HARDWARE, null)
@@ -235,5 +264,44 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
         }
     }
 
+    /**
+     * 웹뷰 기본 세팅
+     */
+    private fun settingsWebView(webView: WebView) {
+        webView.settings.apply {
+            javaScriptEnabled = true
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                WebView.setWebContentsDebuggingEnabled(true);
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                val cookieManager = CookieManager.getInstance()
+                cookieManager.setAcceptCookie(true)
+                cookieManager.setAcceptThirdPartyCookies(webView, true)
+            }
+
+            cacheMode = WebSettings.LOAD_NO_CACHE
+
+            blockNetworkImage = false
+            loadsImagesAutomatically = true
+
+            if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                safeBrowsingEnabled = true  // api 26
+            }
+
+            useWideViewPort = false
+            loadWithOverviewMode = true
+            javaScriptCanOpenWindowsAutomatically = true
+
+            domStorageEnabled = true
+            loadWithOverviewMode = true
+            allowContentAccess = true
+
+            setSupportZoom(false)
+            displayZoomControls = false
+        }
+    }
 
 }

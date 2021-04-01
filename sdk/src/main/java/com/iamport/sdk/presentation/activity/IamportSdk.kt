@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
+import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
@@ -34,6 +35,7 @@ internal class IamportSdk(
     val activity: ComponentActivity? = null,
     val fragment: Fragment? = null,
     val webViewLauncher: ActivityResultLauncher<Payment>?,
+    val webView: WebView? = null,
     val close: LiveData<Event<Unit>>,
     val finish: LiveData<Event<Unit>>,
 ) : IamportKoinComponent {
@@ -301,7 +303,8 @@ internal class IamportSdk(
      */
     private fun requestWebViewPayment(it: Payment) {
         clearData()
-        webViewLauncher?.launch(it)
+//        webViewLauncher?.launch(it)
+        FlutterWebView().initStart(activity!!, webView!!, it)
     }
 
 

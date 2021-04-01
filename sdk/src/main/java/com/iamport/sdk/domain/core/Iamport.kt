@@ -2,6 +2,7 @@ package com.iamport.sdk.domain.core
 
 import android.app.Application
 import android.util.Log
+import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.MainThread
@@ -154,6 +155,35 @@ object Iamport {
             IamportSdk(
                 activity = componentActivity,
                 webViewLauncher = webViewLauncher,
+                close = close,
+                finish = finish
+            )
+    }
+
+
+    // TODO 이거 쓰자
+    fun init(componentActivity: ComponentActivity, webView: WebView) {
+
+        if (!iamportCreated()) {
+            return
+        }
+
+        d("INITIALIZE IAMPORT SDK for activity")
+
+        clear()
+        createInitialData()
+
+        // TODO 웹뷰 액티비티에 대한 응답 콜백이었음
+//        webViewLauncher = componentActivity.registerForActivityResult(WebViewActivityContract()) {
+//            callback(it)
+//        }
+
+        this.activity = componentActivity
+        this.iamportSdk =
+            IamportSdk(
+                activity = componentActivity,
+                webViewLauncher = webViewLauncher,
+                webView = webView,
                 close = close,
                 finish = finish
             )
