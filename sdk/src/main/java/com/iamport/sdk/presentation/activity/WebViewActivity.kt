@@ -138,7 +138,8 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
      * 모든 결과 처리 및 SDK 종료
      */
     override fun sdkFinish(iamPortResponse: IamPortResponse?) {
-        w("명시적 sdkFinish ${iamPortResponse.toString()}")
+        i("call sdkFinish")
+        d("sdkFinish => ${iamPortResponse.toString()}")
         loadingVisible(false)
         setResult(Activity.RESULT_OK,
             Intent().apply { putExtra(CONST.CONTRACT_OUTPUT, iamPortResponse) })
@@ -214,7 +215,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
             }
         }
 
-//        setTheme(R.style.Theme_AppCompat_Transparent_NoActionBar)
+        setTheme(R.style.Theme_AppCompat_Transparent_NoActionBar)
         updateAlpha(true)
         loadingVisible(true)
 

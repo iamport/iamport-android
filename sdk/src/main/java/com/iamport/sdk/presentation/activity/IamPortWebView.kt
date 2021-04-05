@@ -1,26 +1,19 @@
 package com.iamport.sdk.presentation.activity
 
-import android.app.Activity
-import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import android.util.Log
 import android.view.View
 import android.webkit.CookieManager
 import android.webkit.WebSettings
 import android.webkit.WebView
-import android.widget.ProgressBar
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
-import androidx.lifecycle.viewModelScope
 import com.google.gson.GsonBuilder
 import com.iamport.sdk.BuildConfig
-import com.iamport.sdk.R
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.data.sdk.ProvidePgPkg
-import com.iamport.sdk.databinding.WebviewActivityBinding
 import com.iamport.sdk.domain.IamportWebChromeClient
 import com.iamport.sdk.domain.JsNativeInterface
 import com.iamport.sdk.domain.core.Iamport
@@ -30,21 +23,17 @@ import com.iamport.sdk.presentation.contract.BankPayContract
 import com.iamport.sdk.presentation.viewmodel.WebViewModel
 import com.orhanobut.logger.Logger.*
 import kotlinx.coroutines.*
-import org.koin.android.ext.android.get
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.get
 
 
 @KoinApiExtension
-class FlutterWebView @JvmOverloads constructor(scope: BaseCoroutineScope = UICoroutineScope()) :
+class IamPortWebView @JvmOverloads constructor(scope: BaseCoroutineScope = UICoroutineScope()) :
     IamportKoinComponent, BaseCoroutineScope by scope {
 
-    //    override val layoutResourceId: Int = R.layout.webview_activity
 //    override val viewModel: WebViewModel by viewModel()
     private val viewModel: WebViewModel = WebViewModel(get(), get())
 
-    //    private lateinit var loading: ProgressBar
     private var payment: Payment? = null
     private var activity: ComponentActivity? = null
     private var webview: WebView? = null
@@ -71,6 +60,7 @@ class FlutterWebView @JvmOverloads constructor(scope: BaseCoroutineScope = UICor
 //        val bundle = intent.getBundleExtra(CONST.CONTRACT_INPUT)
 //        payment = bundle?.getParcelable(CONST.BUNDLE_PAYMENT)
 
+        this.activity = activity
         this.payment = payment
         this.webview = webview
 
@@ -109,14 +99,17 @@ class FlutterWebView @JvmOverloads constructor(scope: BaseCoroutineScope = UICor
         d(GsonBuilder().setPrettyPrinting().create().toJson(payment))
         payment?.let { pay: Payment ->
             activity?.run {
-                viewModel.payment().observe(this, EventObserver(this@FlutterWebView::requestPayment))
-                viewModel.loading().observe(this, EventObserver(this@FlutterWebView::loadingVisible))
 
-                viewModel.openWebView().observe(this, EventObserver(this@FlutterWebView::openWebView))
-                viewModel.niceTransRequestParam().observe(this, EventObserver(this@FlutterWebView::openNiceTransApp))
-                viewModel.thirdPartyUri().observe(this, EventObserver(this@FlutterWebView::openThirdPartyApp))
+                i("등록하니?")
 
-                viewModel.impResponse().observe(this, EventObserver(this@FlutterWebView::sdkFinish))
+                viewModel.payment().observe(this, EventObserver(this@IamPortWebView::requestPayment))
+                viewModel.loading().observe(this, EventObserver(this@IamPortWebView::loadingVisible))
+
+                viewModel.openWebView().observe(this, EventObserver(this@IamPortWebView::openWebView))
+                viewModel.niceTransRequestParam().observe(this, EventObserver(this@IamPortWebView::openNiceTransApp))
+                viewModel.thirdPartyUri().observe(this, EventObserver(this@IamPortWebView::openThirdPartyApp))
+
+                viewModel.impResponse().observe(this, EventObserver(this@IamPortWebView::sdkFinish))
 
                 viewModel.startPayment(pay)
             }
@@ -134,6 +127,7 @@ class FlutterWebView @JvmOverloads constructor(scope: BaseCoroutineScope = UICor
      * 결제 요청 실행
      */
     private fun requestPayment(it: Payment) {
+        i("나왔니??")
         loadingVisible(true)
         activity?.run {
             if (!Util.isInternetAvailable(this)) {
@@ -167,11 +161,13 @@ class FlutterWebView @JvmOverloads constructor(scope: BaseCoroutineScope = UICor
      * 모든 결과 처리 및 SDK 종료
      */
     fun sdkFinish(iamPortResponse: IamPortResponse?) {
-        w("명시적 sdkFinish ${iamPortResponse.toString()}")
+        i("call sdkFinish")
+        d("sdkFinish => ${iamPortResponse.toString()}")
         loadingVisible(false)
-        activity?.setResult(Activity.RESULT_OK,
-            Intent().apply { putExtra(CONST.CONTRACT_OUTPUT, iamPortResponse) })
-        activity?.finish()
+//        activity?.setResult(Activity.RESULT_OK,
+//            Intent().apply { putExtra(CONST.CONTRACT_OUTPUT, iamPortResponse) })
+//        activity?.finish()
+        Iamport.callback(iamPortResponse)
     }
 
     /**
