@@ -85,7 +85,7 @@ internal class IamportSdk(
         clearData()
     }
 
-    // webview 모드임
+    // webview 사용 모드
     fun setWebView(webview: WebView) {
         this.webview = webview
     }
@@ -311,14 +311,15 @@ internal class IamportSdk(
     private fun requestWebViewPayment(it: Payment) {
         d("requestWebViewPayment $it")
         clearData()
-        activity?.let { activity ->
-            webview?.let { webView ->
+        webview?.let { webView ->
+            hostHelper.activity?.let { activity ->
                 IamPortWebView().initStart(activity, webView, it) // webview only 모드
             } ?: run {
+                w("Cannot found activity, So running activity mode")
                 webViewLauncher?.launch(it) // new activity 모드
             }
         } ?: run {
-            e("Cannot found activity")
+            webViewLauncher?.launch(it) // new activity 모드
         }
     }
 

@@ -161,33 +161,11 @@ object Iamport {
     }
 
 
-    // TODO 이거 쓰자
-    fun init(componentActivity: ComponentActivity, webView: WebView) {
-
-        if (!iamportCreated()) {
-            return
-        }
-
-        d("INITIALIZE IAMPORT SDK for activity")
-
-        clear()
-        createInitialData()
-
-        // TODO 웹뷰 액티비티에 대한 응답 콜백이었음
-//        webViewLauncher = componentActivity.registerForActivityResult(WebViewActivityContract()) {
-//            callback(it)
-//        }
-
-        this.activity = componentActivity
-        this.iamportSdk =
-            IamportSdk(
-                activity = componentActivity,
-                webViewLauncher = webViewLauncher,
-                webView = webView,
-                close = close,
-                finish = finish
-            )
+    // webview 사용 모드
+    fun setWebView(webview : WebView) {
+        iamportSdk?.setWebView(webview)
     }
+
 
     /**
      * SDK Activity 열기 위한 Contract for Fragment
@@ -254,7 +232,7 @@ object Iamport {
         return isPolling()?.value?.peekContent() ?: false
     }
 
-    private val callback = fun(iamPortResponse: IamPortResponse?) {
+    val callback = fun(iamPortResponse: IamPortResponse?) {
 //        impCallbackImpl?.result(iamPortResponse)
         impCallbackFunction?.invoke(iamPortResponse)
     }
