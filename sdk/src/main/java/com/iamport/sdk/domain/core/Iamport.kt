@@ -87,12 +87,14 @@ object Iamport {
     // TODO Application 사용하지 않는 방안 모색
     fun createWithKoin(app: Application, koinApp: KoinApplication? = null) {
 
-        stopKoin()
         IamportKoinContext.koinApp = koinApp
-            ?: startKoin {
-                logger(AndroidLogger())
-                androidContext(app)
-                modules(httpClientModule, apiModule, appModule)
+            ?: run {
+                stopKoin()
+                startKoin {
+                    logger(AndroidLogger())
+                    androidContext(app)
+                    modules(httpClientModule, apiModule, appModule)
+                }
             }
 
         Foreground.init(app)
@@ -162,7 +164,7 @@ object Iamport {
 
 
     // webview 사용 모드
-    fun setWebView(webview : WebView) {
+    fun setWebView(webview: WebView) {
         iamportSdk?.setWebView(webview)
     }
 
