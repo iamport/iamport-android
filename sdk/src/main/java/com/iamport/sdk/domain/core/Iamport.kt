@@ -15,7 +15,7 @@ import com.iamport.sdk.domain.di.IamportKoinContext
 import com.iamport.sdk.domain.di.IamportKoinContext.koinApp
 import com.iamport.sdk.domain.di.apiModule
 import com.iamport.sdk.domain.di.appModule
-import com.iamport.sdk.domain.di.httpClientModule
+//import com.iamport.sdk.domain.di.httpClientModule
 import com.iamport.sdk.domain.service.ChaiService
 import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.Event
@@ -87,7 +87,7 @@ object Iamport {
     // TODO Application 사용하지 않는 방안 모색
     fun createWithKoin(app: Application, koinApp: KoinApplication? = null) {
 
-        val modules = listOf(httpClientModule, apiModule, appModule)
+        val modules = listOf(apiModule, appModule)
         IamportKoinContext.koinApp = if (koinApp == null) {
             stopKoin()
             startKoin {

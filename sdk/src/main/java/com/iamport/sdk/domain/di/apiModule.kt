@@ -64,14 +64,12 @@ fun provideChaiApi(isStaging: Boolean, gson: Gson, client: OkHttpClient?): ChaiA
 }
 
 //@OptIn(KoinApiExtension::class)
-//val httpClientModule = module {
+//val httpClientModule = module(override = true) {
 //    single { provideOkHttpClient(get()) }
 //}
 
 @OptIn(KoinApiExtension::class)
 val apiModule = module {
-//    single { provideIamportApi(get(), get()) }
-//    single { provideNiceApi(get(), get()) }
     single { provideIamportApi(get(), null) }
 //    single { provideChaiApi(false, get(), get()) }
     single { provideNiceApi(get(), null) }
