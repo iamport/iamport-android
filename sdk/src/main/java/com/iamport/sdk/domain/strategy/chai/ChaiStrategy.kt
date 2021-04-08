@@ -385,7 +385,7 @@ open class ChaiStrategy : BaseStrategy() {
                 if (code == 0) {
                     data.run {
                         prepareData = this
-                        chaiApi = provideChaiApi(mode == CHAI.MODE, get(), null) // mode 에 따라 chaiApi 생성
+                        chaiApi = provideChaiApi(mode == CHAI.MODE, null) // mode 에 따라 chaiApi 생성
                         returnUrl?.let { bus.chaiUri.value = Event(it) }
                     }
                 } else {

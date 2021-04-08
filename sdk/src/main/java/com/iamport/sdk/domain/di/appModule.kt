@@ -22,7 +22,7 @@ val appModule = module {
     viewModel { MainViewModel(get(), get()) }
     viewModel { WebViewModel(get(), get()) }
     single { IamportReceiver() }
-    single { Gson() }
+//    single { Gson() }
 
     single { StrategyRepository() }
     single { WebViewLiveDataEventBus() }

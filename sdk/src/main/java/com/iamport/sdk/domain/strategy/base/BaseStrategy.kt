@@ -13,7 +13,8 @@ import org.koin.core.component.inject
 @KoinApiExtension
 abstract class BaseStrategy : IStrategy, IamportKoinComponent {
 
-    protected val gson: Gson by inject()
+//    protected val gson: Gson by inject()
+    protected val gson = Gson()
     protected val bus: NativeLiveDataEventBus by inject()
     lateinit var payment: Payment
 

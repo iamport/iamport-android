@@ -20,7 +20,8 @@ import org.koin.core.component.inject
 @KoinApiExtension
 open class BaseWebViewStrategy : WebViewClient(), IStrategy, IamportKoinComponent {
 
-    protected val gson: Gson by inject()
+//    protected val gson: Gson by inject()
+    protected val gson = Gson()
     protected val bus: WebViewLiveDataEventBus by inject()
 
     lateinit var payment: Payment

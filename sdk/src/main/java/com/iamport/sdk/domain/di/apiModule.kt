@@ -32,31 +32,31 @@ import java.util.concurrent.TimeUnit
 //    } ?: run { null }
 //}
 
-fun provideIamportApi(gson: Gson, client: OkHttpClient?): IamportApi {
+fun provideIamportApi(client: OkHttpClient?): IamportApi {
 
     return Retrofit.Builder()
         .baseUrl(CONST.IAMPORT_PROD_URL)
-        .addConverterFactory(GsonConverterFactory.create(gson)).apply {
+        .addConverterFactory(GsonConverterFactory.create(Gson())).apply {
             client?.let { client(it) }
         }
         .build()
         .create(IamportApi::class.java)
 }
 
-fun provideNiceApi(gson: Gson, client: OkHttpClient?): NiceApi {
+fun provideNiceApi(client: OkHttpClient?): NiceApi {
     return Retrofit.Builder()
         .baseUrl("${CONST.IAMPORT_DETECT_URL}/")
-        .addConverterFactory(GsonConverterFactory.create(gson)).apply {
+        .addConverterFactory(GsonConverterFactory.create(Gson())).apply {
             client?.let { client(it) }
         }
         .build()
         .create(NiceApi::class.java)
 }
 
-fun provideChaiApi(isStaging: Boolean, gson: Gson, client: OkHttpClient?): ChaiApi {
+fun provideChaiApi(isStaging: Boolean, client: OkHttpClient?): ChaiApi {
     return Retrofit.Builder()
         .baseUrl(if (isStaging) CONST.CHAI_SERVICE_STAGING_URL else CONST.CHAI_SERVICE_URL)
-        .addConverterFactory(GsonConverterFactory.create(gson)).apply {
+        .addConverterFactory(GsonConverterFactory.create(Gson())).apply {
             client?.let { client(it) }
         }
         .build()
@@ -70,7 +70,7 @@ fun provideChaiApi(isStaging: Boolean, gson: Gson, client: OkHttpClient?): ChaiA
 
 @OptIn(KoinApiExtension::class)
 val apiModule = module {
-    single { provideIamportApi(get(), null) }
+    single { provideIamportApi(null) }
 //    single { provideChaiApi(false, get(), get()) }
-    single { provideNiceApi(get(), null) }
+    single { provideNiceApi(null) }
 }
