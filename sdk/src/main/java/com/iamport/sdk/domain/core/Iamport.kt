@@ -87,15 +87,17 @@ object Iamport {
     // TODO Application 사용하지 않는 방안 모색
     fun createWithKoin(app: Application, koinApp: KoinApplication? = null) {
 
-        IamportKoinContext.koinApp = koinApp
-            ?: run {
-                stopKoin()
-                startKoin {
-                    logger(AndroidLogger())
-                    androidContext(app)
-                    modules(httpClientModule, apiModule, appModule)
-                }
+        val modules = listOf(httpClientModule, apiModule, appModule)
+        IamportKoinContext.koinApp = if (koinApp == null) {
+            stopKoin()
+            startKoin {
+                logger(AndroidLogger())
+                androidContext(app)
+                modules(modules)
             }
+        } else {
+            koinApp.modules(modules)
+        }
 
         Foreground.init(app)
 
