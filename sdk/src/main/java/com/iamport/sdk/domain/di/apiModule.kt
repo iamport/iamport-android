@@ -10,67 +10,68 @@ import com.iamport.sdk.domain.utils.CONST
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.core.component.KoinApiExtension
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 
-//fun provideOkHttpClient(context: Context?): OkHttpClient? {
-//    return context?.let {
-//        OkHttpClient.Builder()
-//            .connectTimeout(20, TimeUnit.MINUTES)
-//            .readTimeout(20, TimeUnit.SECONDS)
-//            .writeTimeout(20, TimeUnit.SECONDS).apply {
-//                if (BuildConfig.DEBUG) {
-//                    addInterceptor(HttpLoggingInterceptor().apply {
-//                        level = HttpLoggingInterceptor.Level.BODY
-//                    })
-//                }
-//            }
-//            .build()
-//    } ?: run { null }
-//}
+fun provideOkHttpClient(context: Context?): OkHttpClient? {
+    return context?.let {
+        OkHttpClient.Builder()
+            .connectTimeout(20, TimeUnit.MINUTES)
+            .readTimeout(20, TimeUnit.SECONDS)
+            .writeTimeout(20, TimeUnit.SECONDS).apply {
+                if (BuildConfig.DEBUG) {
+                    addInterceptor(HttpLoggingInterceptor().apply {
+                        level = HttpLoggingInterceptor.Level.BODY
+                    })
+                }
+            }
+            .build()
+    } ?: run { null }
+}
 
-fun provideIamportApi(client: OkHttpClient?): IamportApi {
+fun provideIamportApi(gson : Gson, client: OkHttpClient?): IamportApi {
 
     return Retrofit.Builder()
         .baseUrl(CONST.IAMPORT_PROD_URL)
-        .addConverterFactory(GsonConverterFactory.create(Gson())).apply {
+        .addConverterFactory(GsonConverterFactory.create(gson)).apply {
             client?.let { client(it) }
         }
         .build()
         .create(IamportApi::class.java)
 }
 
-fun provideNiceApi(client: OkHttpClient?): NiceApi {
+fun provideNiceApi(gson : Gson, client: OkHttpClient?): NiceApi {
     return Retrofit.Builder()
         .baseUrl("${CONST.IAMPORT_DETECT_URL}/")
-        .addConverterFactory(GsonConverterFactory.create(Gson())).apply {
+        .addConverterFactory(GsonConverterFactory.create(gson)).apply {
             client?.let { client(it) }
         }
         .build()
         .create(NiceApi::class.java)
 }
 
-fun provideChaiApi(isStaging: Boolean, client: OkHttpClient?): ChaiApi {
+fun provideChaiApi(isStaging: Boolean, gson : Gson, client: OkHttpClient?): ChaiApi {
     return Retrofit.Builder()
         .baseUrl(if (isStaging) CONST.CHAI_SERVICE_STAGING_URL else CONST.CHAI_SERVICE_URL)
-        .addConverterFactory(GsonConverterFactory.create(Gson())).apply {
+        .addConverterFactory(GsonConverterFactory.create(gson)).apply {
             client?.let { client(it) }
         }
         .build()
         .create(ChaiApi::class.java)
 }
 
-//@OptIn(KoinApiExtension::class)
-//val httpClientModule = module(override = true) {
-//    single { provideOkHttpClient(get()) }
-//}
+@OptIn(KoinApiExtension::class)
+val httpClientModule = module(override = true) {
+    single(named("${CONST.KOIN_KEY}provideOkHttpClient")) { provideOkHttpClient(get()) }
+}
 
 @OptIn(KoinApiExtension::class)
 val apiModule = module {
-    single { provideIamportApi(null) }
+    single { provideIamportApi(get(named("${CONST.KOIN_KEY}Gson")), get(named("${CONST.KOIN_KEY}provideOkHttpClient")),) }
 //    single { provideChaiApi(false, get(), get()) }
-    single { provideNiceApi(null) }
+    single { provideNiceApi(get(named("${CONST.KOIN_KEY}Gson")), get(named("${CONST.KOIN_KEY}provideOkHttpClient")),) }
 }

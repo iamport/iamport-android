@@ -16,12 +16,12 @@ import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Logger.d
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.inject
+import org.koin.core.qualifier.named
 
 @KoinApiExtension
 open class BaseWebViewStrategy : WebViewClient(), IStrategy, IamportKoinComponent {
 
-//    protected val gson: Gson by inject()
-    protected val gson = Gson()
+    protected val gson: Gson by inject(named("${CONST.KOIN_KEY}Gson"))
     protected val bus: WebViewLiveDataEventBus by inject()
 
     lateinit var payment: Payment

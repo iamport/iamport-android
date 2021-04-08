@@ -24,6 +24,7 @@ import kotlinx.coroutines.*
 import org.koin.android.ext.android.get
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.component.KoinApiExtension
+import org.koin.core.qualifier.named
 
 
 @KoinApiExtension
@@ -226,7 +227,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
             setLayerType(View.LAYER_TYPE_HARDWARE, null)
             clearCache(true)
             addJavascriptInterface(
-                JsNativeInterface(payment, Gson(), get(), evaluateJS),
+                JsNativeInterface(payment, get(named("${CONST.KOIN_KEY}Gson")), get(), evaluateJS),
                 CONST.PAYMENT_WEBVIEW_JS_INTERFACE_NAME
             )
             webViewClient = viewModel.getWebViewClient(payment)

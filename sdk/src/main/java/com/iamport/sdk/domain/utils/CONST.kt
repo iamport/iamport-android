@@ -1,6 +1,7 @@
 package com.iamport.sdk.domain.utils
 
 object CONST {
+    const val KOIN_KEY = "iamport-koin-key"
     const val APP_SCHME = "iamport_android"
     const val HTTP_SCHEME = "http"
     const val HTTPS_SCHEME = "https"

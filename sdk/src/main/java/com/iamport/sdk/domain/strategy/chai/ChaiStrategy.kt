@@ -25,6 +25,7 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.get
 import org.koin.core.component.inject
+import org.koin.core.qualifier.named
 import java.util.concurrent.atomic.AtomicInteger
 
 // TODO: 12/1/20 구조 좀 정리하기 ㅠㅠ 너무 복잡 ㅠㅠ
@@ -385,7 +386,7 @@ open class ChaiStrategy : BaseStrategy() {
                 if (code == 0) {
                     data.run {
                         prepareData = this
-                        chaiApi = provideChaiApi(mode == CHAI.MODE, null) // mode 에 따라 chaiApi 생성
+                        chaiApi = provideChaiApi(mode == CHAI.MODE, get(named("${CONST.KOIN_KEY}Gson")), get(named("${CONST.KOIN_KEY}provideOkHttpClient"))) // mode 에 따라 chaiApi 생성
                         returnUrl?.let { bus.chaiUri.value = Event(it) }
                     }
                 } else {
