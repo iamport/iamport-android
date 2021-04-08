@@ -64,13 +64,6 @@ class WebViewModel(private val bus: WebViewLiveDataEventBus, private val reposit
         return bus.loading
     }
 
-    /**
-     * 결제 데이터
-     */
-    fun jsMethodData(): LiveData<Event<String>> {
-        return bus.jsMethod
-    }
-
 
     /**
      * PG(nice or 비nice) 따라 webview client 가져오기

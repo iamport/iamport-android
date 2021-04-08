@@ -19,7 +19,7 @@ class BaseApplication : Application() {
             logger(AndroidLogger())
             androidContext(this@BaseApplication)
         }
-        Iamport.create(this, koinApp)
+        Iamport.createWithKoin(this, koinApp)
          */
     }
 }

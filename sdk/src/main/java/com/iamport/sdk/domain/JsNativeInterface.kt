@@ -14,7 +14,7 @@ import com.orhanobut.logger.Logger
 import org.koin.core.component.KoinApiExtension
 
 @KoinApiExtension
-class JsNativeInterface(val payment: Payment, val gson: Gson, private val bus: WebViewLiveDataEventBus) : IamportKoinComponent {
+class JsNativeInterface(val payment: Payment, val gson: Gson, private val bus: WebViewLiveDataEventBus, val evaluateJS: ((String) -> Unit)) : IamportKoinComponent {
 
     /**
      * 아임포트 JS SDK 에서 콜백 호출시에 해당 함수 동작
@@ -47,7 +47,6 @@ class JsNativeInterface(val payment: Payment, val gson: Gson, private val bus: W
         Logger.d("JS SDK 통한 결제 시작 요청")
 
         initSDK(payment.userCode, payment.tierCode)
-
 
         when (payment.getStatus()) {
             PAYMENT -> payment.iamPortRequest?.let {
@@ -85,11 +84,6 @@ class JsNativeInterface(val payment: Payment, val gson: Gson, private val bus: W
     private fun certification(certification: IamPortCertification) {
         Logger.d(certification)
         evaluateJS("certification('${gson.toJson(certification)}');")
-    }
-
-    private fun evaluateJS(jsMethod: String) {
-        val js = "javascript:$jsMethod"
-        bus.jsMethod.postValue(Event(js))
     }
 
 }

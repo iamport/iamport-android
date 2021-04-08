@@ -35,13 +35,24 @@
 ```
 
 > app build.gradle 
+> 
 [$SDK-VERSION][5]
 ```gradle
   implementation 'com.github.iamport:iamport-android:$SDK-VERSION'
 ```
+> 
+[Set DataBinding][6]
+```gradle
+  android {
+    ...
+    buildFeatures {
+        dataBinding true
+    }
+  }
+```
 
 [5]: https://github.com/iamport/iamport-android/releases
-
+[6]: https://developer.android.com/jetpack/androidx/releases/databinding
 
 ### KOTLIN usage
 

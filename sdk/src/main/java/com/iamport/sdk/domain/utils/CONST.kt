@@ -15,7 +15,9 @@ object CONST {
     const val NICE_PG_PROVIDER = "nice"
 
     // 이 url 로 감지되면, 결제완료 콜백이란 의미 + 붙은 파라미터로 결제결과 처리
-    const val IAMPORT_DETECT_URL = "http://a-detectchangingwebview/iamport"
+    const val IAMPORT_DETECT_SCHEME = "$HTTP_SCHEME://"
+    const val IAMPORT_DETECT_ADDRESS = "detectchangingwebview/iamport/a" // a == android
+    const val IAMPORT_DETECT_URL = "$IAMPORT_DETECT_SCHEME$IAMPORT_DETECT_ADDRESS"
 
     const val IAMPORT_PROD_URL = "https://service.iamport.kr" // 테스트도 상용서버에서
 //    const val IAMPORT_TEST_URL = "https://kicc.iamport.kr"

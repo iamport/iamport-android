@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
+import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
@@ -70,6 +71,8 @@ internal class IamportSdk(
         addAction(Intent.ACTION_SCREEN_ON)
     }
 
+    private var webview: WebView? = null
+
     init {
 //        viewModel = ViewModelProvider(hostHelper.viewModelStoreOwner, MainViewModelFactory(get(), get())).get(MainViewModel::class.java)
 
@@ -80,6 +83,11 @@ internal class IamportSdk(
         }
 
         clearData()
+    }
+
+    // webview 사용 모드
+    fun setWebView(webview: WebView) {
+        this.webview = webview
     }
 
     private val lifecycleObserver = object : LifecycleObserver {
@@ -262,6 +270,7 @@ internal class IamportSdk(
         viewModel.checkChaiStatusForResultCallback()
     }
 
+
     /**
      * 결제 요청 실행
      */
@@ -300,8 +309,18 @@ internal class IamportSdk(
      * 웹뷰 결제 요청 실행
      */
     private fun requestWebViewPayment(it: Payment) {
+        d("requestWebViewPayment $it")
         clearData()
-        webViewLauncher?.launch(it)
+        webview?.let { webView ->
+            hostHelper.activity?.let { activity ->
+                IamPortWebView().initStart(activity, webView, it) // webview only 모드
+            } ?: run {
+                w("Cannot found activity, So running activity mode")
+                webViewLauncher?.launch(it) // new activity 모드
+            }
+        } ?: run {
+            webViewLauncher?.launch(it) // new activity 모드
+        }
     }
 
 

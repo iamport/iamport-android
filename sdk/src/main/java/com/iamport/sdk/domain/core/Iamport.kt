@@ -2,6 +2,7 @@ package com.iamport.sdk.domain.core
 
 import android.app.Application
 import android.util.Log
+import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.MainThread
@@ -32,6 +33,7 @@ import org.koin.android.logger.AndroidLogger
 import org.koin.core.KoinApplication
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
 
 
 object Iamport {
@@ -85,12 +87,17 @@ object Iamport {
     // TODO Application 사용하지 않는 방안 모색
     fun createWithKoin(app: Application, koinApp: KoinApplication? = null) {
 
-        IamportKoinContext.koinApp = koinApp
-            ?: startKoin {
+        val modules = listOf(httpClientModule, apiModule, appModule)
+        IamportKoinContext.koinApp = if (koinApp == null) {
+            stopKoin()
+            startKoin {
                 logger(AndroidLogger())
                 androidContext(app)
-                modules(httpClientModule, apiModule, appModule)
+                modules(modules)
             }
+        } else {
+            koinApp.modules(modules)
+        }
 
         Foreground.init(app)
 
@@ -157,6 +164,13 @@ object Iamport {
             )
     }
 
+
+    // webview 사용 모드
+    fun setWebView(webview: WebView) {
+        iamportSdk?.setWebView(webview)
+    }
+
+
     /**
      * SDK Activity 열기 위한 Contract for Fragment
      * @param fragment : Host Fragment
@@ -222,7 +236,7 @@ object Iamport {
         return isPolling()?.value?.peekContent() ?: false
     }
 
-    private val callback = fun(iamPortResponse: IamPortResponse?) {
+    val callback = fun(iamPortResponse: IamPortResponse?) {
 //        impCallbackImpl?.result(iamPortResponse)
         impCallbackFunction?.invoke(iamPortResponse)
     }

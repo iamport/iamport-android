@@ -97,14 +97,20 @@ class JudgeStrategy : BaseStrategy(), IamportKoinComponent {
         val myPg = split[0]
         val user = userDataList.find {
             if (split.size > 1) {
-                it.pg_provider?.makePgRawName() == myPg && it.pg_id == split[1]
+                it.pg_provider == myPg && it.pg_id == split[1]
             } else {
-                it.pg_provider?.makePgRawName() == myPg
+                it.pg_provider == myPg
             }
         }
 
         return when (user) {
-            null -> defUser.let { getPgTriple(it, replacePG(it.pg_provider!!, payment)) } // user 를 찾지 못하면 디폴트 값 사용
+            null -> defUser.pg_provider?.let {
+                PG.convertPG(it)?.let { pg ->
+                    getPgTriple(defUser, replacePG(pg, payment))
+                }
+            } ?: run {
+                Triple(JudgeKinds.ERROR, null, payment)
+            }
 
             else -> getPgTriple(user, payment)
         }
@@ -118,7 +124,7 @@ class JudgeStrategy : BaseStrategy(), IamportKoinComponent {
      * pg 정보 값 가져옴 first : 타입, second : pg유저, third : 결제 요청 데이터
      */
     private fun getPgTriple(user: UserData, payment: Payment): Triple<JudgeKinds, UserData?, Payment> {
-        return when (user.pg_provider) {
+        return when (user.pg_provider?.let { PG.convertPG(it) }) {
             PG.chai -> Triple(JudgeKinds.CHAI, user, payment)
             else -> Triple(JudgeKinds.WEB, user, payment)
         }

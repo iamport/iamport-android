@@ -12,6 +12,7 @@ import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.WebViewLiveDataEventBus
+import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Logger.d
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.inject
@@ -51,9 +52,10 @@ open class BaseWebViewStrategy : WebViewClient(), IStrategy, IamportKoinComponen
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
+        Logger.w("onReceivedError code ${error?.errorCode}, description ${error?.description}")
         super.onReceivedError(view, request, error)
         // 에러 발생시, 결제 취소 페이지 이동
-        failureFinish(payment, msg = "code ${error?.errorCode}, description ${error?.description}")
+//        failureFinish(payment, msg = "code ${error?.errorCode}, description ${error?.description}")
     }
 
 

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.view.View
 import android.widget.ProgressBar
+import androidx.lifecycle.viewModelScope
 import com.google.gson.GsonBuilder
 import com.iamport.sdk.R
 import com.iamport.sdk.data.sdk.IamPortResponse
@@ -14,12 +15,11 @@ import com.iamport.sdk.databinding.WebviewActivityBinding
 import com.iamport.sdk.domain.IamportWebChromeClient
 import com.iamport.sdk.domain.JsNativeInterface
 import com.iamport.sdk.domain.di.IamportKoinComponent
-import com.iamport.sdk.domain.utils.CONST
-import com.iamport.sdk.domain.utils.EventObserver
-import com.iamport.sdk.domain.utils.Util
+import com.iamport.sdk.domain.utils.*
 import com.iamport.sdk.presentation.contract.BankPayContract
 import com.iamport.sdk.presentation.viewmodel.WebViewModel
 import com.orhanobut.logger.Logger.*
+import kotlinx.coroutines.*
 import org.koin.android.ext.android.get
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.component.KoinApiExtension
@@ -101,8 +101,6 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
 
             viewModel.impResponse().observe(this, EventObserver(this::sdkFinish))
 
-            viewModel.jsMethodData().observe(this, EventObserver(this::evaluateJS))
-
             viewModel.startPayment(pay)
         }
     }
@@ -140,7 +138,8 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
      * 모든 결과 처리 및 SDK 종료
      */
     override fun sdkFinish(iamPortResponse: IamPortResponse?) {
-        w("명시적 sdkFinish ${iamPortResponse.toString()}")
+        i("call sdkFinish")
+        d("sdkFinish => ${iamPortResponse.toString()}")
         loadingVisible(false)
         setResult(Activity.RESULT_OK,
             Intent().apply { putExtra(CONST.CONTRACT_OUTPUT, iamPortResponse) })
@@ -206,6 +205,16 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
     private fun openWebView(payment: Payment) {
         d("오픈! 웹뷰")
 
+        val evaluateJS = fun(jsMethod: String) {
+            val js = "javascript:$jsMethod"
+            d("evaluateJS => $js")
+            launch {
+                viewDataBinding.webview.run {
+                    this.loadUrl(js)
+                }
+            }
+        }
+
         setTheme(R.style.Theme_AppCompat_Transparent_NoActionBar)
         updateAlpha(true)
         loadingVisible(true)
@@ -216,7 +225,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
             setLayerType(View.LAYER_TYPE_HARDWARE, null)
             clearCache(true)
             addJavascriptInterface(
-                JsNativeInterface(payment, get(), get()),
+                JsNativeInterface(payment, get(), get(), evaluateJS),
                 CONST.PAYMENT_WEBVIEW_JS_INTERFACE_NAME
             )
             webViewClient = viewModel.getWebViewClient(payment)
@@ -224,13 +233,6 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
 
             loadUrl(CONST.PAYMENT_FILE_URL) // load WebView
             webChromeClient = IamportWebChromeClient()
-        }
-    }
-
-    private fun evaluateJS(jsMethod: String) {
-        d("evaluateJS => $jsMethod")
-        viewDataBinding.webview.run {
-            this.loadUrl(jsMethod)
         }
     }
 

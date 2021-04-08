@@ -109,8 +109,17 @@ object Util {
             mobilians -> setOf(PayMethod.card, PayMethod.phone)
             settle -> setOf(PayMethod.vbank)
             chai, payple -> setOf(PayMethod.trans)
+            eximbay -> setOf(
+                PayMethod.card,
+                PayMethod.unionpay,
+                PayMethod.alipay,
+                PayMethod.tenpay,
+                PayMethod.wechat,
+                PayMethod.molpay,
+                PayMethod.paysbuy
+            )
             jtnet, nice, danal_tpay, kicc,
-            eximbay, naverco, naverpay -> defaultPayMethod
+            naverco, naverpay -> defaultPayMethod
             else -> defaultPayMethod
         }
     }
@@ -212,6 +221,10 @@ object Util {
             }
         } ?: kotlin.run { 0L }
 
+    }
+
+    fun getRedirectUrl(str: String): String {
+        return "${CONST.IAMPORT_DETECT_SCHEME}${CONST.IAMPORT_DETECT_ADDRESS}/${str}"
     }
 
 }
