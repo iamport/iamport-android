@@ -16,21 +16,21 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 
-fun provideOkHttpClient(context: Context?): OkHttpClient? {
-    return context?.let {
-        OkHttpClient.Builder()
-            .connectTimeout(20, TimeUnit.MINUTES)
-            .readTimeout(20, TimeUnit.SECONDS)
-            .writeTimeout(20, TimeUnit.SECONDS).apply {
-                if (BuildConfig.DEBUG) {
-                    addInterceptor(HttpLoggingInterceptor().apply {
-                        level = HttpLoggingInterceptor.Level.BODY
-                    })
-                }
-            }
-            .build()
-    } ?: run { null }
-}
+//fun provideOkHttpClient(context: Context?): OkHttpClient? {
+//    return context?.let {
+//        OkHttpClient.Builder()
+//            .connectTimeout(20, TimeUnit.MINUTES)
+//            .readTimeout(20, TimeUnit.SECONDS)
+//            .writeTimeout(20, TimeUnit.SECONDS).apply {
+//                if (BuildConfig.DEBUG) {
+//                    addInterceptor(HttpLoggingInterceptor().apply {
+//                        level = HttpLoggingInterceptor.Level.BODY
+//                    })
+//                }
+//            }
+//            .build()
+//    } ?: run { null }
+//}
 
 fun provideIamportApi(gson: Gson, client: OkHttpClient?): IamportApi {
 
@@ -63,14 +63,16 @@ fun provideChaiApi(isStaging: Boolean, gson: Gson, client: OkHttpClient?): ChaiA
         .create(ChaiApi::class.java)
 }
 
-@OptIn(KoinApiExtension::class)
-val httpClientModule = module {
-    single { provideOkHttpClient(get()) }
-}
+//@OptIn(KoinApiExtension::class)
+//val httpClientModule = module {
+//    single { provideOkHttpClient(get()) }
+//}
 
 @OptIn(KoinApiExtension::class)
 val apiModule = module {
-    single { provideIamportApi(get(), get()) }
+//    single { provideIamportApi(get(), get()) }
+//    single { provideNiceApi(get(), get()) }
+    single { provideIamportApi(get(), null) }
 //    single { provideChaiApi(false, get(), get()) }
-    single { provideNiceApi(get(), get()) }
+    single { provideNiceApi(get(), null) }
 }
