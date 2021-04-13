@@ -313,7 +313,7 @@ internal class IamportSdk(
         clearData()
         webview?.let { webView ->
             hostHelper.activity?.let { activity ->
-                IamPortWebView().initStart(activity, webView, it) // webview only 모드
+                IamPortWebViewMode().initStart(activity, webView, it) // webview only 모드
             } ?: run {
                 w("Cannot found activity, So running activity mode")
                 webViewLauncher?.launch(it) // new activity 모드
