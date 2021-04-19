@@ -16,6 +16,7 @@ import com.iamport.sdk.domain.di.IamportKoinContext.koinApp
 import com.iamport.sdk.domain.di.apiModule
 import com.iamport.sdk.domain.di.appModule
 import com.iamport.sdk.domain.di.httpClientModule
+//import com.iamport.sdk.domain.di.httpClientModule
 import com.iamport.sdk.domain.service.ChaiService
 import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.Event

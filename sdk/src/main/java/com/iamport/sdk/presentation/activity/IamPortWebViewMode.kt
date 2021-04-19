@@ -25,10 +25,11 @@ import com.orhanobut.logger.Logger.*
 import kotlinx.coroutines.*
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.get
+import org.koin.core.qualifier.named
 
 
 @KoinApiExtension
-class IamPortWebView @JvmOverloads constructor(scope: BaseCoroutineScope = UICoroutineScope()) :
+class IamPortWebViewMode @JvmOverloads constructor(scope: BaseCoroutineScope = UICoroutineScope()) :
     IamportKoinComponent, BaseCoroutineScope by scope {
 
 //    override val viewModel: WebViewModel by viewModel()
@@ -100,16 +101,16 @@ class IamPortWebView @JvmOverloads constructor(scope: BaseCoroutineScope = UICor
         payment?.let { pay: Payment ->
             activity?.run {
 
-                i("등록하니?")
+                d("등록하니?")
 
-                viewModel.payment().observe(this, EventObserver(this@IamPortWebView::requestPayment))
-                viewModel.loading().observe(this, EventObserver(this@IamPortWebView::loadingVisible))
+                viewModel.payment().observe(this, EventObserver(this@IamPortWebViewMode::requestPayment))
+                viewModel.loading().observe(this, EventObserver(this@IamPortWebViewMode::loadingVisible))
 
-                viewModel.openWebView().observe(this, EventObserver(this@IamPortWebView::openWebView))
-                viewModel.niceTransRequestParam().observe(this, EventObserver(this@IamPortWebView::openNiceTransApp))
-                viewModel.thirdPartyUri().observe(this, EventObserver(this@IamPortWebView::openThirdPartyApp))
+                viewModel.openWebView().observe(this, EventObserver(this@IamPortWebViewMode::openWebView))
+                viewModel.niceTransRequestParam().observe(this, EventObserver(this@IamPortWebViewMode::openNiceTransApp))
+                viewModel.thirdPartyUri().observe(this, EventObserver(this@IamPortWebViewMode::openThirdPartyApp))
 
-                viewModel.impResponse().observe(this, EventObserver(this@IamPortWebView::sdkFinish))
+                viewModel.impResponse().observe(this, EventObserver(this@IamPortWebViewMode::sdkFinish))
 
                 viewModel.startPayment(pay)
             }
@@ -127,7 +128,7 @@ class IamPortWebView @JvmOverloads constructor(scope: BaseCoroutineScope = UICor
      * 결제 요청 실행
      */
     private fun requestPayment(it: Payment) {
-        i("나왔니??")
+        d("나왔니??")
         loadingVisible(true)
         activity?.run {
             if (!Util.isInternetAvailable(this)) {
@@ -167,7 +168,7 @@ class IamPortWebView @JvmOverloads constructor(scope: BaseCoroutineScope = UICor
 //        activity?.setResult(Activity.RESULT_OK,
 //            Intent().apply { putExtra(CONST.CONTRACT_OUTPUT, iamPortResponse) })
 //        activity?.finish()
-        Iamport.callback(iamPortResponse)
+        Iamport.callback.invoke(iamPortResponse)
     }
 
     /**
@@ -249,7 +250,7 @@ class IamPortWebView @JvmOverloads constructor(scope: BaseCoroutineScope = UICor
             setLayerType(View.LAYER_TYPE_HARDWARE, null)
             clearCache(true)
             addJavascriptInterface(
-                JsNativeInterface(payment, get(), get(), evaluateJS),
+                JsNativeInterface(payment, get(named("${CONST.KOIN_KEY}Gson")), get(), evaluateJS),
                 CONST.PAYMENT_WEBVIEW_JS_INTERFACE_NAME
             )
             webViewClient = viewModel.getWebViewClient(payment)

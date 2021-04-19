@@ -10,6 +10,7 @@ import com.iamport.sdk.domain.utils.CONST
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.core.component.KoinApiExtension
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -32,7 +33,7 @@ fun provideOkHttpClient(context: Context?): OkHttpClient? {
     } ?: run { null }
 }
 
-fun provideIamportApi(gson: Gson, client: OkHttpClient?): IamportApi {
+fun provideIamportApi(gson : Gson, client: OkHttpClient?): IamportApi {
 
     return Retrofit.Builder()
         .baseUrl(CONST.IAMPORT_PROD_URL)
@@ -43,7 +44,7 @@ fun provideIamportApi(gson: Gson, client: OkHttpClient?): IamportApi {
         .create(IamportApi::class.java)
 }
 
-fun provideNiceApi(gson: Gson, client: OkHttpClient?): NiceApi {
+fun provideNiceApi(gson : Gson, client: OkHttpClient?): NiceApi {
     return Retrofit.Builder()
         .baseUrl("${CONST.IAMPORT_DETECT_URL}/")
         .addConverterFactory(GsonConverterFactory.create(gson)).apply {
@@ -53,7 +54,7 @@ fun provideNiceApi(gson: Gson, client: OkHttpClient?): NiceApi {
         .create(NiceApi::class.java)
 }
 
-fun provideChaiApi(isStaging: Boolean, gson: Gson, client: OkHttpClient?): ChaiApi {
+fun provideChaiApi(isStaging: Boolean, gson : Gson, client: OkHttpClient?): ChaiApi {
     return Retrofit.Builder()
         .baseUrl(if (isStaging) CONST.CHAI_SERVICE_STAGING_URL else CONST.CHAI_SERVICE_URL)
         .addConverterFactory(GsonConverterFactory.create(gson)).apply {
@@ -64,13 +65,13 @@ fun provideChaiApi(isStaging: Boolean, gson: Gson, client: OkHttpClient?): ChaiA
 }
 
 @OptIn(KoinApiExtension::class)
-val httpClientModule = module {
-    single { provideOkHttpClient(get()) }
+val httpClientModule = module(override = true) {
+    single(named("${CONST.KOIN_KEY}provideOkHttpClient")) { provideOkHttpClient(get()) }
 }
 
 @OptIn(KoinApiExtension::class)
 val apiModule = module {
-    single { provideIamportApi(get(), get()) }
+    single { provideIamportApi(get(named("${CONST.KOIN_KEY}Gson")), get(named("${CONST.KOIN_KEY}provideOkHttpClient")),) }
 //    single { provideChaiApi(false, get(), get()) }
-    single { provideNiceApi(get(), get()) }
+    single { provideNiceApi(get(named("${CONST.KOIN_KEY}Gson")), get(named("${CONST.KOIN_KEY}provideOkHttpClient")),) }
 }
