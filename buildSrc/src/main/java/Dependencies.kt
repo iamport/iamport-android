@@ -1,3 +1,4 @@
+// 디펜던시 업데이트 확인 ./gradlew dependencyUpdates -Drevision=release
 object Versions {
     const val multidex = "2.0.1"
     const val kotlin_stdlib_jdk = "1.4.31"
@@ -19,8 +20,8 @@ object Versions {
 
     const val material = "1.4.0-alpha01"
 
-    const val activity_ktx = "1.3.0-alpha04"
-    const val fragment_ktx = "1.3.1"
+    const val activity_ktx = "1.3.0-alpha07"
+    const val fragment_ktx = "1.3.3"
 
     const val koin_version = "2.2.2"
     const val retrofit_version = "2.9.0"
@@ -33,7 +34,7 @@ object Versions {
     const val logger = "2.2.0"
 
     // Rx
-    const val rxjava = "2.2.20"
+    const val rxjava = "2.2.21"
     const val rxandroid = "2.1.1"
     const val rxjava2_debug = "1.4.0"
 
