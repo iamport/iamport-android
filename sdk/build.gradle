@@ -11,7 +11,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 30
         versionCode 210419001 // yymmdd000
-        versionName "0.0.6" // prod(x.y.z), dev(x.y.z-dev00), poc(x.y.z-poc00)
+        versionName "1.0.0-dev01" // prod(x.y.z), dev(x.y.z-dev00), poc(x.y.z-poc00)
         multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
