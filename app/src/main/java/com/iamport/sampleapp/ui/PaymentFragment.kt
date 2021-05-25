@@ -171,7 +171,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
     }
 
     /**
-     *  TODO 재고확인 등 최종결제를 위한 처리를 해주세요
+     *  TODO: CHAI 결제시 재고확인 등 최종결제를 위한 처리를 해주세요
      *  CONST.CHAI_FINAL_PAYMENT_TIME_OUT_SEC 만큼 타임아웃 후 결제 데이터가
      *  초기화 되기 때문에 타임아웃 시간 안에 Iamport.chaiPayment 함수를 호출해주셔야 합니다.
      */
