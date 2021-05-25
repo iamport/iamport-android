@@ -90,7 +90,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
     /**
      * 관찰할 LiveData 옵저빙
      */
-    private fun observeViewModel(payment: Payment?) {
+    override fun observeViewModel(payment: Payment?) {
         d(GsonBuilder().setPrettyPrinting().create().toJson(payment))
         payment?.let { pay: Payment ->
 
@@ -117,7 +117,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
     /**
      * 결제 요청 실행
      */
-    private fun requestPayment(it: Payment) {
+    override fun requestPayment(it: Payment) {
         loadingVisible(true)
         if (!Util.isInternetAvailable(this)) {
             sdkFinish(IamPortResponse.makeFail(it, msg = "네트워크 연결 안됨"))
@@ -151,7 +151,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
     /**
      * 뱅크페이 외부앱 열기 for nice PG + 실시간계좌이체(trans)
      */
-    private fun openNiceTransApp(it: String) {
+    override fun openNiceTransApp(it: String) {
         runCatching {
             launcherBankPay.launch(it) // 뱅크페이 앱 실행
         }.onFailure {
@@ -165,7 +165,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
     /**
      * 외부앱 열기
      */
-    private fun openThirdPartyApp(it: Uri) {
+    override fun openThirdPartyApp(it: Uri) {
         d("openThirdPartyApp $it")
         Intent.parseUri(it.toString(), Intent.URI_INTENT_SCHEME)?.let { intent: Intent ->
             runCatching {
@@ -181,7 +181,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
     /**
      * 앱 패키지 검색하여 플레이 스토어로 이동
      */
-    private fun movePlayStore(intent: Intent) {
+    override fun movePlayStore(intent: Intent) {
         val pkg = intent.`package` ?: run {
             // intent 에 패키지 없으면 ProvidePgPkg에서 intnet.schme 으로 앱 패키지 검색
             i("Not found intent package")
@@ -204,7 +204,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
     /**
      * 웹뷰 오픈
      */
-    private fun openWebView(payment: Payment) {
+    override fun openWebView(payment: Payment) {
         d("오픈! 웹뷰")
 
         val evaluateJS = fun(jsMethod: String) {

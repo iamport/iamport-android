@@ -30,9 +30,8 @@ import org.koin.core.qualifier.named
 
 @KoinApiExtension
 class IamPortWebViewMode @JvmOverloads constructor(scope: BaseCoroutineScope = UICoroutineScope()) :
-    IamportKoinComponent, BaseCoroutineScope by scope {
+    IamportKoinComponent, BaseMain, BaseCoroutineScope by scope {
 
-//    override val viewModel: WebViewModel by viewModel()
     private val viewModel: WebViewModel = WebViewModel(get(), get())
 
     private var payment: Payment? = null
@@ -45,7 +44,6 @@ class IamPortWebViewMode @JvmOverloads constructor(scope: BaseCoroutineScope = U
     private var launcherBankPay =
         activity?.registerForActivityResult(BankPayContract()) { res: Pair<String, String>? ->
             res?.let {
-                loadingVisible(true)
                 viewModel.processBankPayPayment(res)
             } ?: e("NICE TRANS result is NULL")
         }
@@ -55,11 +53,6 @@ class IamPortWebViewMode @JvmOverloads constructor(scope: BaseCoroutineScope = U
      */
     fun initStart(activity: ComponentActivity, webview: WebView, payment: Payment) {
         i("HELLO I'MPORT WebView SDK!")
-        initLoading()
-
-        // intent 로 부터 전달받은 Payment 객체
-//        val bundle = intent.getBundleExtra(CONST.CONTRACT_INPUT)
-//        payment = bundle?.getParcelable(CONST.BUNDLE_PAYMENT)
 
         this.activity = activity
         this.payment = payment
@@ -69,34 +62,11 @@ class IamPortWebViewMode @JvmOverloads constructor(scope: BaseCoroutineScope = U
         observeViewModel(payment) // 관찰할 LiveData
     }
 
-//    fun onNewIntent(intent: Intent?) {
-//        d("onNewIntent")
-//        this.intent = intent
-////        removeObserveViewModel(payment)
-//        initStart()
-//    }
-
-    /**
-     * 로딩 UI 초기화
-     */
-    private fun initLoading() {
-//        loading = viewDataBinding.loading as ProgressBar
-        loadingVisible(true)
-    }
-
-
-    /**
-     * 액티비티 알파값 조정
-     */
-    private fun updateAlpha(isWebViewPG: Boolean) {
-        val alpha = if (isWebViewPG) 1.0F else 0.0F
-//        viewDataBinding.webviewActivity.alpha = alpha
-    }
 
     /**
      * 관찰할 LiveData 옵저빙
      */
-    private fun observeViewModel(payment: Payment?) {
+    override fun observeViewModel(payment: Payment?) {
         d(GsonBuilder().setPrettyPrinting().create().toJson(payment))
         payment?.let { pay: Payment ->
             activity?.run {
@@ -104,7 +74,6 @@ class IamPortWebViewMode @JvmOverloads constructor(scope: BaseCoroutineScope = U
                 d("등록하니?")
 
                 viewModel.payment().observe(this, EventObserver(this@IamPortWebViewMode::requestPayment))
-                viewModel.loading().observe(this, EventObserver(this@IamPortWebViewMode::loadingVisible))
 
                 viewModel.openWebView().observe(this, EventObserver(this@IamPortWebViewMode::openWebView))
                 viewModel.niceTransRequestParam().observe(this, EventObserver(this@IamPortWebViewMode::openNiceTransApp))
@@ -118,18 +87,10 @@ class IamPortWebViewMode @JvmOverloads constructor(scope: BaseCoroutineScope = U
     }
 
     /**
-     * 로딩 프로그래스 visible 여부
-     */
-    private fun loadingVisible(visible: Boolean) {
-//        loading.visibility = if (visible) View.VISIBLE else View.INVISIBLE
-    }
-
-    /**
      * 결제 요청 실행
      */
-    private fun requestPayment(it: Payment) {
+    override fun requestPayment(it: Payment) {
         d("나왔니??")
-        loadingVisible(true)
         activity?.run {
             if (!Util.isInternetAvailable(this)) {
                 sdkFinish(IamPortResponse.makeFail(it, msg = "네트워크 연결 안됨"))
@@ -152,7 +113,7 @@ class IamPortWebViewMode @JvmOverloads constructor(scope: BaseCoroutineScope = U
         }
     }
 
-    fun onBackPressed() {
+    override fun onBackPressed() {
         activity?.run {
             activity?.onBackPressedDispatcher?.addCallback(this, backPressCallback)
         }
@@ -161,34 +122,29 @@ class IamPortWebViewMode @JvmOverloads constructor(scope: BaseCoroutineScope = U
     /**
      * 모든 결과 처리 및 SDK 종료
      */
-    fun sdkFinish(iamPortResponse: IamPortResponse?) {
+    override fun sdkFinish(iamPortResponse: IamPortResponse?) {
         i("call sdkFinish")
         d("sdkFinish => ${iamPortResponse.toString()}")
-        loadingVisible(false)
-//        activity?.setResult(Activity.RESULT_OK,
-//            Intent().apply { putExtra(CONST.CONTRACT_OUTPUT, iamPortResponse) })
-//        activity?.finish()
         Iamport.callback.invoke(iamPortResponse)
     }
 
     /**
      * 뱅크페이 외부앱 열기 for nice PG + 실시간계좌이체(trans)
      */
-    private fun openNiceTransApp(it: String) {
+    override fun openNiceTransApp(it: String) {
         runCatching {
             launcherBankPay?.launch(it) // 뱅크페이 앱 실행
         }.onFailure {
             // 뱅크페이 앱 패키지는 하드코딩
             activity?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Util.getMarketId(ProvidePgPkg.BANKPAY.pkg))))
         }
-        loadingVisible(false)
     }
 
 
     /**
      * 외부앱 열기
      */
-    private fun openThirdPartyApp(it: Uri) {
+    override fun openThirdPartyApp(it: Uri) {
         d("openThirdPartyApp $it")
         Intent.parseUri(it.toString(), Intent.URI_INTENT_SCHEME)?.let { intent: Intent ->
             runCatching {
@@ -197,14 +153,13 @@ class IamPortWebViewMode @JvmOverloads constructor(scope: BaseCoroutineScope = U
                 movePlayStore(intent)
             }
         }
-        loadingVisible(false)
     }
 
 
     /**
      * 앱 패키지 검색하여 플레이 스토어로 이동
      */
-    private fun movePlayStore(intent: Intent) {
+    override fun movePlayStore(intent: Intent) {
         val pkg = intent.`package` ?: run {
             // intent 에 패키지 없으면 ProvidePgPkg에서 intnet.schme 으로 앱 패키지 검색
             i("Not found intent package")
@@ -227,7 +182,7 @@ class IamPortWebViewMode @JvmOverloads constructor(scope: BaseCoroutineScope = U
     /**
      * 웹뷰 오픈
      */
-    private fun openWebView(payment: Payment) {
+    override fun openWebView(payment: Payment) {
         d("오픈! 웹뷰")
 
         val evaluateJS = fun(jsMethod: String) {
@@ -239,10 +194,6 @@ class IamPortWebViewMode @JvmOverloads constructor(scope: BaseCoroutineScope = U
                 }
             }
         }
-
-//        activity?.setTheme(R.style.Theme_AppCompat_Transparent_NoActionBar)
-        updateAlpha(true)
-        loadingVisible(true)
 
         webview?.run {
             fitsSystemWindows = true
@@ -258,46 +209,6 @@ class IamPortWebViewMode @JvmOverloads constructor(scope: BaseCoroutineScope = U
 
             loadUrl(CONST.PAYMENT_FILE_URL) // load WebView
             webChromeClient = IamportWebChromeClient()
-        }
-    }
-
-    /**
-     * 웹뷰 기본 세팅
-     */
-    private fun settingsWebView(webView: WebView) {
-        webView.settings.apply {
-            javaScriptEnabled = true
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                WebView.setWebContentsDebuggingEnabled(true);
-            }
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-                val cookieManager = CookieManager.getInstance()
-                cookieManager.setAcceptCookie(true)
-                cookieManager.setAcceptThirdPartyCookies(webView, true)
-            }
-
-            cacheMode = WebSettings.LOAD_NO_CACHE
-
-            blockNetworkImage = false
-            loadsImagesAutomatically = true
-
-            if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                safeBrowsingEnabled = true  // api 26
-            }
-
-            useWideViewPort = false
-            loadWithOverviewMode = true
-            javaScriptCanOpenWindowsAutomatically = true
-
-            domStorageEnabled = true
-            loadWithOverviewMode = true
-            allowContentAccess = true
-
-            setSupportZoom(false)
-            displayZoomControls = false
         }
     }
 
