@@ -364,7 +364,7 @@ open class ChaiStrategy : BaseStrategy() {
                     clearData()
                 } else {
                     if (isBgAndScreenOn()) {
-                        d("결제 리모트 폴링! $chaiPayment")
+                        d("결제 리모트 폴링! ($tryCount / ${CONST.TRY_OUT_COUNT}) => $chaiPayment")
                         pollingCheckStatus(pollingDelay, idx)
                     } else {
                         d("프로세스 체크 로컬 폴링 $chaiPayment")
