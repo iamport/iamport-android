@@ -25,7 +25,7 @@ object Foreground : ActivityLifecycleCallbacks {
     var appStatus: AppStatus? = null
 
     val isBackground: Boolean // 백그라운드 여부
-        get() = appStatus!!.ordinal == AppStatus.BACKGROUND.ordinal
+        get() = appStatus?.ordinal == AppStatus.BACKGROUND.ordinal
 
     var isScreenOn: Boolean = true // 스크린 on/off 여부
 

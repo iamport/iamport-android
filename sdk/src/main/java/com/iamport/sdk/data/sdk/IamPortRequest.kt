@@ -39,10 +39,19 @@ data class IamPortRequest(
     val app_scheme: String? = null, // 명세상 nullable 이나, RN 에서 필수
     val biz_num: String? = null,
     val popup: Boolean? = null,
+    private val niceMobileV2 : Boolean = true,
+
+    // 네이버 관련
     val naverPopupMode: Boolean? = null,
     val naverUseCfm: String? = null,
-    val naverProducts: List<ProductItem>? = null,
-    private val niceMobileV2 : Boolean = true
+    val naverProducts: List<BaseProductItem>? = null,
+    val naverCultureBenefit: Boolean? = null,
+    val naverProductCode: String? = null,
+    val naverActionType: String? = null,
+
+    val cultureBenefit: Boolean? = null,
+    val naverInterface: NaverInterface? = null,
+
 
 ) : Parcelable {
 
@@ -103,11 +112,19 @@ data class IamPortRequest(
             var app_scheme: String? = null // 명세상 nullable 이나, RN 에서 필수
             var biz_num: String? = null
             var popup: Boolean? = null // 명세상 없으나, RN 에 있음
+            private val niceMobileV2 : Boolean = true
 
+            // 네이버 관련
             var naverPopupMode: Boolean? = null
             var naverUseCfm: String? = null
-            var naverProducts: List<ProductItem>? = null
-            private val niceMobileV2 : Boolean = true
+            var naverProducts: List<BaseProductItem>? = null
+
+            var naverCultureBenefit: Boolean? = null
+            var naverProductCode: String? = null
+            var naverActionType: String? = null
+
+            var cultureBenefit: Boolean? = null
+            var naverInterface: NaverInterface? = null
 
             fun pg(pg: String) = apply {
                 this.pg = pg
@@ -209,13 +226,34 @@ data class IamPortRequest(
                 this.naverPopupMode = naverPopupMode
             }
 
-            fun naverProducts(naverProducts: List<ProductItem>) = apply {
-                this.naverProducts = naverProducts
-            }
-
             fun naverUseCfm(naverUseCfm: String) = apply {
                 this.naverUseCfm = naverUseCfm
             }
+
+            fun naverProducts(naverProducts: List<BaseProductItem>) = apply {
+                this.naverProducts = naverProducts
+            }
+
+            fun naverCultureBenefit(naverCultureBenefit: Boolean) = apply {
+                this.naverCultureBenefit = naverCultureBenefit
+            }
+
+            fun naverProductCode(naverProductCode: String) = apply {
+                this.naverProductCode = naverProductCode
+            }
+
+            fun naverActionType(naverActionType: String) = apply {
+                this.naverActionType = naverActionType
+            }
+
+            fun cultureBenefit(cultureBenefit: Boolean) = apply {
+                this.cultureBenefit = cultureBenefit
+            }
+
+            fun naverInterface(naverInterface: NaverInterface) = apply {
+                this.naverInterface = naverInterface
+            }
+
 
             fun build() = IamPortRequest(
                 pg,
@@ -242,8 +280,15 @@ data class IamPortRequest(
                 app_scheme,
                 biz_num,
                 popup,
+                niceMobileV2,
                 naverPopupMode,
-                naverUseCfm, naverProducts
+                naverUseCfm,
+                naverProducts,
+                naverCultureBenefit,
+                naverProductCode,
+                naverActionType,
+                cultureBenefit,
+                naverInterface
             )
         }
     }

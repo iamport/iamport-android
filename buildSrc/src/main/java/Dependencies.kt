@@ -1,6 +1,13 @@
+// 디펜던시 업데이트 확인 ./gradlew dependencyUpdates -Drevision=release
 object Versions {
+    const val versionCode = 210525001 // yymmdd000
+    const val versionName = "1.0.0-dev02"  // prod(x.y.z), dev(x.y.z-dev00), poc(x.y.z-poc00)
+
+    const val gradle_versions_plugin = "0.38.0"
+    const val gradle_version = "4.1.1"
+
     const val multidex = "2.0.1"
-    const val kotlin_stdlib_jdk = "1.4.31"
+    const val kotlin_stdlib_jdk = "1.5.0"
     const val core_ktx = "1.3.2"
     const val appcompat = "1.2.0"
 
@@ -19,10 +26,10 @@ object Versions {
 
     const val material = "1.4.0-alpha01"
 
-    const val activity_ktx = "1.3.0-alpha04"
-    const val fragment_ktx = "1.3.1"
+    const val activity_ktx = "1.3.0-alpha07"
+    const val fragment_ktx = "1.3.3"
 
-    const val koin_version = "2.2.2"
+    const val koin_version = "2.2.3"
     const val retrofit_version = "2.9.0"
     const val logging_interceptor = "4.9.0"
 
@@ -33,7 +40,7 @@ object Versions {
     const val logger = "2.2.0"
 
     // Rx
-    const val rxjava = "2.2.20"
+    const val rxjava = "2.2.21"
     const val rxandroid = "2.1.1"
     const val rxjava2_debug = "1.4.0"
 
@@ -79,15 +86,15 @@ object Libs {
     const val activity_ktx = "androidx.activity:activity-ktx:${Versions.activity_ktx}"
     const val fragment_ktx = "androidx.fragment:fragment-ktx:${Versions.fragment_ktx}"
 
-    const val koin_core = "org.koin:koin-core:${Versions.koin_version}"
-    const val koin_core_ext = "org.koin:koin-core-ext:${Versions.koin_version}"
-    const val koin_test = "org.koin:koin-test:${Versions.koin_version}"
+    const val koin_core = "io.insert-koin:koin-core:${Versions.koin_version}"
+    const val koin_core_ext = "io.insert-koin:koin-core-ext:${Versions.koin_version}"
+    const val koin_test = "io.insert-koin:koin-test:${Versions.koin_version}"
 
     // AndroidX Scope 생성 - 삭제 자동화
-    const val koin_androidx_scope = "org.koin:koin-androidx-scope:${Versions.koin_version}"
-    const val koin_androidx_viewmodel = "org.koin:koin-androidx-viewmodel:${Versions.koin_version}"
-    const val koin_androidx_fragment = "org.koin:koin-androidx-fragment:${Versions.koin_version}"
-    const val koin_androidx_ext = "org.koin:koin-androidx-ext:${Versions.koin_version}"
+    const val koin_androidx_scope = "io.insert-koin:koin-androidx-scope:${Versions.koin_version}"
+    const val koin_androidx_viewmodel = "io.insert-koin:koin-androidx-viewmodel:${Versions.koin_version}"
+    const val koin_androidx_fragment = "io.insert-koin:koin-androidx-fragment:${Versions.koin_version}"
+    const val koin_androidx_ext = "io.insert-koin:koin-androidx-ext:${Versions.koin_version}"
 
 
     // Retorofit

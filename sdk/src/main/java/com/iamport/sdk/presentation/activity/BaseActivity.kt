@@ -1,23 +1,17 @@
 package com.iamport.sdk.presentation.activity
 
-import android.os.Build
 import android.os.Bundle
-import android.webkit.CookieManager
-import android.webkit.WebSettings
-import android.webkit.WebView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import com.google.android.material.snackbar.Snackbar
-import com.iamport.sdk.BuildConfig
-import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.domain.utils.BaseCoroutineScope
 import com.iamport.sdk.domain.utils.UICoroutineScope
 import com.iamport.sdk.presentation.viewmodel.BaseViewModel
 
 abstract class BaseActivity<T : ViewDataBinding, R : BaseViewModel>
 @JvmOverloads constructor(scope: BaseCoroutineScope = UICoroutineScope()) :
-    AppCompatActivity(), BaseCoroutineScope by scope {
+    AppCompatActivity(), BaseMain, BaseCoroutineScope by scope {
 
     lateinit var viewDataBinding: T
     abstract val viewModel: R
@@ -39,9 +33,6 @@ abstract class BaseActivity<T : ViewDataBinding, R : BaseViewModel>
         super.onDestroy()
         releaseCoroutine()
     }
-
-    abstract fun sdkFinish(iamPortResponse: IamPortResponse?)
-
 
     private fun snackbarObserving() {
         viewModel.observeSnackbarMessage(this) {
@@ -75,44 +66,5 @@ abstract class BaseActivity<T : ViewDataBinding, R : BaseViewModel>
         }
     }
 
-    /**
-     * 웹뷰 기본 세팅
-     */
-    protected fun settingsWebView(webView: WebView) {
-        webView.settings.apply {
-            javaScriptEnabled = true
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                WebView.setWebContentsDebuggingEnabled(true);
-            }
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-                val cookieManager = CookieManager.getInstance()
-                cookieManager.setAcceptCookie(true)
-                cookieManager.setAcceptThirdPartyCookies(webView, true)
-            }
-
-            cacheMode = WebSettings.LOAD_NO_CACHE
-
-            blockNetworkImage = false
-            loadsImagesAutomatically = true
-
-            if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                safeBrowsingEnabled = true  // api 26
-            }
-
-            useWideViewPort = false
-            loadWithOverviewMode = true
-            javaScriptCanOpenWindowsAutomatically = true
-
-            domStorageEnabled = true
-            loadWithOverviewMode = true
-            allowContentAccess = true
-
-            setSupportZoom(false)
-            displayZoomControls = false
-        }
-    }
 
 }

@@ -81,7 +81,7 @@ class NiceTransWebViewStrategy : WebViewStrategy() {
     }
 
     private fun isNiceTransScheme(uri: Uri): Boolean {
-        return uri.scheme == ProvidePgPkg.BANKPAY.schme
+        return uri.scheme == ProvidePgPkg.BANKPAY.scheme
     }
 
 }

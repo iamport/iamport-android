@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlinx-serialization'
 
@@ -10,8 +11,8 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 30
-        versionCode 210419001 // yymmdd000
-        versionName "0.0.6" // prod(x.y.z), dev(x.y.z-dev00), poc(x.y.z-poc00)
+        versionCode Versions.versionCode // yymmdd000
+        versionName Versions.versionName // prod(x.y.z), dev(x.y.z-dev00), poc(x.y.z-poc00)
         multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -125,5 +126,4 @@ dependencies {
 //    releaseImplementation Libs.releaseChuck
 
     implementation Libs.serialization
-
 }

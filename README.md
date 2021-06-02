@@ -70,6 +70,7 @@
     
    // DI 로 koin 을 사용하시는 경우 
    // 생성된 koinApplication 을 파라미터로 넘겨주셔야 합니다
+   // 참고 : 코틀린 1.5.0 이상 및 Koin 2.2.2 를 사용하시는 분들은 2.2.3 으로 업데이트 하시기 바랍니다.
    class BaseApplication : Application() {
     override fun onCreate() {
         ..   
@@ -82,6 +83,8 @@
 }
 
 ```
+
+
 ```kotlin
 
   // SDK 초기화
@@ -199,6 +202,7 @@ Iamport.isPolling()?.observe 에서 true 전달 받을 시점에, 직접 포그�
 
    // DI 로 koin 을 사용하시는 경우 
    // 생성된 koinApplication 을 파라미터로 넘겨주셔야 합니다
+   // 참고 : 코틀린 1.5.0 이상 및 Koin 2.2.2 를 사용하시는 분들은 2.2.3 으로 업데이트 하시기 바랍니다.
     public class BaseApplication extends Application {
         @Override
         public void onCreate() {
