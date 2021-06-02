@@ -176,8 +176,18 @@ object Iamport {
 
 
     // webview 사용 모드
-    fun setWebView(webview: WebView) {
-        iamportSdk?.setWebView(webview)
+    fun enableWebViewMode(webview: WebView) {
+        iamportSdk?.enableWebViewMode(webview)
+    }
+
+    // webview 사용 모드 해제
+    fun disableWebViewMode() {
+        iamportSdk?.disableWebViewMode()
+    }
+
+    // webview 사용 모드 해제
+    fun isWebViewMode(): Boolean {
+        return iamportSdk?.isWebViewMode() ?: false
     }
 
 

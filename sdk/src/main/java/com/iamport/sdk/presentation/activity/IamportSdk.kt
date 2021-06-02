@@ -86,8 +86,16 @@ internal class IamportSdk(
     }
 
     // webview 사용 모드
-    fun setWebView(webview: WebView) {
+    fun enableWebViewMode(webview: WebView) {
         this.webview = webview
+    }
+
+    fun disableWebViewMode() {
+        this.webview = null
+    }
+
+    fun isWebViewMode(): Boolean {
+        return this.webview != null
     }
 
     private val lifecycleObserver = object : LifecycleObserver {
