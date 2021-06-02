@@ -16,7 +16,6 @@ import com.iamport.sdk.domain.di.IamportKoinContext.koinApp
 import com.iamport.sdk.domain.di.apiModule
 import com.iamport.sdk.domain.di.appModule
 import com.iamport.sdk.domain.di.httpClientModule
-//import com.iamport.sdk.domain.di.httpClientModule
 import com.iamport.sdk.domain.service.ChaiService
 import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.Event
@@ -67,11 +66,21 @@ object Iamport {
         this.preventOverlapRun = PreventOverlapRun()
     }
 
-    private fun iamportCreated(): Boolean {
+    private fun isCreated(): Boolean {
         if (!isCreated) {
             Log.e(CONST.IAMPORT_LOG, "IAMPORT SDK was not created. Please initialize it in Application class")
         }
         return isCreated
+    }
+
+    private fun checkInit(payment: Payment): Boolean {
+        if (iamportSdk == null) {
+            val errMsg = "IAMPORT SDK was not Init. Please call Iamport.init() in your start code(ex: onAttach() or onCreate() or etc.. )"
+            Log.e(CONST.IAMPORT_LOG, errMsg)
+            callback(IamPortResponse.makeFail(payment, msg = errMsg))
+            return false
+        }
+        return true
     }
 
     fun getKoinApplition(): KoinApplication? {
@@ -142,7 +151,7 @@ object Iamport {
      */
     fun init(componentActivity: ComponentActivity) {
 
-        if (!iamportCreated()) {
+        if (!isCreated()) {
             return
         }
 
@@ -178,7 +187,7 @@ object Iamport {
      */
     fun init(fragment: Fragment) {
 
-        if (!iamportCreated()) {
+        if (!isCreated()) {
             return
         }
 
@@ -250,6 +259,12 @@ object Iamport {
     fun payment(
         userCode: String, iamPortRequest: IamPortRequest, approveCallback: ((IamPortApprove) -> Unit)? = null, paymentResultCallback: ICallbackPaymentResult?,
     ) {
+        Payment(userCode, iamPortRequest = iamPortRequest).let {
+            if (!checkInit(it)) {
+                return@let
+            }
+        }
+
         preventOverlapRun?.launch {
             corePayment(userCode, iamPortRequest, approveCallback) { paymentResultCallback?.result(it) }
         }
@@ -263,6 +278,12 @@ object Iamport {
     fun certification(
         userCode: String, iamPortCertification: IamPortCertification, resultCallback: (IamPortResponse?) -> Unit
     ) {
+        Payment(userCode, iamPortCertification = iamPortCertification).let {
+            if (!checkInit(it)) {
+                return@let
+            }
+        }
+
         preventOverlapRun?.launch {
             coreCertification(userCode, iamPortCertification, resultCallback)
         }
@@ -276,6 +297,12 @@ object Iamport {
     fun payment(
         userCode: String, iamPortRequest: IamPortRequest, approveCallback: ((IamPortApprove) -> Unit)? = null, paymentResultCallback: (IamPortResponse?) -> Unit
     ) {
+        Payment(userCode, iamPortRequest = iamPortRequest).let {
+            if (!checkInit(it)) {
+                return@let
+            }
+        }
+
         preventOverlapRun?.launch {
             corePayment(userCode, iamPortRequest, approveCallback, paymentResultCallback)
         }
@@ -288,7 +315,6 @@ object Iamport {
         paymentResultCallback: ((IamPortResponse?) -> Unit)?
     ) {
         this.impCallbackFunction = paymentResultCallback
-
         iamportSdk?.initStart(Payment(userCode, iamPortCertification = iamPortCertification), paymentResultCallback)
     }
 
@@ -301,7 +327,7 @@ object Iamport {
     ) {
         this.approveCallback = approveCallback
         this.impCallbackFunction = paymentResultCallback
-
         iamportSdk?.initStart(Payment(userCode, iamPortRequest = iamPortRequest), approveCallback, paymentResultCallback)
     }
+
 }
