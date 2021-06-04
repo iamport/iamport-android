@@ -74,6 +74,11 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
             onClickCertification()
         }
 
+        viewDataBinding.webviewModeButton.setOnClickListener {
+            Iamport.close()
+            (activity as MainActivity).replaceFragment(WebViewModeFragment())
+        }
+
         viewDataBinding.backButton.setOnClickListener {
             backPressCallback.handleOnBackPressed()
         }
@@ -191,10 +196,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
             Log.i("SAMPLE", "결제 결과 콜백\n$resJson")
             result = iamPortResponse
             if (iamPortResponse != null) {
-                requireActivity().supportFragmentManager.beginTransaction()
-                    .replace(R.id.container, PaymentResultFragment())
-                    .addToBackStack(null)
-                    .commit()
+                (activity as MainActivity).replaceFragment(PaymentResultFragment())
             }
         }
     }

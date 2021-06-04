@@ -142,6 +142,14 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
     override fun sdkFinish(iamPortResponse: IamPortResponse?) {
         i("call sdkFinish")
         d("sdkFinish => ${iamPortResponse.toString()}")
+
+        viewModel.payment().removeObservers(this)
+        viewModel.loading().removeObservers(this)
+        viewModel.openWebView().removeObservers(this)
+        viewModel.niceTransRequestParam().removeObservers(this)
+        viewModel.thirdPartyUri().removeObservers(this)
+        viewModel.impResponse().removeObservers(this)
+
         loadingVisible(false)
         setResult(Activity.RESULT_OK,
             Intent().apply { putExtra(CONST.CONTRACT_OUTPUT, iamPortResponse) })

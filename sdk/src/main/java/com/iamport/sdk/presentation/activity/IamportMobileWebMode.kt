@@ -3,16 +3,16 @@ package com.iamport.sdk.presentation.activity
 import android.view.View
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
+import androidx.activity.result.ActivityResultLauncher
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.domain.IamportWebChromeClient
-import com.iamport.sdk.domain.core.IamportLifecycleObserver
 import com.iamport.sdk.domain.utils.EventObserver
 import com.orhanobut.logger.Logger
 import org.koin.core.component.KoinApiExtension
 
 @KoinApiExtension
-open class IamportMobileWebMode(lifecycleObserver: IamportLifecycleObserver) : IamPortWebViewMode(lifecycleObserver = lifecycleObserver) {
+open class IamportMobileWebMode(bankPayLauncher: ActivityResultLauncher<String>?) : IamPortWebViewMode(bankPayLauncher = bankPayLauncher) {
 
     fun initStart(activity: ComponentActivity, webview: WebView) {
         Logger.i("HELLO I'MPORT Mobile Web Mode SDK!")

@@ -30,6 +30,7 @@ object CONST {
     const val PAYMENT_PLAY_STORE_URL = "market://details?id="
 
     const val PAYMENT_FILE_URL = "file:///android_asset/iamportcdn.html"
+    const val PAYMENT_MOBILE_WEB_FILE_URL = "file:///android_asset/mobileweb.html"
 
     const val IAMPORT_LOG = "IAMPORT"
 
