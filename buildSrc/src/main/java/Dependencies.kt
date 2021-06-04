@@ -23,6 +23,7 @@ object Versions {
 
     const val constraintlayout = "2.0.4"
     const val lifecycle_extensions = "2.2.0"
+    const val lifecycle_common = "2.3.1"
 
     const val material = "1.4.0-alpha01"
 
@@ -80,6 +81,9 @@ object Libs {
     const val lifecycle_extensions = "androidx.lifecycle:lifecycle-extensions:${Versions.lifecycle_extensions}"
     const val lifecycle_viewmodel_ktx = "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.lifecycle_extensions}"
     const val lifecycle_livedata_ktx = "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.lifecycle_extensions}"
+
+    const val lifecycle_common = "androidx.lifecycle:lifecycle-common-java8:${Versions.lifecycle_common}"
+
     const val material = "com.google.android.material:material:${Versions.material}"
 
 

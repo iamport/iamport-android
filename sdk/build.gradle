@@ -87,6 +87,7 @@ dependencies {
     implementation Libs.lifecycle_extensions
     implementation Libs.lifecycle_viewmodel_ktx
     implementation Libs.lifecycle_livedata_ktx
+    implementation Libs.lifecycle_common
     implementation Libs.material
 
     implementation Libs.activity_ktx

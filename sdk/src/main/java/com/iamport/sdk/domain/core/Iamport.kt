@@ -191,6 +191,12 @@ object Iamport {
     }
 
 
+    // mobile web standalone 사용 모드
+    fun pluginMobileWebSupporter(webview: WebView) {
+        iamportSdk?.pluginMobileWebSupporter(webview)
+    }
+
+
     /**
      * SDK Activity 열기 위한 Contract for Fragment
      * @param fragment : Host Fragment
