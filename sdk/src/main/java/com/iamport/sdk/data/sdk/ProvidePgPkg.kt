@@ -8,7 +8,8 @@ enum class ProvidePgPkg(val scheme: String, val pkg: String) {
     KB_BANKPAY("kb-bankpay", "com.kbstar.liivbank"),
     NH_BANKPAY("nhb-bankpay", "com.nh.cashcardapp"),
     MG_BANKPAY("mg-bankpay", "kr.co.kfcc.mobilebank"),
-    KN_BANKPAY("kn-bankpay", "com.knb.psb");
+    KN_BANKPAY("kn-bankpay", "com.knb.psb"),
+    TOSS_TRANS_PAYNOW("lguthepay-xpay", "com.lguplus.paynow");
 
     companion object {
         fun from(s: String): ProvidePgPkg? = values().find { it.scheme == s }
