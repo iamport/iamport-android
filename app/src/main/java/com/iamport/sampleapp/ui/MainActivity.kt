@@ -3,6 +3,7 @@ package com.iamport.sampleapp.ui
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.iamport.sampleapp.R
 import com.iamport.sdk.domain.core.Iamport
 
@@ -15,13 +16,19 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
         // use fragment
-        supportFragmentManager.beginTransaction().replace(R.id.container, PaymentFragment()).commitAllowingStateLoss()
+        replaceFragment(PaymentFragment())
 
         // webview mode
-//        supportFragmentManager.beginTransaction().replace(R.id.container, WebViewModeFragment()).commitAllowingStateLoss()
+//        replaceFragment(WebViewModeFragment())
+
         mainLayout = findViewById(R.id.container)
 
     }
+
+    fun replaceFragment(moveToFragment : Fragment) {
+        supportFragmentManager.beginTransaction().replace(R.id.container, moveToFragment).addToBackStack(null).commit()
+    }
+
 
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()

@@ -12,6 +12,7 @@ import com.iamport.sdk.data.sdk.IamPortRequest
 import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.data.sdk.PayMethod
 import com.iamport.sdk.domain.core.Iamport
+import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.Util
 import java.util.*
 
@@ -34,16 +35,15 @@ class WebViewModeFragment : Fragment() {
     ): View? {
         Iamport.init(this)
         _binding = WebViewModeFragmentBinding.inflate(inflater, container, false)
+        binding.webview.loadUrl("https://github.com/iamport/iamport-android")
         return binding.root
     }
 
     override fun onStart() {
         super.onStart()
 
-        binding.webview.loadUrl("https://github.com/iamport/iamport-android")
-
         val request = IamPortRequest(
-            pg = PG.html5_inicis.makePgRawName(""),         // PG사
+            pg = PG.kcp.makePgRawName(""),         // PG사
             pay_method = PayMethod.card,                    // 결제수단
             name = "웹뷰모드도 진짜 쉬워요!",                      // 주문명
             merchant_uid = "sample_aos_${Date().time}",     // 주문번호
@@ -51,18 +51,28 @@ class WebViewModeFragment : Fragment() {
             buyer_name = "김개발"
         )
 
-        binding.paymentButton.setOnClickListener {
+        // 웹뷰 모드 enable
+        binding.webviewButton.setOnClickListener {
             Log.d("WebViewMode", "결제 요청!")
 
-            // 웹뷰 모드 enable
             Iamport.enableWebViewMode(binding.webview)
             Log.d("WebViewMode", "iamport sdk webview mode? ${Iamport.isWebViewMode()}")
-
             // 아임포트에 결제 요청하기
-            Iamport.payment(Util.DevUserCode.imp96304110.name, request, paymentResultCallback = {
+            Iamport.payment("iamport", request, paymentResultCallback = {
                 // 결제 완료 후 결과 콜백을 토스트 메시지로 보여줌
                 Toast.makeText(this.context, "결제결과 => $it", Toast.LENGTH_LONG).show()
             })
+        }
+
+        binding.mobilewebButton.setOnClickListener {
+            // 모바일 웹 단독 모드
+            binding.webview.loadUrl(CONST.PAYMENT_MOBILE_WEB_FILE_URL)
+            Iamport.pluginMobileWebSupporter(binding.webview)
+        }
+
+        binding.normalmodeButton.setOnClickListener {
+            Iamport.close()
+            (activity as MainActivity).replaceFragment(PaymentFragment())
         }
     }
 
