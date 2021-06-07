@@ -25,10 +25,13 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun replaceFragment(moveToFragment : Fragment) {
+    fun replaceFragment(moveToFragment: Fragment) {
         supportFragmentManager.beginTransaction().replace(R.id.container, moveToFragment).addToBackStack(null).commit()
     }
 
+    fun popBackStack(){
+        supportFragmentManager.popBackStack()
+    }
 
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
