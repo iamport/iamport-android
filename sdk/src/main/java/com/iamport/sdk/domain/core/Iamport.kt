@@ -157,6 +157,7 @@ object Iamport {
 
         d("INITIALIZE IAMPORT SDK for activity")
 
+        close()
         clear()
         createInitialData()
 
@@ -209,6 +210,7 @@ object Iamport {
 
         d("INITIALIZE IAMPORT SDK for fragment")
 
+        close()
         clear()
         createInitialData()
 

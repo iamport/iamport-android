@@ -44,12 +44,12 @@ internal class IamportSdk(
 
     private val launcherChai: ActivityResultLauncher<Pair<String, String>>? // 차이앱 런처
     private val bankPayLauncher: ActivityResultLauncher<String>? // 뱅크페이 앱 런처(for webview & mobile web mode)
-//    private var iamportLifecycleObserver: IamportLifecycleObserver? = null
 
-    private var iamPortWebViewMode: IamPortWebViewMode?
-    private var iamportMobileWebMode: IamportMobileWebMode?
+    private var iamPortWebViewMode: IamPortWebViewMode
+    private var iamportMobileWebMode: IamportMobileWebMode
 
-    //    private val viewModel: MainViewModel // 요청할 뷰모델
+    private var modeWebView: WebView? = null // webviewmode 웹뷰
+
     private val viewModel: MainViewModel by viewModel(hostHelper.viewModelStoreOwner, MainViewModel::class.java) // 요청할 뷰모델 {
 
 
@@ -77,7 +77,6 @@ internal class IamportSdk(
         addAction(Intent.ACTION_SCREEN_ON)
     }
 
-    private var webview: WebView? = null
 
     init {
 //        viewModel = ViewModelProvider(hostHelper.viewModelStoreOwner, MainViewModelFactory(get(), get())).get(MainViewModel::class.java)
@@ -101,38 +100,29 @@ internal class IamportSdk(
         iamPortWebViewMode = IamPortWebViewMode(bankPayLauncher)
         iamportMobileWebMode = IamportMobileWebMode(bankPayLauncher)
 
-//        hostHelper.activity?.let {
-//            iamportLifecycleObserver = IamportLifecycleObserver(it.activityResultRegistry).apply {
-//                it.lifecycle.addObserver(this)
-//            }
-//        }
-
         clearData()
+        observeClose()
     }
 
     // webview 사용 모드
     fun enableWebViewMode(webview: WebView) {
-        this.webview = webview
+        this.modeWebView = webview
     }
 
     fun disableWebViewMode() {
-        this.webview = null
+        this.modeWebView = null
     }
 
     fun isWebViewMode(): Boolean {
-        return this.webview != null
+        return this.modeWebView != null
     }
 
     // mobile web standalone 사용 모드
     fun pluginMobileWebSupporter(webview: WebView) {
         hostHelper.activity?.let { activity ->
-//            iamportLifecycleObserver?.let { observer ->
-//                IamportMobileWebMode(observer).initStart(activity, webview) // webview only 모드
-//            }
-            iamportMobileWebMode?.initStart(activity, webview) // webview only 모드
+            iamportMobileWebMode.initStart(activity, webview) // webview only 모드
         }
     }
-
 
     private val lifecycleObserver = object : LifecycleObserver {
 
@@ -160,21 +150,26 @@ internal class IamportSdk(
         }
     }
 
+
+    private fun closeWebViewMode() {
+        iamPortWebViewMode.close()
+        iamportMobileWebMode.close()
+    }
+
     // 외부에서 종료
     private fun observeClose() {
-        d("close")
+        d("observeClose")
+        close.removeObservers(hostHelper.lifecycleOwner)
         close.observeAlways(hostHelper.lifecycleOwner, EventObserver {
-            iamPortWebViewMode?.close()
-            iamPortWebViewMode = null
-            iamportMobileWebMode?.close()
-            iamportMobileWebMode = null
-            webview = null
+            d("do Close! $iamPortWebViewMode")
+            closeWebViewMode()
+            modeWebView = null
             clearData()
         })
     }
 
     /**
-     * BaseActivity 에서 onCreate 시 호출
+     * 결제 요청시 실행 for cert
      */
     fun initStart(payment: Payment, paymentResultCallBack: ((IamPortResponse?) -> Unit)?) {
         i("HELLO I'MPORT SDK! for cert")
@@ -192,13 +187,13 @@ internal class IamportSdk(
         this.paymentResultCallBack = paymentResultCallBack
 
         hostHelper.lifecycle.addObserver(lifecycleObserver)
-        observeCertification(payment) // 관찰할 LiveData
 
-        observeClose()
+//        observeClose()
+        observeCertification(payment) // 관찰할 LiveData
     }
 
     /**
-     * BaseActivity 에서 onCreate 시 호출
+     * 결제 요청시 실행 for payment
      */
     fun initStart(payment: Payment, approveCallback: ((IamPortApprove) -> Unit)?, paymentResultCallBack: ((IamPortResponse?) -> Unit)?) {
         i("HELLO I'MPORT SDK! for payment")
@@ -216,9 +211,9 @@ internal class IamportSdk(
         this.paymentResultCallBack = paymentResultCallBack
 
         hostHelper.lifecycle.addObserver(lifecycleObserver)
-        observeViewModel(payment) // 관찰할 LiveData
 
-        observeClose()
+//        observeClose()
+        observeViewModel(payment) // 관찰할 LiveData
     }
 
     /**
@@ -330,8 +325,8 @@ internal class IamportSdk(
      */
     private fun resultBankPayAppCallback(resPair: Pair<String, String>) {
         d("Result Callback BankPayLauncher")
-        iamPortWebViewMode?.processBankPayPayment(resPair)
-        iamportMobileWebMode?.processBankPayPayment(resPair)
+        iamPortWebViewMode.processBankPayPayment(resPair)
+        iamportMobileWebMode.processBankPayPayment(resPair)
     }
 
 
@@ -372,21 +367,18 @@ internal class IamportSdk(
     /**
      * 웹뷰 결제 요청 실행
      */
-    private fun requestWebViewPayment(it: Payment) {
-        d("requestWebViewPayment $it")
+    private fun requestWebViewPayment(payment: Payment) {
+        d("requestWebViewPayment $payment")
         clearData()
-        webview?.let { webView ->
+        modeWebView?.let { webView ->
             hostHelper.activity?.let { activity ->
-//                iamportLifecycleObserver?.let { observer ->
-//                    IamPortWebViewMode(lifecycleObserver = observer).initStart(activity, webView, it) // webview only 모드
-//                }
-                iamPortWebViewMode?.initStart(activity, webView, it) // webview only 모드
+                iamPortWebViewMode.initStart(activity, webView, payment) // webview only 모드
             } ?: run {
                 w("Cannot found activity, So running activity mode")
-                webViewLauncher?.launch(it) // new activity 모드
+                webViewLauncher?.launch(payment) // new activity 모드
             }
         } ?: run {
-            webViewLauncher?.launch(it) // new activity 모드
+            webViewLauncher?.launch(payment) // new activity 모드
         }
     }
 
@@ -408,6 +400,8 @@ internal class IamportSdk(
     private fun sdkFinish(iamPortResponse: IamPortResponse?) {
         i("SDK Finish")
         d(iamPortResponse.toString())
+        closeWebViewMode() // FIXME: 필요할까?
+
         clearData()
         paymentResultCallBack?.invoke(iamPortResponse)
     }
