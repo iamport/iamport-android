@@ -20,7 +20,6 @@ open class IamportMobileWebMode(bankPayLauncher: ActivityResultLauncher<String>?
         this.activity = activity
         this.webview = webview
 
-//        onBackPressed()
         observeViewModel(null) // 관찰할 LiveData
     }
 
@@ -40,9 +39,9 @@ open class IamportMobileWebMode(bankPayLauncher: ActivityResultLauncher<String>?
     }
 
 
-    // 여기서만 처리하면 됨
     override fun sdkFinish(iamPortResponse: IamPortResponse?) {
         // ignore
+        Logger.d("sdkFinish MobileWebMode => $iamPortResponse")
     }
 
     private fun openWebView() {

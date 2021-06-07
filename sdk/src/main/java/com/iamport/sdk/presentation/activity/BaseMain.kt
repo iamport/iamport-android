@@ -14,7 +14,6 @@ interface BaseMain {
     fun openWebView(payment: Payment)
     fun openThirdPartyApp(it: Uri)
     fun openNiceTransApp(it: String)
-    fun onBackPressed()
     fun observeViewModel(payment: Payment?)
     fun requestPayment(it: Payment)
     fun sdkFinish(iamPortResponse: IamPortResponse?)
