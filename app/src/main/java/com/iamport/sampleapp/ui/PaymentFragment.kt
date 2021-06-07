@@ -5,7 +5,9 @@ import android.content.Context
 import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.activity.OnBackPressedCallback
@@ -29,9 +31,9 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
     override val layoutResourceId: Int = R.layout.payment_fragment
     private val receiver = MerchantReceiver()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Iamport.init(this) // fragment
+        return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     override fun onAttach(context: Context) {
