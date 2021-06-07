@@ -3,8 +3,10 @@ package com.iamport.sdk.presentation.activity
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -178,8 +180,10 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
         Intent.parseUri(it.toString(), Intent.URI_INTENT_SCHEME)?.let { intent: Intent ->
             runCatching {
                 startActivity(intent)
-            }.onFailure {
+            }.recoverCatching {
                 movePlayStore(intent)
+            }.onFailure {
+                i("설치 버튼을 이용하여 앱을 설치하세요.")
             }
         }
         loadingVisible(false)
@@ -198,7 +202,10 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
                     e("Not found intent schme :: ${intent.scheme}")
                     return@run null
                 }
-                else -> providePgPkg.pkg
+                else -> {
+                    d("Found pkg : ${providePgPkg.pkg}")
+                    providePgPkg.pkg
+                }
             }
         }
 
