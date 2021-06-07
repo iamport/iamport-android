@@ -167,8 +167,10 @@ open class IamPortWebViewMode @JvmOverloads constructor(
         Intent.parseUri(it.toString(), Intent.URI_INTENT_SCHEME)?.let { intent: Intent ->
             runCatching {
                 activity?.startActivity(intent)
-            }.onFailure {
+            }.recoverCatching {
                 movePlayStore(intent)
+            }.onFailure {
+                i("설치 버튼을 이용하여 앱을 설치하세요.")
             }
         }
     }

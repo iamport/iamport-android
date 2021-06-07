@@ -35,7 +35,7 @@ class JsNativeInterface(val payment: Payment, val gson: Gson, private val bus: W
      */
     @JavascriptInterface
     fun debugConsoleLog(logStr: String) {
-        Logger.d("logFromWebView => $logStr")
+        Logger.d("WebViewConsoleLog => $logStr")
     }
 
 
