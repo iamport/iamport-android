@@ -14,7 +14,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
+        // use fragment
         supportFragmentManager.beginTransaction().replace(R.id.container, PaymentFragment()).commitAllowingStateLoss()
+
+        // webview mode
+//        supportFragmentManager.beginTransaction().replace(R.id.container, WebViewModeFragment()).commitAllowingStateLoss()
         mainLayout = findViewById(R.id.container)
 
     }

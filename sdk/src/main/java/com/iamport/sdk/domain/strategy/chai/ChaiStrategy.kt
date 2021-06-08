@@ -356,14 +356,15 @@ open class ChaiStrategy : BaseStrategy() {
 
             waiting, prepared -> {
                 if (isTryOut()) { // 타임아웃
-                    i("${CONST.TRY_OUT_MIN}분 이상 결제되지 않아 결제취소 처리합니다. 결제를 재시도 해주세요.")
-                    clearData()
+                    val msg = "${CONST.TRY_OUT_MIN}분 이상 결제되지 않아 미결제 처리합니다. 결제를 재시도 해주세요."
+//                    clearData()
+                    failureFinish(payment, prepareData, msg)
                 } else if (clearStopPolling) { // 타임아웃
                     i("클리어 앱 버전이므로 폴링 취소")
                     clearData()
                 } else {
                     if (isBgAndScreenOn()) {
-                        d("결제 리모트 폴링! $chaiPayment")
+                        d("결제 리모트 폴링! ($tryCount / ${CONST.TRY_OUT_COUNT}) => $chaiPayment")
                         pollingCheckStatus(pollingDelay, idx)
                     } else {
                         d("프로세스 체크 로컬 폴링 $chaiPayment")

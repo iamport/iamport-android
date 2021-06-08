@@ -16,6 +16,7 @@ import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.data.sdk.ProvidePgPkg
+import com.iamport.sdk.domain.core.IamportLifecycleObserver
 import com.iamport.sdk.domain.core.IamportReceiver
 import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.service.ChaiService
@@ -42,6 +43,7 @@ internal class IamportSdk(
     private val hostHelper: HostHelper = HostHelper(activity, fragment)
 
     private val launcherChai: ActivityResultLauncher<Pair<String, String>>? // 차이앱 런처
+    private var iamportLifecycleObserver: IamportLifecycleObserver? = null
 
     //    private val viewModel: MainViewModel // 요청할 뷰모델
     private val viewModel: MainViewModel by viewModel(hostHelper.viewModelStoreOwner, MainViewModel::class.java) // 요청할 뷰모델 {
@@ -82,13 +84,38 @@ internal class IamportSdk(
             fragment?.registerForActivityResult(ChaiContract()) { resultCallback() }
         }
 
+        hostHelper.activity?.let {
+            iamportLifecycleObserver = IamportLifecycleObserver(it.activityResultRegistry).apply {
+                it.lifecycle.addObserver(this)
+            }
+        }
+
+
         clearData()
     }
 
     // webview 사용 모드
-    fun setWebView(webview: WebView) {
+    fun enableWebViewMode(webview: WebView) {
         this.webview = webview
     }
+
+    fun disableWebViewMode() {
+        this.webview = null
+    }
+
+    fun isWebViewMode(): Boolean {
+        return this.webview != null
+    }
+
+    // mobile web standalone 사용 모드
+    fun pluginMobileWebSupporter(webview: WebView) {
+        hostHelper.activity?.let { activity ->
+            iamportLifecycleObserver?.let { observer ->
+                IamportMobileWebMode(observer).initStart(activity, webview) // webview only 모드
+            }
+        }
+    }
+
 
     private val lifecycleObserver = object : LifecycleObserver {
 
@@ -313,7 +340,9 @@ internal class IamportSdk(
         clearData()
         webview?.let { webView ->
             hostHelper.activity?.let { activity ->
-                IamPortWebViewMode().initStart(activity, webView, it) // webview only 모드
+                iamportLifecycleObserver?.let { observer ->
+                    IamPortWebViewMode(lifecycleObserver = observer).initStart(activity, webView, it) // webview only 모드
+                }
             } ?: run {
                 w("Cannot found activity, So running activity mode")
                 webViewLauncher?.launch(it) // new activity 모드

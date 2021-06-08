@@ -8,6 +8,7 @@ import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.repository.StrategyRepository
+import com.iamport.sdk.domain.strategy.webview.NiceTransWebViewStrategy
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.WebViewLiveDataEventBus
 import com.orhanobut.logger.Logger.d
@@ -84,6 +85,10 @@ class WebViewModel(private val bus: WebViewLiveDataEventBus, private val reposit
      */
     fun processBankPayPayment(resPair: Pair<String, String>) {
         repository.getNiceTransWebViewClient().processBankPayPayment(resPair)
+    }
+
+    fun getNiceTransWebViewClient(): NiceTransWebViewStrategy {
+        return repository.getNiceTransWebViewClient()
     }
 
     /**

@@ -2,24 +2,21 @@ package com.iamport.sdk.presentation.activity
 
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.view.View
-import android.webkit.CookieManager
-import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import com.google.gson.GsonBuilder
-import com.iamport.sdk.BuildConfig
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.data.sdk.ProvidePgPkg
 import com.iamport.sdk.domain.IamportWebChromeClient
 import com.iamport.sdk.domain.JsNativeInterface
 import com.iamport.sdk.domain.core.Iamport
+import com.iamport.sdk.domain.core.IamportLifecycleObserver
 import com.iamport.sdk.domain.di.IamportKoinComponent
+import com.iamport.sdk.domain.strategy.webview.NiceTransWebViewStrategy
 import com.iamport.sdk.domain.utils.*
-import com.iamport.sdk.presentation.contract.BankPayContract
 import com.iamport.sdk.presentation.viewmodel.WebViewModel
 import com.orhanobut.logger.Logger.*
 import kotlinx.coroutines.*
@@ -29,24 +26,18 @@ import org.koin.core.qualifier.named
 
 
 @KoinApiExtension
-class IamPortWebViewMode @JvmOverloads constructor(scope: BaseCoroutineScope = UICoroutineScope()) :
+open class IamPortWebViewMode @JvmOverloads constructor(
+    private val lifecycleObserver: IamportLifecycleObserver,
+    scope: BaseCoroutineScope = UICoroutineScope()
+) :
     IamportKoinComponent, BaseMain, BaseCoroutineScope by scope {
 
-    private val viewModel: WebViewModel = WebViewModel(get(), get())
+    val viewModel: WebViewModel = WebViewModel(get(), get())
 
     private var payment: Payment? = null
-    private var activity: ComponentActivity? = null
-    private var webview: WebView? = null
+    var activity: ComponentActivity? = null
+    var webview: WebView? = null
 
-    /**
-     * 뱅크페이 앱 열기 위한 런처
-     */
-    private var launcherBankPay =
-        activity?.registerForActivityResult(BankPayContract()) { res: Pair<String, String>? ->
-            res?.let {
-                viewModel.processBankPayPayment(res)
-            } ?: e("NICE TRANS result is NULL")
-        }
 
     /**
      * BaseActivity 에서 onCreate 시 호출
@@ -132,8 +123,11 @@ class IamPortWebViewMode @JvmOverloads constructor(scope: BaseCoroutineScope = U
      * 뱅크페이 외부앱 열기 for nice PG + 실시간계좌이체(trans)
      */
     override fun openNiceTransApp(it: String) {
+        d("openNiceTransApp $it")
         runCatching {
-            launcherBankPay?.launch(it) // 뱅크페이 앱 실행
+            lifecycleObserver.bankPayLaunch(it) {
+                viewModel.processBankPayPayment(it)
+            }// 뱅크페이 앱 실행
         }.onFailure {
             // 뱅크페이 앱 패키지는 하드코딩
             activity?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Util.getMarketId(ProvidePgPkg.BANKPAY.pkg))))
