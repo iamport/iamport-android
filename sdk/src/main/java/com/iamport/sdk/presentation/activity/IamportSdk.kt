@@ -46,7 +46,7 @@ internal class IamportSdk(
     private val bankPayLauncher: ActivityResultLauncher<String>? // 뱅크페이 앱 런처(for webview & mobile web mode)
 
     private var iamPortWebViewMode: IamPortWebViewMode
-    private var iamportMobileWebMode: IamportMobileWebMode
+    private var iamPortMobileWebMode: IamPortMobileWebMode
 
     private var modeWebView: WebView? = null // webviewmode 웹뷰
 
@@ -98,7 +98,7 @@ internal class IamportSdk(
         }
 
         iamPortWebViewMode = IamPortWebViewMode(bankPayLauncher)
-        iamportMobileWebMode = IamportMobileWebMode(bankPayLauncher)
+        iamPortMobileWebMode = IamPortMobileWebMode(bankPayLauncher)
 
         clearData()
         observeClose()
@@ -120,7 +120,7 @@ internal class IamportSdk(
     // mobile web standalone 사용 모드
     fun pluginMobileWebSupporter(webview: WebView) {
         hostHelper.activity?.let { activity ->
-            iamportMobileWebMode.initStart(activity, webview) // webview only 모드
+            iamPortMobileWebMode.initStart(activity, webview) // webview only 모드
         }
     }
 
@@ -153,7 +153,7 @@ internal class IamportSdk(
 
     private fun closeWebViewMode() {
         iamPortWebViewMode.close()
-        iamportMobileWebMode.close()
+        iamPortMobileWebMode.close()
     }
 
     // 외부에서 종료
@@ -326,7 +326,7 @@ internal class IamportSdk(
     private fun resultBankPayAppCallback(resPair: Pair<String, String>) {
         d("Result Callback BankPayLauncher")
         iamPortWebViewMode.processBankPayPayment(resPair)
-        iamportMobileWebMode.processBankPayPayment(resPair)
+        iamPortMobileWebMode.processBankPayPayment(resPair)
     }
 
 

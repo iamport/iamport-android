@@ -12,7 +12,7 @@ import com.orhanobut.logger.Logger
 import org.koin.core.component.KoinApiExtension
 
 @KoinApiExtension
-open class IamportMobileWebMode(bankPayLauncher: ActivityResultLauncher<String>?) : IamPortWebViewMode(bankPayLauncher = bankPayLauncher) {
+open class IamPortMobileWebMode(bankPayLauncher: ActivityResultLauncher<String>?) : IamPortWebViewMode(bankPayLauncher = bankPayLauncher) {
 
     fun initStart(activity: ComponentActivity, webview: WebView) {
         Logger.i("HELLO I'MPORT Mobile Web Mode SDK!")
@@ -30,9 +30,9 @@ open class IamportMobileWebMode(bankPayLauncher: ActivityResultLauncher<String>?
     override fun observeViewModel(payment: Payment?) {
         activity?.run {
 
-            viewModel.niceTransRequestParam().observe(this, EventObserver(this@IamportMobileWebMode::openNiceTransApp))
-            viewModel.thirdPartyUri().observe(this, EventObserver(this@IamportMobileWebMode::openThirdPartyApp))
-            viewModel.impResponse().observe(this, EventObserver(this@IamportMobileWebMode::sdkFinish))
+            viewModel.niceTransRequestParam().observe(this, EventObserver(this@IamPortMobileWebMode::openNiceTransApp))
+            viewModel.thirdPartyUri().observe(this, EventObserver(this@IamPortMobileWebMode::openThirdPartyApp))
+            viewModel.impResponse().observe(this, EventObserver(this@IamPortMobileWebMode::sdkFinish))
 
             openWebView()
         }
