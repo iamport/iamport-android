@@ -26,6 +26,7 @@ object CONST {
 
     const val CHAI_SERVICE_URL = "https://api.chai.finance"
     const val CHAI_SERVICE_STAGING_URL = "https://api-staging.chai.finance"
+    const val CHAI_SERVICE_DEV_URL = "https://api-dev.chai.finance"
 
     const val PAYMENT_PLAY_STORE_URL = "market://details?id="
 

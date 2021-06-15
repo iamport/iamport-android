@@ -9,5 +9,5 @@ object CHAI {
     const val STATUS = "status"
     const val NATIVE = "native"
     const val CHANNEL = "mobile"
-    const val MODE = "staging"
+    const val MODE = "prod"
 }
