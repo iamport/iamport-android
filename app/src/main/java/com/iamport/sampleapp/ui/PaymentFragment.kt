@@ -154,7 +154,8 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
             name = paymentName,                         // 주문명
             merchant_uid = merchantUid,                 // 주문번호
             amount = amount,                            // 결제금액
-            buyer_name = "남궁안녕"
+            buyer_name = "남궁안녕",
+//            customer_uid = getRandomCustomerUid()
         )
 
         val userCode = Util.getUserCode(viewDataBinding.userCode.selectedItemPosition)
@@ -238,6 +239,10 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
 
     private fun getRandomMerchantUid(): String {
         return "muid_aos_${Date().time}"
+    }
+
+    private fun getRandomCustomerUid(): String {
+        return "mcuid_aos_${Date().time}"
     }
 
 }

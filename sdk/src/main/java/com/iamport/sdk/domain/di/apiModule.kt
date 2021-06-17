@@ -37,6 +37,7 @@ fun provideIamportApi(gson : Gson, client: OkHttpClient?): IamportApi {
 
     return Retrofit.Builder()
         .baseUrl(CONST.IAMPORT_PROD_URL)
+//        .baseUrl(CONST.IAMPORT_TEST_URL)
         .addConverterFactory(GsonConverterFactory.create(gson)).apply {
             client?.let { client(it) }
         }
@@ -54,9 +55,9 @@ fun provideNiceApi(gson : Gson, client: OkHttpClient?): NiceApi {
         .create(NiceApi::class.java)
 }
 
-fun provideChaiApi(isProd: Boolean, gson : Gson, client: OkHttpClient?): ChaiApi {
+fun provideChaiApi(url: String, gson : Gson, client: OkHttpClient?): ChaiApi {
     return Retrofit.Builder()
-        .baseUrl(if (isProd) CONST.CHAI_SERVICE_URL else CONST.CHAI_SERVICE_DEV_URL)
+        .baseUrl(url)
         .addConverterFactory(GsonConverterFactory.create(gson)).apply {
             client?.let { client(it) }
         }

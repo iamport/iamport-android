@@ -8,10 +8,12 @@ import kotlinx.parcelize.Parcelize
 data class IamPortApprove(
     val userCode: String,
     val merchantUid: String,
+    val customerUid: String?,
     val paymentId: String?,
-    val impUid: String?,
-    val idempotencyKey: String?,
-    val publicAPIKey: String?,
+    val subscriptionId: String?,
+    val impUid: String,
+    val idempotencyKey: String,
+    val publicAPIKey: String,
     val msg: String? = null
 ) : Parcelable {
 
@@ -20,7 +22,9 @@ data class IamPortApprove(
             return IamPortApprove(
                 userCode = payment.userCode,
                 merchantUid = payment.getMerchantUid(),
+                customerUid = payment.getCustomerUid(),
                 paymentId = data.paymentId,
+                subscriptionId = data.subscriptionId,
                 impUid = data.impUid,
                 idempotencyKey = data.idempotencyKey,
                 publicAPIKey = data.publicAPIKey

@@ -141,15 +141,18 @@ internal class IamportSdk(
         @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
         fun onDestroy() {
             d("onDestroy")
-            clearData()
-            hostHelper.lifecycle.removeObserver(this)
-            runCatching {
-                hostHelper.context?.unregisterReceiver(iamportReceiver)
-                hostHelper.context?.applicationContext?.unregisterReceiver(screenBrReceiver)
-            }
+            initClear()
         }
     }
 
+    private fun initClear(){
+        clearData()
+        hostHelper.lifecycle.removeObserver(lifecycleObserver)
+        runCatching {
+            hostHelper.context?.unregisterReceiver(iamportReceiver)
+            hostHelper.context?.applicationContext?.unregisterReceiver(screenBrReceiver)
+        }
+    }
 
     private fun closeWebViewMode() {
         iamPortWebViewMode.close()
@@ -164,7 +167,8 @@ internal class IamportSdk(
             d("do Close! $iamPortWebViewMode")
             closeWebViewMode()
             modeWebView = null
-            clearData()
+//            clearData()
+            initClear()
         })
     }
 
@@ -173,7 +177,7 @@ internal class IamportSdk(
      */
     fun initStart(payment: Payment, paymentResultCallBack: ((IamPortResponse?) -> Unit)?) {
         i("HELLO I'MPORT SDK! for cert")
-
+        initClear()
 
         IntentFilter().let {
             it.addAction(CONST.BROADCAST_FOREGROUND_SERVICE)
@@ -182,7 +186,7 @@ internal class IamportSdk(
             hostHelper.context?.registerReceiver(iamportReceiver, it)
         }
 
-        clearData()
+//        clearData()
 
         this.paymentResultCallBack = paymentResultCallBack
 
@@ -197,6 +201,7 @@ internal class IamportSdk(
      */
     fun initStart(payment: Payment, approveCallback: ((IamPortApprove) -> Unit)?, paymentResultCallBack: ((IamPortResponse?) -> Unit)?) {
         i("HELLO I'MPORT SDK! for payment")
+        initClear()
 
         IntentFilter().let {
             it.addAction(CONST.BROADCAST_FOREGROUND_SERVICE)
@@ -205,7 +210,7 @@ internal class IamportSdk(
             hostHelper.context?.registerReceiver(iamportReceiver, it)
         }
 
-        clearData()
+//        clearData()
 
         this.chaiApproveCallBack = approveCallback
         this.paymentResultCallBack = paymentResultCallBack
@@ -386,7 +391,7 @@ internal class IamportSdk(
     /**
      * 뷰모델 데이터 클리어
      */
-    fun clearData() {
+    private fun clearData() {
         d("clearData!")
         updatePolling(false)
         controlForegroundService(false)
@@ -402,7 +407,8 @@ internal class IamportSdk(
         d(iamPortResponse.toString())
         closeWebViewMode() // FIXME: 필요할까?
 
-        clearData()
+//        clearData()
+        initClear()
         paymentResultCallBack?.invoke(iamPortResponse)
     }
 
