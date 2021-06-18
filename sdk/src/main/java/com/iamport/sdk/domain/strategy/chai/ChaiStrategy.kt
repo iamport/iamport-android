@@ -322,9 +322,9 @@ open class ChaiStrategy : BaseStrategy() {
     }
 
 
-    private suspend fun confirmMerchant(payment: Payment, data: PrepareData) {
+    private suspend fun confirmMerchant(payment: Payment, data: PrepareData, status: ChaiPaymentStatus) {
         withContext(Dispatchers.Default) {
-            IamPortApprove.make(payment, data).run {
+            IamPortApprove.make(payment, data, status).run {
                 bus.chaiApprove.postValue(Event(this))
             }
 
@@ -410,7 +410,7 @@ open class ChaiStrategy : BaseStrategy() {
             }
 
             when (val response =
-                apiApprovePayment(userCode, idempotencyKey, paymentId, idempotencyKey, approved, OS.aos.name)) {
+                apiApprovePayment(userCode, idempotencyKey, paymentId, idempotencyKey, approve.status, OS.aos.name)) {
                 is NetworkError -> failureFinish(payment, prepareData, "최종결제 요청 실패 NetworkError [${response.error}]")
                 is GenericError -> failureFinish(payment, prepareData, "최종결제 요청 실패 GenericError [${response.code}, ${response.error}]")
 
@@ -439,7 +439,7 @@ open class ChaiStrategy : BaseStrategy() {
             }
 
             when (val response =
-                apiApprovePaymentSubscription(userCode, idempotencyKey, customerUid, subscriptionId, idempotencyKey, approved, OS.aos.name)) {
+                apiApprovePaymentSubscription(userCode, idempotencyKey, customerUid, subscriptionId, idempotencyKey, approve.status, OS.aos.name)) {
                 is NetworkError -> failureFinish(payment, prepareData, "최종 정기결제 요청 실패 NetworkError [${response.error}]")
                 is GenericError -> failureFinish(payment, prepareData, "최종 정기결제 GenericError [${response.code}, ${response.error}]")
 
@@ -458,8 +458,8 @@ open class ChaiStrategy : BaseStrategy() {
         }
         increaseTryCount()
 
-        when (ChaiPaymentStatus.from(displayStatus)) {
-            approved -> confirmMerchant(payment, prepareData)
+        when (val status = ChaiPaymentStatus.from(displayStatus)) {
+            approved -> confirmMerchant(payment, prepareData, status)
 
             confirmed -> successFinish(payment, this.prepareData, "가맹점 측 결제 승인 완료 (결제 성공) [${displayStatus}]")
 
@@ -484,7 +484,12 @@ open class ChaiStrategy : BaseStrategy() {
                 }
             }
 
-            user_canceled, canceled, failed, timeout, inactive, churn -> failureFinish(payment, this.prepareData, "결제실패 [${displayStatus}]")
+            user_canceled, canceled, failed, timeout, inactive, churn -> {
+//                failureFinish(payment, this.prepareData, "결제실패 [${displayStatus}]")
+                IamPortApprove.make(payment, prepareData, status).run {
+                    requestApproveToIamport(this)
+                }
+            }
 
             else -> failureFinish(payment, this.prepareData, "결제실패 [${displayStatus}]")
         }
@@ -507,8 +512,9 @@ open class ChaiStrategy : BaseStrategy() {
                     data.run {
 
                         if (subscriptionId.isNullOrBlank() && paymentId.isNullOrBlank()) {
-                            w("subscriptionId & paymentId 모두 값이 없습니다.")
-                            failureFinish(payment, prepareData, msg)
+                            val errMsg = "subscriptionId & paymentId 모두 값이 없습니다."
+                            w(errMsg)
+                            failureFinish(payment, prepareData, errMsg)
                         }
 
                         prepareData = this

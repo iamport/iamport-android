@@ -9,7 +9,7 @@ object CHAI {
     const val SINGLE_ACTIVITY_VERSION: Long = 2000169
     const val PAYMENT_ID = "paymentId"
     const val SUBSCRIPTION_ID = "subscriptionId"
-    const val IDEMPOENCY_KEY = "idempotencyKey"
+    const val IDEMPOTENCY_KEY = "idempotencyKey"
     const val STATUS = "status"
     const val NATIVE = "native"
     const val CHANNEL = "mobile"

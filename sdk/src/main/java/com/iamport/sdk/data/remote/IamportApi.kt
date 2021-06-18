@@ -25,7 +25,7 @@ interface IamportApi {
         @Path(CONST.IMP_USER_CODE) impUserCode: String,
         @Path(CONST.IMP_UID) impUid: String,
         @Query(CHAI.PAYMENT_ID) paymentId: String,
-        @Query(CHAI.IDEMPOENCY_KEY) idempotencyKey: String,
+        @Query(CHAI.IDEMPOTENCY_KEY) idempotencyKey: String,
         @Query(CHAI.STATUS) status: ChaiPaymentStatus,
         @Query(CHAI.NATIVE) native: String
     ): Approve
@@ -37,7 +37,7 @@ interface IamportApi {
         @Path(CONST.IMP_UID) impUid: String,
         @Path(CONST.IMP_CUSTOMER_UID) impCustomerUid: String,
         @Query(CHAI.SUBSCRIPTION_ID) subscriptionId: String,
-        @Query(CHAI.IDEMPOENCY_KEY) idempotencyKey: String,
+        @Query(CHAI.IDEMPOTENCY_KEY) idempotencyKey: String,
         @Query(CHAI.STATUS) status: ChaiPaymentStatus,
         @Query(CHAI.NATIVE) native: String
     ): Approve

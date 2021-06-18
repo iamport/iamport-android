@@ -7,6 +7,7 @@ package com.iamport.sdk.data.chai.response
 //* 응답본문(Response) :
 data class ChaiPayment(
     val paymentId: String, // "198ad2c1cc485629447c4527247c198bdb0cd82c",
+//    val merchantUserId: String,
     val type: String, // "payment",
     val status: String, // "waiting",
     val displayStatus: String, // "waiting",
@@ -32,7 +33,7 @@ data class ChaiPayment(
     val canceledCashbackAmount: Float, // 0,
     val returnUrl: String, // "https://ksmobile.inicis.com/smart/chaipayAcsResult.ini",
     val description: String, // "결제테스트",
-    val cashbacks: ArrayList<String?>, // [], // TODO 이거 모르겠네
+//    val cashbacks: ArrayList<String?>, // [], // TODO 이거 모르겠네
     val createdAt: String, // "2020-10-27T06:36:12.218Z",
     val updatedAt: String, // "2020-10-27T06:36:12.218Z",
     val metadata: PaymentMetadata,

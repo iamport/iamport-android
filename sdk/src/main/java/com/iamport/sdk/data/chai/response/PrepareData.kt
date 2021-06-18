@@ -12,5 +12,5 @@ data class PrepareData(
     val returnUrl: String,
     val publicAPIKey: String,
     val mode: String?,
-    val isSbcr: Boolean,
+    val isSbcr: Boolean?, // FIXME: 서버 배포 후 non nullable 로
 ) : Parcelable
