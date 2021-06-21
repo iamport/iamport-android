@@ -1,6 +1,7 @@
 package com.iamport.sdk
 
 import androidx.test.core.app.ApplicationProvider
+import com.iamport.sdk.data.chai.CHAI_MODE
 import com.iamport.sdk.domain.di.appModule
 import com.iamport.sdk.domain.di.provideChaiApi
 import com.iamport.sdk.domain.di.provideIamportApi
@@ -43,7 +44,7 @@ abstract class AbstractKoinTest : AutoCloseKoinTest() {
         val mockApiModule by lazy {
             module {
                 single { provideIamportApi(get(), null) }
-                single { provideChaiApi(false, get(),null) }
+                single { provideChaiApi(CHAI_MODE.staging.name, get(),null) }
                 single { provideNiceApi(get(), null) }
             }
         }
