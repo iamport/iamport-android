@@ -69,7 +69,7 @@ class WebViewModeFragment : Fragment() {
         binding?.mobilewebButton?.setOnClickListener {
             // 모바일 웹 단독 모드
             binding?.webview?.let {
-                binding?.webview?.loadUrl(CONST.PAYMENT_MOBILE_WEB_FILE_URL)
+                it.loadUrl(CONST.PAYMENT_MOBILE_WEB_FILE_URL)
                 Iamport.pluginMobileWebSupporter(it)
             }
         }

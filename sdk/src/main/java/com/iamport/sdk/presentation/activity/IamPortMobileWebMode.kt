@@ -49,7 +49,7 @@ open class IamPortMobileWebMode(bankPayLauncher: ActivityResultLauncher<String>?
             fitsSystemWindows = true
             settingsWebView(this)
             setLayerType(View.LAYER_TYPE_HARDWARE, null)
-            clearCache(true)
+            clearCache(true) // FIXME: 안지워도 될까? 고민..
 
             webViewClient = viewModel.getNiceTransWebViewClient()
             visibility = View.VISIBLE
