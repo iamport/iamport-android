@@ -131,7 +131,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
             company = "유어포트",
         )
 
-        Iamport.certification(userCode, certification) { callBackListener.result(it) }
+        Iamport.certification(userCode, iamPortCertification = certification) { callBackListener.result(it) }
     }
 
 
@@ -175,7 +175,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
 //            approveCallback = { approveCallback(it) },
 //            paymentResultCallback = { callBackListener.result(it) })
 
-        Iamport.payment(userCode, request) { callBackListener.result(it) }
+        Iamport.payment(userCode, iamPortRequest = request) { callBackListener.result(it) }
     }
 
     /**
