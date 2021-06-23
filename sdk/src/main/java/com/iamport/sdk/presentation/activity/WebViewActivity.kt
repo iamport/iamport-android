@@ -49,7 +49,8 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
 
     override fun onDestroy() {
         runCatching {
-            close()
+//            close()
+            removeObservers()
         }.onFailure {
             d("ignore fail close webview $it")
         }
@@ -142,15 +143,24 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
         }
     }
 
-    private fun close() {
+    private fun removeObservers() {
         runCatching {
-            d("WebViewActivity close")
+            d("WebViewActivity removeObservers")
             viewModel.payment().removeObservers(this)
             viewModel.loading().removeObservers(this)
             viewModel.openWebView().removeObservers(this)
             viewModel.niceTransRequestParam().removeObservers(this)
             viewModel.thirdPartyUri().removeObservers(this)
             viewModel.impResponse().removeObservers(this)
+        }.onFailure {
+            e("Fail WebViewActivity removeObservers$it")
+        }
+    }
+
+    private fun close() {
+        runCatching {
+            d("WebViewActivity close")
+            removeObservers()
 
             viewDataBinding.webview.run {
                 removeJavascriptInterface(CONST.PAYMENT_WEBVIEW_JS_INTERFACE_NAME)

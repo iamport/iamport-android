@@ -59,7 +59,7 @@ class WebViewModeFragment : Fragment() {
                 Iamport.enableWebViewMode(it)
                 Log.d("WebViewMode", "iamport sdk webview mode? ${Iamport.isWebViewMode()}")
                 // 아임포트에 결제 요청하기
-                Iamport.payment("iamport", request, paymentResultCallback = {
+                Iamport.payment("iamport", iamPortRequest = request, paymentResultCallback = {
                     // 결제 완료 후 결과 콜백을 토스트 메시지로 보여줌
                     Toast.makeText(this.context, "결제결과 => $it", Toast.LENGTH_LONG).show()
                 })
@@ -69,7 +69,7 @@ class WebViewModeFragment : Fragment() {
         binding?.mobilewebButton?.setOnClickListener {
             // 모바일 웹 단독 모드
             binding?.webview?.let {
-                binding?.webview?.loadUrl(CONST.PAYMENT_MOBILE_WEB_FILE_URL)
+                it.loadUrl(CONST.PAYMENT_MOBILE_WEB_FILE_URL)
                 Iamport.pluginMobileWebSupporter(it)
             }
         }

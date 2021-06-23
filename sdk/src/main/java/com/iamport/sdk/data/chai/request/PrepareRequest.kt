@@ -21,6 +21,7 @@ data class PrepareRequest(
     val tax_free: String?, // 결제금액 중 면세공급가액,
     val name: String, //주문명,
     val merchant_uid: String, // 가맹점 주문번호,
+    val customer_uid: String?, // 정기결제용
     val user_code: String, // 아임포트 가맹점 식별코드,
     val tier_code: String?, // 아임포트 agency 하위계정 tier code,
     val pg_id: String, // 차이계정 public Key, // 복수PG로직에 따라 Http 요청 1에서 받은 정보 + 요청인자 활용
@@ -49,6 +50,7 @@ data class PrepareRequest(
                     tax_free = Util.getOrZeroString(tax_free),
                     name = Util.getOrEmpty(name),
                     merchant_uid = merchant_uid,
+                    customer_uid = customer_uid,
                     user_code = payment.userCode,
                     tier_code = empty,
                     pg_id = chaiId,

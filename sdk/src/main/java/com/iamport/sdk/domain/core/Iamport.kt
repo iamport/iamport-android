@@ -275,16 +275,20 @@ object Iamport {
      * @param ICallbackPaymentResult? : 결제결과 callback type#1 ICallbackPaymentResult 구현
      */
     fun payment(
-        userCode: String, iamPortRequest: IamPortRequest, approveCallback: ((IamPortApprove) -> Unit)? = null, paymentResultCallback: ICallbackPaymentResult?,
+        userCode: String,
+        tierCode: String? = null,
+        iamPortRequest: IamPortRequest,
+        approveCallback: ((IamPortApprove) -> Unit)? = null,
+        paymentResultCallback: ICallbackPaymentResult?,
     ) {
-        Payment(userCode, iamPortRequest = iamPortRequest).let {
+        Payment(userCode, tierCode = tierCode, iamPortRequest = iamPortRequest).let {
             if (!checkInit(it)) {
                 return@let
             }
         }
 
         preventOverlapRun?.launch {
-            corePayment(userCode, iamPortRequest, approveCallback) { paymentResultCallback?.result(it) }
+            corePayment(userCode, tierCode, iamPortRequest, approveCallback) { paymentResultCallback?.result(it) }
         }
     }
 
@@ -294,16 +298,19 @@ object Iamport {
      * @param (IamPortResponse?) -> Unit: ICallbackPaymentResult? : 결제결과 callbck type#2 함수 호출
      */
     fun certification(
-        userCode: String, iamPortCertification: IamPortCertification, resultCallback: (IamPortResponse?) -> Unit
+        userCode: String,
+        tierCode: String? = null,
+        iamPortCertification: IamPortCertification,
+        resultCallback: (IamPortResponse?) -> Unit
     ) {
-        Payment(userCode, iamPortCertification = iamPortCertification).let {
+        Payment(userCode, tierCode = tierCode, iamPortCertification = iamPortCertification).let {
             if (!checkInit(it)) {
                 return@let
             }
         }
 
         preventOverlapRun?.launch {
-            coreCertification(userCode, iamPortCertification, resultCallback)
+            coreCertification(userCode, tierCode, iamPortCertification, resultCallback)
         }
     }
 
@@ -313,39 +320,45 @@ object Iamport {
      * @param (IamPortResponse?) -> Unit: ICallbackPaymentResult? : 결제결과 callbck type#2 함수 호출
      */
     fun payment(
-        userCode: String, iamPortRequest: IamPortRequest, approveCallback: ((IamPortApprove) -> Unit)? = null, paymentResultCallback: (IamPortResponse?) -> Unit
+        userCode: String,
+        tierCode: String? = null,
+        iamPortRequest: IamPortRequest,
+        approveCallback: ((IamPortApprove) -> Unit)? = null,
+        paymentResultCallback: (IamPortResponse?) -> Unit
     ) {
-        Payment(userCode, iamPortRequest = iamPortRequest).let {
+        Payment(userCode, tierCode = tierCode, iamPortRequest = iamPortRequest).let {
             if (!checkInit(it)) {
                 return@let
             }
         }
 
         preventOverlapRun?.launch {
-            corePayment(userCode, iamPortRequest, approveCallback, paymentResultCallback)
+            corePayment(userCode, tierCode, iamPortRequest, approveCallback, paymentResultCallback)
         }
     }
 
     @KoinApiExtension
     internal fun coreCertification(
         userCode: String,
+        tierCode: String? = null,
         iamPortCertification: IamPortCertification,
         paymentResultCallback: ((IamPortResponse?) -> Unit)?
     ) {
         this.impCallbackFunction = paymentResultCallback
-        iamportSdk?.initStart(Payment(userCode, iamPortCertification = iamPortCertification), paymentResultCallback)
+        iamportSdk?.initStart(Payment(userCode, tierCode = tierCode, iamPortCertification = iamPortCertification), paymentResultCallback)
     }
 
     @KoinApiExtension
     internal fun corePayment(
         userCode: String,
+        tierCode: String? = null,
         iamPortRequest: IamPortRequest,
         approveCallback: ((IamPortApprove) -> Unit)?,
         paymentResultCallback: ((IamPortResponse?) -> Unit)?
     ) {
         this.approveCallback = approveCallback
         this.impCallbackFunction = paymentResultCallback
-        iamportSdk?.initStart(Payment(userCode, iamPortRequest = iamPortRequest), approveCallback, paymentResultCallback)
+        iamportSdk?.initStart(Payment(userCode, tierCode = tierCode, iamPortRequest = iamPortRequest), approveCallback, paymentResultCallback)
     }
 
 }

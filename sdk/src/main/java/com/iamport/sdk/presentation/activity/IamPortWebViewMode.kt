@@ -104,7 +104,7 @@ open class IamPortWebViewMode @JvmOverloads constructor(
     }
 
     fun close() {
-        d("close")
+        d("close WebViewMode")
         removeObservers()
         webview?.run {
             removeJavascriptInterface(CONST.PAYMENT_WEBVIEW_JS_INTERFACE_NAME)
