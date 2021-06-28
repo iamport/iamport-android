@@ -24,7 +24,6 @@ import com.iamport.sdk.domain.utils.PreventOverlapRun
 import com.iamport.sdk.presentation.activity.IamportSdk
 import com.iamport.sdk.presentation.contract.WebViewActivityContract
 import com.orhanobut.logger.AndroidLogAdapter
-import com.orhanobut.logger.BuildConfig
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Logger.*
 import com.orhanobut.logger.PrettyFormatStrategy
@@ -34,6 +33,7 @@ import org.koin.core.KoinApplication
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
+import org.koin.core.module.Module
 
 
 object Iamport {
@@ -91,13 +91,18 @@ object Iamport {
         createWithKoin(app)
     }
 
+
+    fun getKoinModules(): List<Module> {
+        return listOf(httpClientModule, apiModule, appModule)
+    }
+
     /**
      * Application instance 를 통해 SDK 생명주기 감지, DI 초기화
      */
     // TODO Application 사용하지 않는 방안 모색
     fun createWithKoin(app: Application, koinApp: KoinApplication? = null) {
 
-        val modules = listOf(httpClientModule, apiModule, appModule)
+        val modules = getKoinModules()
         IamportKoinContext.koinApp = if (koinApp == null) {
             stopKoin()
             startKoin {
@@ -106,7 +111,7 @@ object Iamport {
                 modules(modules)
             }
         } else {
-            koinApp.modules(modules)
+            koinApp.modules(modules) // or getKoinModules 를 직접 받아서 사용
         }
 
         Foreground.init(app)
