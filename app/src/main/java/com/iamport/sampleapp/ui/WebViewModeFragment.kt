@@ -56,10 +56,9 @@ class WebViewModeFragment : Fragment() {
 
                 this.activity?.onBackPressedDispatcher?.addCallback(this, backPressCallback)
 
-                Iamport.enableWebViewMode(it)
                 Log.d("WebViewMode", "iamport sdk webview mode? ${Iamport.isWebViewMode()}")
                 // 아임포트에 결제 요청하기
-                Iamport.payment("iamport", iamPortRequest = request, paymentResultCallback = {
+                Iamport.payment("iamport", webviewMode = it, iamPortRequest = request, paymentResultCallback = {
                     // 결제 완료 후 결과 콜백을 토스트 메시지로 보여줌
                     Toast.makeText(this.context, "결제결과 => $it", Toast.LENGTH_LONG).show()
                 })

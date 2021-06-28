@@ -122,9 +122,9 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
     }
 
     fun onClickCertification() {
-        val userCode = "imp00357859"
+        val userCode = "iamport"
         val certification = IamPortCertification(
-            merchant_uid = "muid_aos_123123",
+            merchant_uid = getRandomMerchantUid(),
             min_age = 19,
             name = "김준혁",
             phone = "010-4597-5833",

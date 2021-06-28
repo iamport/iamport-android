@@ -166,7 +166,7 @@ internal class IamportSdk(
         close.observeAlways(hostHelper.lifecycleOwner, EventObserver {
             d("do Close! $iamPortWebViewMode")
             closeWebViewMode()
-            modeWebView = null
+            disableWebViewMode()
 //            clearData()
             initClear()
         })

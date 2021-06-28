@@ -322,14 +322,21 @@ object Iamport {
     fun payment(
         userCode: String,
         tierCode: String? = null,
+        webviewMode: WebView? = null,
         iamPortRequest: IamPortRequest,
         approveCallback: ((IamPortApprove) -> Unit)? = null,
         paymentResultCallback: (IamPortResponse?) -> Unit
     ) {
+
+        disableWebViewMode()
         Payment(userCode, tierCode = tierCode, iamPortRequest = iamPortRequest).let {
             if (!checkInit(it)) {
                 return@let
             }
+        }
+
+        if (webviewMode != null) {
+            enableWebViewMode(webviewMode)
         }
 
         preventOverlapRun?.launch {
