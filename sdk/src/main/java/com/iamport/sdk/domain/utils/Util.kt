@@ -111,7 +111,7 @@ object Util {
             )
             danal -> setOf(PayMethod.phone)
             mobilians -> setOf(PayMethod.card, PayMethod.phone)
-            settle -> setOf(PayMethod.vbank)
+            settle -> setOf(PayMethod.card, PayMethod.vbank)
             chai, payple -> setOf(PayMethod.trans)
             eximbay -> setOf(
                 PayMethod.card,
