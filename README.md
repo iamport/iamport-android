@@ -2,7 +2,7 @@
 
 [![](https://jitpack.io/v/iamport/iamport-android.svg)](https://jitpack.io/#iamport/iamport-android)
 
-## 설명
+## :open_book: 설명
 
 안드로이드 네이티브 앱에서 결제 개발을 간편하게 도와주는 아임포트 SDK 입니다.
 
@@ -36,7 +36,7 @@
 
 > app build.gradle 
 > 
-[$SDK-VERSION][5]
+[최신 버전 확인($SDK-VERSION)][5]
 ```gradle
   implementation 'com.github.iamport:iamport-android:$SDK-VERSION'
 ```
@@ -46,6 +46,7 @@
   android {
     ...
     buildFeatures {
+        ...
         dataBinding true
     }
   }
@@ -60,7 +61,7 @@
 ```kotlin
 
   // 일반적인 경우
-  // 사용하시는 안드로이드 어플리케이션 클래스에 추가하세요
+  // 사용하시는 안드로이드 Application 클래스에 추가하세요
   class BaseApplication : Application() {
     override fun onCreate() {
         ..
@@ -126,6 +127,9 @@
 
 
 ### Optional 구현사항 for CHAI 결제
+<details>
+<summary>펼쳐보기</summary>
+
 > - 차이 결제에서 approveCallback 이 있을 때 (최종 결제전 재고 확인 등이 필요할 때)  
 콜백 전달 받은 후에 chaiPayment 함수 호출  
 (타임아웃 : CONST.CHAI_FINAL_PAYMENT_TIME_OUT_SEC)
@@ -170,6 +174,54 @@ enableFailStopButton = true 라면, 포그라운드 서비스에서 중지 버�
 - (포그라운드 서비스 직접 구현시에는 enableService = false 로 설정하고,  
 Iamport.isPolling()?.observe 에서 true 전달 받을 시점에, 직접 포그라운드 서비스 만들어 띄우시면 됩니다.)
 
+</details>
+
+---
+
+
+### Optional 구현사항 WebView Mode 와 MobileWeb Mode
+<details>
+<summary>펼쳐보기</summary>
+
+> 본 sdk 에서는 기본적으로 결제연동의 편의를 제공하고자  
+Iamport.payment 를 통해 결제 요청시 새로운 Activity 가 열리고,   
+내부적으로 WebView 를 생성하여 전달해주신 parameters 를 통해 결제창을 열고 있습니다.  
+
+그러나 요청에 따라 개발의 자유도를 드리기 위해 WebView Mode, MobileWeb Mode 두가지가 추가되었습니다. ( <= 1.0.0-dev05 )    
+
+### 1. WebView Mode
+
+설명 : 결제페이지를 직접 생성하시고 iamport-sdk 에 webview 를 넘겨 결제를 진행합니다.  
+ex) 결제 Activity(or Fragment) 를 통해 직접 결제페이지를 꾸미기 원하는 분.  
+
+반영방법 : 기존 [필수구현 사항][7] 과 같이 iamport-sdk 세팅을 합니다.  
+Iamport.payment 호출 파라미터 중 webviewMode 에 webview 를 넣어주시면 됩니다.
+그 외는 기존의 동작과 같습니다.
+
+```kotlin
+Iamport.payment(가맹점식별코드, webviewMode = webview, 기타 params, 콜백)
+```    
+
+
+
+### 2. MobileWeb Mode
+
+설명 : 아임포트를 사용하는 Mobile 웹페이지가 load 된 webview 를 넘겨 결제 진행을 서포트 합니다.    
+ex) 이미 웹사이트에서 아임포트 js sdk 를 이용하고 있고, 본인 서비스를 app 으로만 감싸서 출시 하고자 하시는 분.   
+
+반영방법 : 기존 [필수구현 사항][7] 과 같이 iamport-sdk 세팅을 합니다.  
+추가로 Iamport.pluginMobileWebSupporter(webview) 를 호출하여 파라미터로 webview 를 전달합니다.  
+실제 결제 진행은 고객님의 웹사이트 내에서 진행됩니다.  
+
+```kotlin
+Iamport.pluginMobileWebSupporter(webview)
+```
+
+
+
+</details>
+
+
 ---
 
 ## 자바 프로젝트는 아래 [펼쳐보기] 를 참조해주세요
@@ -185,9 +237,9 @@ Iamport.isPolling()?.observe 에서 true 전달 받을 시점에, 직접 포그�
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$코틀린-버전"
 ```
 
-> 필수구현 사항. SDK 제공 api 별 설명은 위의 [KOTLIN usage][6] 를 참고하세요.
+> 필수구현 사항. SDK 제공 api 별 설명은 위의 [KOTLIN usage][7] 를 참고하세요.
 
-[6]:https://github.com/iamport/iamport-android#kotlin-usage
+[7]:https://github.com/iamport/iamport-android#kotlin-usage
 
 ```java
   // 일반적인 경우
