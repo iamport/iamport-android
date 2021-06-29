@@ -124,8 +124,8 @@
 
         <Button
             android:id="@+id/back_button"
-            android:layout_width="200dp"
-            android:layout_height="50dp"
+            android:layout_width="80dp"
+            android:layout_height="70dp"
             android:layout_marginBottom="30dp"
             android:text="종료하기"
             app:layout_constraintBottom_toTopOf="@id/payment_button"
@@ -142,10 +142,19 @@
             app:layout_constraintBottom_toTopOf="@id/payment_button"
             app:layout_constraintLeft_toRightOf="@+id/back_button"/>
 
+        <Button
+            android:id="@+id/webview_mode_button"
+            android:layout_width="80dp"
+            android:layout_height="70dp"
+            android:layout_marginBottom="30dp"
+            android:text="@string/webviewmode"
+            app:layout_constraintBottom_toTopOf="@id/payment_button"
+            app:layout_constraintRight_toLeftOf="@+id/back_button"/>
+
 
         <Button
             android:id="@+id/payment_button"
-            android:layout_width="300dp"
+            android:layout_width="200dp"
             android:layout_height="70dp"
             android:layout_marginBottom="30dp"
             android:text="@string/buy"

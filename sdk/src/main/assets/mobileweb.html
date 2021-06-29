@@ -56,15 +56,15 @@
           document.addEventListener('DOMContentLoaded', () => {
            
 <!--            IMP.init('imp96304110'); // 빙봉-->
-            IMP.init('iamport'); // 빙봉
+            IMP.init('iamport');
 
             });
 
 
             function onClickPayment() {
               IMP.request_pay({
-                  pg: 'nice',
-                  pay_method : 'trans',
+                  pg: 'kcp',
+                  pay_method : 'card',
                   niceMobileV2: true,
                   amount: '1000',
                   // company: '아임포트',

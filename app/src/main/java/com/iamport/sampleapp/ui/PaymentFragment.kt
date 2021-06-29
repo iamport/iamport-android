@@ -5,7 +5,9 @@ import android.content.Context
 import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.activity.OnBackPressedCallback
@@ -29,9 +31,9 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
     override val layoutResourceId: Int = R.layout.payment_fragment
     private val receiver = MerchantReceiver()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Iamport.init(this) // fragment
+        return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     override fun onAttach(context: Context) {
@@ -72,6 +74,11 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
 
         viewDataBinding.certificationButton.setOnClickListener {
             onClickCertification()
+        }
+
+        viewDataBinding.webviewModeButton.setOnClickListener {
+            Iamport.close()
+            (activity as MainActivity).replaceFragment(WebViewModeFragment())
         }
 
         viewDataBinding.backButton.setOnClickListener {
@@ -124,7 +131,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
             company = "유어포트",
         )
 
-        Iamport.certification(userCode, certification) { callBackListener.result(it) }
+        Iamport.certification(userCode, iamPortCertification = certification) { callBackListener.result(it) }
     }
 
 
@@ -147,7 +154,8 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
             name = paymentName,                         // 주문명
             merchant_uid = merchantUid,                 // 주문번호
             amount = amount,                            // 결제금액
-            buyer_name = "남궁안녕"
+            buyer_name = "남궁안녕",
+//            customer_uid = getRandomCustomerUid()
         )
 
         val userCode = Util.getUserCode(viewDataBinding.userCode.selectedItemPosition)
@@ -167,7 +175,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
 //            approveCallback = { approveCallback(it) },
 //            paymentResultCallback = { callBackListener.result(it) })
 
-        Iamport.payment(userCode, request) { callBackListener.result(it) }
+        Iamport.payment(userCode, iamPortRequest = request) { callBackListener.result(it) }
     }
 
     /**
@@ -191,10 +199,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
             Log.i("SAMPLE", "결제 결과 콜백\n$resJson")
             result = iamPortResponse
             if (iamPortResponse != null) {
-                requireActivity().supportFragmentManager.beginTransaction()
-                    .replace(R.id.container, PaymentResultFragment())
-                    .addToBackStack(null)
-                    .commit()
+                (activity as MainActivity).replaceFragment(PaymentResultFragment())
             }
         }
     }
@@ -234,6 +239,10 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
 
     private fun getRandomMerchantUid(): String {
         return "muid_aos_${Date().time}"
+    }
+
+    private fun getRandomCustomerUid(): String {
+        return "mcuid_aos_${Date().time}"
     }
 
 }

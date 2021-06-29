@@ -39,7 +39,7 @@ public class MainActivity_JAVA extends AppCompatActivity {
                 .amount("3200")
                 .buyer_name("김아임포트").build();
 
-        Iamport.INSTANCE.payment("imp19424728", request,
+        Iamport.INSTANCE.payment("imp19424728", null, request,
                 iamPortApprove -> {
                     // (Optional) CHAI 최종 결제전 콜백 함수.
                     return Unit.INSTANCE;

@@ -3,10 +3,10 @@ package com.iamport.sdk.presentation.activity
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.view.View
 import android.widget.ProgressBar
-import androidx.lifecycle.viewModelScope
-import com.google.gson.Gson
+import androidx.annotation.RequiresApi
 import com.google.gson.GsonBuilder
 import com.iamport.sdk.R
 import com.iamport.sdk.data.sdk.IamPortResponse
@@ -47,9 +47,16 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
             } ?: e("NICE TRANS result is NULL")
         }
 
-    /**
-     * BaseActivity 에서 onCreate 시 호출
-     */
+    override fun onDestroy() {
+        runCatching {
+//            close()
+            removeObservers()
+        }.onFailure {
+            d("ignore fail close webview $it")
+        }
+        super.onDestroy()
+    }
+
     override fun initStart() {
         i("HELLO I'MPORT WebView SDK!")
 
@@ -136,15 +143,46 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
         }
     }
 
+    private fun removeObservers() {
+        runCatching {
+            d("WebViewActivity removeObservers")
+            viewModel.payment().removeObservers(this)
+            viewModel.loading().removeObservers(this)
+            viewModel.openWebView().removeObservers(this)
+            viewModel.niceTransRequestParam().removeObservers(this)
+            viewModel.thirdPartyUri().removeObservers(this)
+            viewModel.impResponse().removeObservers(this)
+        }.onFailure {
+            e("Fail WebViewActivity removeObservers$it")
+        }
+    }
+
+    private fun close() {
+        runCatching {
+            d("WebViewActivity close")
+            removeObservers()
+
+            viewDataBinding.webview.run {
+                removeJavascriptInterface(CONST.PAYMENT_WEBVIEW_JS_INTERFACE_NAME)
+                removeAllViews()
+                destroy()
+            }
+        }.onFailure {
+            e("Fail WebViewActivity close$it")
+        }
+    }
+
     /**
      * 모든 결과 처리 및 SDK 종료
      */
     override fun sdkFinish(iamPortResponse: IamPortResponse?) {
         i("call sdkFinish")
         d("sdkFinish => ${iamPortResponse.toString()}")
+
+        close()
         loadingVisible(false)
-        setResult(Activity.RESULT_OK,
-            Intent().apply { putExtra(CONST.CONTRACT_OUTPUT, iamPortResponse) })
+        setResult(Activity.RESULT_OK, Intent().apply { putExtra(CONST.CONTRACT_OUTPUT, iamPortResponse) })
+
         this.finish()
     }
 
@@ -161,7 +199,6 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
         loadingVisible(false)
     }
 
-
     /**
      * 외부앱 열기
      */
@@ -170,8 +207,10 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
         Intent.parseUri(it.toString(), Intent.URI_INTENT_SCHEME)?.let { intent: Intent ->
             runCatching {
                 startActivity(intent)
-            }.onFailure {
+            }.recoverCatching {
                 movePlayStore(intent)
+            }.onFailure {
+                i("설치 버튼을 이용하여 앱을 설치하세요.")
             }
         }
         loadingVisible(false)
@@ -190,7 +229,10 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
                     e("Not found intent schme :: ${intent.scheme}")
                     return@run null
                 }
-                else -> providePgPkg.pkg
+                else -> {
+                    d("Found pkg : ${providePgPkg.pkg}")
+                    providePgPkg.pkg
+                }
             }
         }
 

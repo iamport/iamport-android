@@ -39,7 +39,15 @@ data class Payment(
         return when(getStatus()) {
             STATUS.PAYMENT -> iamPortRequest?.merchant_uid ?: CONST.EMPTY_STR
             STATUS.CERT -> iamPortCertification?.merchant_uid ?: CONST.EMPTY_STR
-            STATUS.ERROR -> "ERR : iamPortCertification & iamPortRequest NULL"
+            STATUS.ERROR -> CONST.EMPTY_STR
+        }
+    }
+
+    fun getCustomerUid(): String {
+        return when(getStatus()) {
+            STATUS.PAYMENT -> iamPortRequest?.customer_uid ?: CONST.EMPTY_STR
+            STATUS.CERT -> CONST.EMPTY_STR
+            STATUS.ERROR -> CONST.EMPTY_STR
         }
     }
 

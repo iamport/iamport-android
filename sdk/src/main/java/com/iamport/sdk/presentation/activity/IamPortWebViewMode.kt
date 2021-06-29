@@ -5,7 +5,7 @@ import android.net.Uri
 import android.view.View
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
-import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.ActivityResultLauncher
 import com.google.gson.GsonBuilder
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
@@ -13,9 +13,7 @@ import com.iamport.sdk.data.sdk.ProvidePgPkg
 import com.iamport.sdk.domain.IamportWebChromeClient
 import com.iamport.sdk.domain.JsNativeInterface
 import com.iamport.sdk.domain.core.Iamport
-import com.iamport.sdk.domain.core.IamportLifecycleObserver
 import com.iamport.sdk.domain.di.IamportKoinComponent
-import com.iamport.sdk.domain.strategy.webview.NiceTransWebViewStrategy
 import com.iamport.sdk.domain.utils.*
 import com.iamport.sdk.presentation.viewmodel.WebViewModel
 import com.orhanobut.logger.Logger.*
@@ -27,10 +25,9 @@ import org.koin.core.qualifier.named
 
 @KoinApiExtension
 open class IamPortWebViewMode @JvmOverloads constructor(
-    private val lifecycleObserver: IamportLifecycleObserver,
+    val bankPayLauncher: ActivityResultLauncher<String>?,
     scope: BaseCoroutineScope = UICoroutineScope()
-) :
-    IamportKoinComponent, BaseMain, BaseCoroutineScope by scope {
+) : IamportKoinComponent, BaseMain, BaseCoroutineScope by scope {
 
     val viewModel: WebViewModel = WebViewModel(get(), get())
 
@@ -38,21 +35,22 @@ open class IamPortWebViewMode @JvmOverloads constructor(
     var activity: ComponentActivity? = null
     var webview: WebView? = null
 
-
     /**
      * BaseActivity 에서 onCreate 시 호출
      */
     fun initStart(activity: ComponentActivity, webview: WebView, payment: Payment) {
-        i("HELLO I'MPORT WebView SDK!")
+        i("HELLO I'MPORT WebView MODE SDK!")
 
         this.activity = activity
         this.payment = payment
         this.webview = webview
 
-        onBackPressed()
         observeViewModel(payment) // 관찰할 LiveData
     }
 
+    fun processBankPayPayment(resPair: Pair<String, String>) {
+        viewModel.processBankPayPayment(resPair)
+    }
 
     /**
      * 관찰할 LiveData 옵저빙
@@ -60,19 +58,17 @@ open class IamPortWebViewMode @JvmOverloads constructor(
     override fun observeViewModel(payment: Payment?) {
         d(GsonBuilder().setPrettyPrinting().create().toJson(payment))
         payment?.let { pay: Payment ->
-            activity?.run {
+            activity?.let {
+                viewModel.run {
+                    d("등록하니?")
+                    payment().observe(it, EventObserver(this@IamPortWebViewMode::requestPayment))
+                    openWebView().observe(it, EventObserver(this@IamPortWebViewMode::openWebView))
+                    niceTransRequestParam().observe(it, EventObserver(this@IamPortWebViewMode::openNiceTransApp))
+                    thirdPartyUri().observe(it, EventObserver(this@IamPortWebViewMode::openThirdPartyApp))
+                    impResponse().observe(it, EventObserver(this@IamPortWebViewMode::sdkFinish))
 
-                d("등록하니?")
-
-                viewModel.payment().observe(this, EventObserver(this@IamPortWebViewMode::requestPayment))
-
-                viewModel.openWebView().observe(this, EventObserver(this@IamPortWebViewMode::openWebView))
-                viewModel.niceTransRequestParam().observe(this, EventObserver(this@IamPortWebViewMode::openNiceTransApp))
-                viewModel.thirdPartyUri().observe(this, EventObserver(this@IamPortWebViewMode::openThirdPartyApp))
-
-                viewModel.impResponse().observe(this, EventObserver(this@IamPortWebViewMode::sdkFinish))
-
-                viewModel.startPayment(pay)
+                    startPayment(pay)
+                }
             }
         }
     }
@@ -91,31 +87,42 @@ open class IamPortWebViewMode @JvmOverloads constructor(
         viewModel.requestPayment(it)
     }
 
-
-    private val backPressCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            webview?.run {
-                if (canGoBack()) {
-                    goBack()
-                } else {
-                    activity?.onBackPressed()
-                }
+    private fun removeObservers() {
+        d("removeObservers")
+        activity?.let {
+            viewModel.run {
+                d("do removeObservers")
+                payment().removeObservers(it)
+                openWebView().removeObservers(it)
+                niceTransRequestParam().removeObservers(it)
+                thirdPartyUri().removeObservers(it)
+                impResponse().removeObservers(it)
             }
         }
+
+        activity = null
     }
 
-    override fun onBackPressed() {
-        activity?.run {
-            activity?.onBackPressedDispatcher?.addCallback(this, backPressCallback)
+    fun close() {
+        d("close WebViewMode")
+        removeObservers()
+        webview?.run {
+            removeJavascriptInterface(CONST.PAYMENT_WEBVIEW_JS_INTERFACE_NAME)
+            removeAllViews()
+            destroy()
         }
+        webview = null
     }
+
 
     /**
      * 모든 결과 처리 및 SDK 종료
+     * IamportSdk 안건너고, 바로 콜백 호출하여 종료.
      */
     override fun sdkFinish(iamPortResponse: IamPortResponse?) {
         i("call sdkFinish")
         d("sdkFinish => ${iamPortResponse.toString()}")
+        removeObservers()
         Iamport.callback.invoke(iamPortResponse)
     }
 
@@ -125,9 +132,7 @@ open class IamPortWebViewMode @JvmOverloads constructor(
     override fun openNiceTransApp(it: String) {
         d("openNiceTransApp $it")
         runCatching {
-            lifecycleObserver.bankPayLaunch(it) {
-                viewModel.processBankPayPayment(it)
-            }// 뱅크페이 앱 실행
+            bankPayLauncher?.launch(it)
         }.onFailure {
             // 뱅크페이 앱 패키지는 하드코딩
             activity?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Util.getMarketId(ProvidePgPkg.BANKPAY.pkg))))
@@ -143,8 +148,10 @@ open class IamPortWebViewMode @JvmOverloads constructor(
         Intent.parseUri(it.toString(), Intent.URI_INTENT_SCHEME)?.let { intent: Intent ->
             runCatching {
                 activity?.startActivity(intent)
-            }.onFailure {
+            }.recoverCatching {
                 movePlayStore(intent)
+            }.onFailure {
+                i("설치 버튼을 이용하여 앱을 설치하세요.")
             }
         }
     }
@@ -177,7 +184,7 @@ open class IamPortWebViewMode @JvmOverloads constructor(
      * 웹뷰 오픈
      */
     override fun openWebView(payment: Payment) {
-        d("오픈! 웹뷰")
+        d("오픈! 웹뷰 $payment")
 
         val evaluateJS = fun(jsMethod: String) {
             val js = "javascript:$jsMethod"
@@ -203,6 +210,8 @@ open class IamPortWebViewMode @JvmOverloads constructor(
 
             loadUrl(CONST.PAYMENT_FILE_URL) // load WebView
             webChromeClient = IamportWebChromeClient()
+        } ?: run {
+            e("웹뷰가 없엉..")
         }
     }
 

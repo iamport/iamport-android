@@ -105,6 +105,10 @@ object Util {
                 PayMethod.smartculture,
                 PayMethod.booknlife
             )
+            tosspay -> setOf(
+                PayMethod.card,
+                PayMethod.trans
+            )
             danal -> setOf(PayMethod.phone)
             mobilians -> setOf(PayMethod.card, PayMethod.phone)
             settle -> setOf(PayMethod.vbank)
