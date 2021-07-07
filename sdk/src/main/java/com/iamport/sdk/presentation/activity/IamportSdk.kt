@@ -101,7 +101,7 @@ internal class IamportSdk(
         iamPortMobileWebMode = IamPortMobileWebMode(bankPayLauncher)
 
         clearData()
-        observeClose()
+        observeInit()
     }
 
     // webview 사용 모드
@@ -145,7 +145,7 @@ internal class IamportSdk(
         }
     }
 
-    private fun initClear(){
+    private fun initClear() {
         clearData()
         hostHelper.lifecycle.removeObserver(lifecycleObserver)
         runCatching {
@@ -160,8 +160,8 @@ internal class IamportSdk(
     }
 
     // 외부에서 종료
-    private fun observeClose() {
-        d("observeClose")
+    private fun observeInit() {
+        d("observeInit")
         close.removeObservers(hostHelper.lifecycleOwner)
         close.observeAlways(hostHelper.lifecycleOwner, EventObserver {
             d("do Close! $iamPortWebViewMode")
@@ -349,6 +349,13 @@ internal class IamportSdk(
         // 네트워크 연결 상태 체크
         if (!Util.isInternetAvailable(hostHelper.context)) {
             sdkFinish(IamPortResponse.makeFail(payment, msg = "네트워크 연결 안됨"))
+            return
+        }
+
+        // webview mode 라면 네이티브 연동 사용하지 않음
+        // 동작의 문제는 없으나 UI 에서 표현하기 애매함
+        if (modeWebView != null) {
+            viewModel.judgePayment(payment, ignoreNative = true)
             return
         }
 

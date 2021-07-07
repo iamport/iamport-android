@@ -103,9 +103,9 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
     /**
      * 결제 요청
      */
-    fun judgePayment(payment: Payment) {
+    fun judgePayment(payment: Payment, ignoreNative: Boolean = false) {
         viewModelScope.launch(job) {
-            repository.judgeStrategy.judge(payment).run {
+            repository.judgeStrategy.judge(payment, ignoreNative = ignoreNative).run {
 
                 Payment.validator(third).run {
                     if (!first) {
