@@ -130,7 +130,7 @@ class JudgeStrategy : BaseStrategy(), IamportKoinComponent {
         return when (user.pg_provider?.let { PG.convertPG(it) }) {
             PG.chai -> {
                 if (ignoreNative) { // ignoreNative 인 경우 webview strategy 가 동작하기 위하여
-                    Triple(JudgeKinds.WEB, user, payment)
+                   return Triple(JudgeKinds.WEB, user, payment)
                 }
                 Triple(JudgeKinds.CHAI, user, payment)
             }

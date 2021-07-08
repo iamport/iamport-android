@@ -31,7 +31,8 @@ import java.util.*
 class WebViewModeFragment : Fragment() {
 
     private var binding: WebViewModeFragmentBinding? = null
-    val viewModel: ViewModel by activityViewModels()
+    private val viewModel: ViewModel by activityViewModels()
+    private var request: IamPortRequest? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,6 +41,7 @@ class WebViewModeFragment : Fragment() {
         Iamport.init(this)
         binding = WebViewModeFragmentBinding.inflate(inflater, container, false)
 //        binding?.webview?.loadUrl("https://github.com/iamport/iamport-android")
+        request = viewModel.createIamPortRequest()
         return binding?.root
     }
 
@@ -47,22 +49,24 @@ class WebViewModeFragment : Fragment() {
         super.onStart()
 
         // 웹뷰 모드 enable
-        Log.d("WebViewMode", "결제 요청!")
-
         val userCode = viewModel.userCode
-        val request = viewModel.createIamPortRequest()
+        request?.let { request ->
 
-        binding?.webview?.let {
+            Log.d("WebViewMode", "결제 요청!")
+            binding?.webview?.let {
 
-            this.activity?.onBackPressedDispatcher?.addCallback(this, backPressCallback)
+                this.activity?.onBackPressedDispatcher?.addCallback(this, backPressCallback)
 
-            Log.d("WebViewMode", "iamport sdk webview mode? ${Iamport.isWebViewMode()}")
-            // 아임포트에 결제 요청하기
-            Iamport.payment(userCode, webviewMode = it, iamPortRequest = request, paymentResultCallback = { it ->
-                // 결제 완료 후 결과 콜백을 토스트 메시지로 보여줌
+                Log.d("WebViewMode", "iamport sdk webview mode? ${Iamport.isWebViewMode()}")
+                // 아임포트에 결제 요청하기
+                Iamport.payment(userCode, webviewMode = it, iamPortRequest = request, paymentResultCallback = { it ->
+                    // 결제 완료 후 결과 콜백을 토스트 메시지로 보여줌
 //                Toast.makeText(this.context, "결제결과 => $it", Toast.LENGTH_LONG).show()
-                callBackListener.result(it)
-            })
+                    callBackListener.result(it)
+                })
+
+                this.request = null // reload 방지
+            }
         }
 
         binding?.normalmodeButton?.setOnClickListener {

@@ -183,6 +183,7 @@ object Iamport {
 
     // webview 사용 모드
     fun enableWebViewMode(webview: WebView) {
+        d("enableWebViewMode $webview")
         iamportSdk?.enableWebViewMode(webview)
     }
 

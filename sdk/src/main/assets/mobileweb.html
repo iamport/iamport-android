@@ -84,7 +84,7 @@
 
                   IMP.request_pay(data, function(response) {
                     console.log(response);
-                    alert(`${response}`)
+                    alert(JSON.stringify(response))
                   });
             }
 
@@ -101,7 +101,7 @@
 
                 IMP.certification(data, function(response) {
                   console.log(response);
-                  alert(`${response}`)
+                  alert(JSON.stringify(response))
                 });
             }
 
