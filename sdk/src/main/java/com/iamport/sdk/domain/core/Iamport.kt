@@ -1,6 +1,7 @@
 package com.iamport.sdk.domain.core
 
 import android.app.Application
+import android.net.Uri
 import android.util.Log
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
@@ -273,6 +274,13 @@ object Iamport {
     val callback = fun(iamPortResponse: IamPortResponse?) {
 //        impCallbackImpl?.result(iamPortResponse)
         impCallbackFunction?.invoke(iamPortResponse)
+    }
+
+    /**
+     * MobileWebMode 일 때, 웹뷰의 url 이 변경되면 값이 전달됨
+     */
+    fun mobileWebModeShouldOverrideUrlLoading(): LiveData<Event<Uri>>? {
+        return iamportSdk?.mobileWebModeShouldOverrideUrlLoading()
     }
 
     /**

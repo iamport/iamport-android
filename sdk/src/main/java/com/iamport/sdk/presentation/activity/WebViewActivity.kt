@@ -3,10 +3,8 @@ package com.iamport.sdk.presentation.activity
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.view.View
 import android.widget.ProgressBar
-import androidx.annotation.RequiresApi
 import com.google.gson.GsonBuilder
 import com.iamport.sdk.R
 import com.iamport.sdk.data.sdk.IamPortResponse
@@ -269,7 +267,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
             setLayerType(View.LAYER_TYPE_HARDWARE, null)
             clearCache(true)
             addJavascriptInterface(
-                JsNativeInterface(payment, get(named("${CONST.KOIN_KEY}Gson")), get(), evaluateJS),
+                JsNativeInterface(payment, get(named("${CONST.KOIN_KEY}Gson")), evaluateJS),
                 CONST.PAYMENT_WEBVIEW_JS_INTERFACE_NAME
             )
             webViewClient = viewModel.getWebViewClient(payment)

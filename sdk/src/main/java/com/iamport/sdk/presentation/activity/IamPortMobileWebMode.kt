@@ -1,12 +1,18 @@
 package com.iamport.sdk.presentation.activity
 
+import android.net.Uri
+import android.os.Build
 import android.view.View
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
+import androidx.lifecycle.LiveData
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.domain.IamportWebChromeClient
+import com.iamport.sdk.domain.strategy.webview.IamPortMobileModeWebViewClient
+import com.iamport.sdk.domain.strategy.webview.NiceTransWebViewStrategy
+import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.EventObserver
 import com.orhanobut.logger.Logger
 import org.koin.core.component.KoinApiExtension
@@ -21,6 +27,11 @@ open class IamPortMobileWebMode(bankPayLauncher: ActivityResultLauncher<String>?
         this.webview = webview
 
         observeViewModel(null) // 관찰할 LiveData
+    }
+
+    override fun processBankPayPayment(resPair: Pair<String, String>) {
+        Logger.d("processBankPayPayment")
+        viewModel.mobileModeProcessBankPayPayment(resPair)
     }
 
 
@@ -39,6 +50,10 @@ open class IamPortMobileWebMode(bankPayLauncher: ActivityResultLauncher<String>?
     }
 
 
+    fun detectShouldOverrideUrlLoading(): LiveData<Event<Uri>> {
+        return viewModel.changeUrl()
+    }
+
     override fun sdkFinish(iamPortResponse: IamPortResponse?) {
         // ignore
         Logger.d("sdkFinish MobileWebMode => $iamPortResponse")
@@ -50,12 +65,20 @@ open class IamPortMobileWebMode(bankPayLauncher: ActivityResultLauncher<String>?
             settingsWebView(this)
             setLayerType(View.LAYER_TYPE_HARDWARE, null)
             clearCache(true) // FIXME: 안지워도 될까? 고민..
-
-            webViewClient = viewModel.getNiceTransWebViewClient()
             visibility = View.VISIBLE
-
             webChromeClient = IamportWebChromeClient()
+
+            webViewClient = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                webViewClient.let {
+                    if (it is IamPortMobileModeWebViewClient) {
+                        viewModel.updateMobileWebModeClient(client = it)
+                        return@let it
+                    }
+                    viewModel.getMobileWebModeClient()
+                }
+            } else {
+                viewModel.getMobileWebModeClient()
+            }
         }
     }
-
 }

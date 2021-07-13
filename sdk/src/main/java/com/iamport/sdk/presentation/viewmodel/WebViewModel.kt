@@ -8,6 +8,7 @@ import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.repository.StrategyRepository
+import com.iamport.sdk.domain.strategy.webview.IamPortMobileModeWebViewClient
 import com.iamport.sdk.domain.strategy.webview.NiceTransWebViewStrategy
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.WebViewLiveDataEventBus
@@ -16,10 +17,13 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinApiExtension
 
 @KoinApiExtension
-class WebViewModel(private val bus: WebViewLiveDataEventBus, private val repository: StrategyRepository) : BaseViewModel(), IamportKoinComponent {
+class WebViewModel(private val repository: StrategyRepository) : BaseViewModel(), IamportKoinComponent {
+
+    private val bus: WebViewLiveDataEventBus = WebViewLiveDataEventBus
 
     override fun onCleared() {
         d("onCleared")
+        repository.init()
         super.onCleared()
     }
 
@@ -59,6 +63,14 @@ class WebViewModel(private val bus: WebViewLiveDataEventBus, private val reposit
     }
 
     /**
+     * 모바일 웹 모드 url 변경
+     */
+    fun changeUrl(): LiveData<Event<Uri>> {
+        return bus.changeUrl
+    }
+
+
+    /**
      * 로딩 프로그래스
      */
     fun loading(): LiveData<Event<Boolean>> {
@@ -87,8 +99,25 @@ class WebViewModel(private val bus: WebViewLiveDataEventBus, private val reposit
         repository.getNiceTransWebViewClient().processBankPayPayment(resPair)
     }
 
-    fun getNiceTransWebViewClient(): NiceTransWebViewStrategy {
-        return repository.getNiceTransWebViewClient()
+    /**
+     * MobileWebMode 뱅크페이 결과 처리
+     */
+    fun mobileModeProcessBankPayPayment(resPair: Pair<String, String>) {
+        repository.getMobileWebModeClient().processBankPayPayment(resPair)
+    }
+
+    /**
+     * MobileWebMode WebViewClient
+     */
+    fun getMobileWebModeClient(): IamPortMobileModeWebViewClient {
+        return repository.getMobileWebModeClient()
+    }
+
+    /**
+     * MobileWebMode WebViewClient
+     */
+    fun updateMobileWebModeClient(client: IamPortMobileModeWebViewClient) {
+        return repository.updateMobileWebModeClient(client)
     }
 
     /**

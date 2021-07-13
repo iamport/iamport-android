@@ -133,7 +133,7 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
         playChai = false
         chaiClearVersion = false
         receiveChaiCallBack = false
-        repository.chaiStrategy.init()
+        repository.init()
         job.cancel()
     }
 

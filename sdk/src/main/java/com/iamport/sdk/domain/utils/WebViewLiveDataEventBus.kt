@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 
-open class WebViewLiveDataEventBus {
+object WebViewLiveDataEventBus {
 
     // 결제 시작
     val webViewPayment = MutableLiveData<Event<Payment>>()
@@ -25,4 +25,6 @@ open class WebViewLiveDataEventBus {
     // 결제 완료 콜백
     val impResponse = MutableLiveData<Event<IamPortResponse?>>()
 
+    // 모바일 웹 모드 전용
+    val changeUrl = MutableLiveData<Event<Uri>>()
 }

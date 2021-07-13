@@ -9,6 +9,7 @@ import com.iamport.sdk.domain.strategy.base.IStrategy
 import com.iamport.sdk.domain.strategy.base.JudgeStrategy
 import com.iamport.sdk.domain.strategy.chai.ChaiStrategy
 import com.iamport.sdk.domain.strategy.webview.CertificationWebViewStrategy
+import com.iamport.sdk.domain.strategy.webview.IamPortMobileModeWebViewClient
 import com.iamport.sdk.domain.strategy.webview.NiceTransWebViewStrategy
 import com.iamport.sdk.domain.strategy.webview.WebViewStrategy
 import com.orhanobut.logger.Logger
@@ -20,9 +21,12 @@ class StrategyRepository : IamportKoinComponent {
 
     val judgeStrategy: JudgeStrategy by inject() // 결제 중 BG 폴링하는 차이 전략
     val chaiStrategy: ChaiStrategy by inject() // 결제 중 BG 폴링하는 차이 전략
+    var mobileWebModeStrategy: IamPortMobileModeWebViewClient? = null
+
 
     private val webViewStrategy: WebViewStrategy by inject() // webview 사용하는 pg
-    private val niceTransWebViewStrategy: NiceTransWebViewStrategy by inject() //
+
+    private val niceTransWebViewStrategy: NiceTransWebViewStrategy by inject()
 
     private val certificationWebViewStrategy: CertificationWebViewStrategy by inject() //
 
@@ -31,6 +35,11 @@ class StrategyRepository : IamportKoinComponent {
      */
     enum class PaymentKinds {
         CHAI, NICE, WEB
+    }
+
+    fun init() {
+        chaiStrategy.init()
+        mobileWebModeStrategy = null
     }
 
     fun failSdkFinish(payment: Payment) {
@@ -67,6 +76,7 @@ class StrategyRepository : IamportKoinComponent {
         } ?: run { return PaymentKinds.WEB } // default WEB
     }
 
+    // for 결제요청
     fun getWebViewStrategy(payment: Payment): IStrategy {
         return when (getPaymentKinds(payment)) {
             PaymentKinds.NICE -> niceTransWebViewStrategy
@@ -74,6 +84,7 @@ class StrategyRepository : IamportKoinComponent {
         }
     }
 
+    // for webview mode inject
     fun getWebViewClient(payment: Payment): WebViewClient {
         return when (getPaymentKinds(payment)) {
             PaymentKinds.NICE -> niceTransWebViewStrategy
@@ -84,5 +95,17 @@ class StrategyRepository : IamportKoinComponent {
     fun getNiceTransWebViewClient(): NiceTransWebViewStrategy {
         return niceTransWebViewStrategy
     }
+
+    fun getMobileWebModeClient(): IamPortMobileModeWebViewClient {
+        return mobileWebModeStrategy ?: run {
+            mobileWebModeStrategy = IamPortMobileModeWebViewClient()
+            mobileWebModeStrategy as IamPortMobileModeWebViewClient
+        }
+    }
+
+    fun updateMobileWebModeClient(client: IamPortMobileModeWebViewClient) {
+        mobileWebModeStrategy = client
+    }
+
 
 }

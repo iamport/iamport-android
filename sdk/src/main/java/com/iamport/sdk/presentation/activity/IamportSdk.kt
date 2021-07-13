@@ -16,6 +16,7 @@ import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.data.sdk.ProvidePgPkg
+import com.iamport.sdk.domain.core.Iamport
 import com.iamport.sdk.domain.core.IamportReceiver
 import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.service.ChaiService
@@ -89,11 +90,15 @@ internal class IamportSdk(
 
         bankPayLauncher = if (hostHelper.mode == MODE.ACTIVITY) {
             activity?.registerForActivityResult(BankPayContract()) {
-                resultBankPayAppCallback(it)
+                if (it != null) {
+                    resultBankPayAppCallback(it)
+                }
             }
         } else {
             fragment?.registerForActivityResult(BankPayContract()) {
-                resultBankPayAppCallback(it)
+                if (it != null) {
+                    resultBankPayAppCallback(it)
+                }
             }
         }
 
@@ -274,6 +279,9 @@ internal class IamportSdk(
         preventOverlapRun.launch { requestCertification(payment) }
     }
 
+    fun mobileWebModeShouldOverrideUrlLoading(): LiveData<Event<Uri>> {
+        return iamPortMobileWebMode.detectShouldOverrideUrlLoading()
+    }
 
     fun isPolling(): LiveData<Event<Boolean>> {
         return isPolling
@@ -330,7 +338,10 @@ internal class IamportSdk(
      */
     private fun resultBankPayAppCallback(resPair: Pair<String, String>) {
         d("Result Callback BankPayLauncher")
-        iamPortWebViewMode.processBankPayPayment(resPair)
+        if (modeWebView != null) {
+            iamPortWebViewMode.processBankPayPayment(resPair)
+            return
+        }
         iamPortMobileWebMode.processBankPayPayment(resPair)
     }
 

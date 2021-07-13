@@ -104,7 +104,7 @@ class JudgeStrategy : BaseStrategy(), IamportKoinComponent {
                 it.pg_provider == myPg
             }
         }
-        Logger.e("user :: $user")
+        Logger.d("user :: $user")
 
         return when (user) {
             null -> defUser.pg_provider?.let {
