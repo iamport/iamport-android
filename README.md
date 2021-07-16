@@ -36,9 +36,9 @@
 
 > app build.gradle 
 > 
-[최신 버전 확인($SDK-VERSION)][5]
+[최신 버전 확인][5]
 ```gradle
-  implementation 'com.github.iamport:iamport-android:$SDK-VERSION'
+  implementation 'com.github.iamport:iamport-android:vX.Y.Z'
 ```
 > 
 [Set DataBinding][6]
@@ -196,13 +196,15 @@ ex) 결제 Activity(or Fragment) 를 통해 직접 결제페이지를 꾸미기 
 
 반영방법 : 기존 [필수구현 사항][7] 과 같이 iamport-sdk 세팅을 합니다.  
 Iamport.payment 호출 파라미터 중 webviewMode 에 webview 를 넣어주시면 됩니다.
-그 외는 기존의 동작과 같습니다.
+그 외는 기존의 동작과 같습니다.  
+
+[샘플앱의 예시 WebViewModeFragment.kt](./app/src/main/java/com/iamport/sampleapp/ui/WebViewModeFragment.kt)  
 
 ```kotlin
 Iamport.payment(가맹점식별코드, webviewMode = webview, 기타 params, 콜백)
 ```    
 
-
+---
 
 ### 2. MobileWeb Mode
 
@@ -213,11 +215,45 @@ ex) 이미 웹사이트에서 아임포트 js sdk 를 이용하고 있고, 본�
 추가로 Iamport.pluginMobileWebSupporter(webview) 를 호출하여 파라미터로 webview 를 전달합니다.  
 실제 결제 진행은 고객님의 웹사이트 내에서 진행됩니다.  
 
+[샘플앱의 예시 mobileweb.html](./sdk/src/main/assets/mobileweb.html) (예시이며 실제로는 고객님의 Front-End 가 됩니다.)  
+[샘플앱의 예시 MobileWebViewModeFragment.kt](./app/src/main/java/com/iamport/sampleapp/ui/MobileWebViewModeFragment.kt)
+  
 ```kotlin
 Iamport.pluginMobileWebSupporter(webview)
 ```
 
+- Custom WebViewClient 의 사용  
 
+[샘플앱의 예시 MyWebViewClient.kt](./app/src/main/java/com/iamport/sampleapp/ui/MyWebViewClient.kt)
+  
+```kotlin
+/**
+ webview url 을 통해 처리하는 로직이 있을 경우에 
+ [IamPortMobileModeWebViewClient] 상속하여 사용 하시거나,
+ [Iamport.mobileWebModeShouldOverrideUrlLoading] 의 observe 을 통해 변경되는 url 을 체크 가능합니다.
+ */
+// CASE 1 : IamPortMobileModeWebViewClient 상속
+open class MyWebViewClient : IamPortMobileModeWebViewClient() {
+    override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+        Log.i("MyWebViewClient", "updated webview url ${view?.url}")
+        return super.shouldOverrideUrlLoading(view, request)
+    }
+}
+
+class MobileWebViewModeFragment : Fragment() {
+    override fun setupWebView() {
+        // IamPortMobileModeWebViewClient 사용
+        binding?.webview?.webViewClient = MyWebViewClient()
+
+        // CASE 2 : Iamport.mobileWebModeShouldOverrideUrlLoading 사용
+        // oreo 미만에서 url 변경만 보고 싶은경우 (oreo 이상부터 getWebViewClient 가 지원되므로)
+        Iamport.mobileWebModeShouldOverrideUrlLoading()?.observe(this, EventObserver { uri ->
+            Log.i("SAMPLE", "changed url :: $uri")
+        })
+    }
+}
+
+```
 
 </details>
 

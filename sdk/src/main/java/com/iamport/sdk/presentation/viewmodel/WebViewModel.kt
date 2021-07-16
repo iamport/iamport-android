@@ -9,7 +9,6 @@ import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.repository.StrategyRepository
 import com.iamport.sdk.domain.strategy.webview.IamPortMobileModeWebViewClient
-import com.iamport.sdk.domain.strategy.webview.NiceTransWebViewStrategy
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.WebViewLiveDataEventBus
 import com.orhanobut.logger.Logger.d
@@ -103,7 +102,7 @@ class WebViewModel(private val repository: StrategyRepository) : BaseViewModel()
      * MobileWebMode 뱅크페이 결과 처리
      */
     fun mobileModeProcessBankPayPayment(resPair: Pair<String, String>) {
-        repository.getMobileWebModeClient().processBankPayPayment(resPair)
+        getMobileWebModeClient().processBankPayPayment(resPair)
     }
 
     /**
