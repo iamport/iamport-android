@@ -29,7 +29,7 @@ open class IamPortWebViewMode @JvmOverloads constructor(
     scope: BaseCoroutineScope = UICoroutineScope()
 ) : IamportKoinComponent, BaseMain, BaseCoroutineScope by scope {
 
-    val viewModel: WebViewModel = WebViewModel(get(), get())
+    val viewModel: WebViewModel = WebViewModel(get())
 
     private var payment: Payment? = null
     var activity: ComponentActivity? = null
@@ -48,7 +48,7 @@ open class IamPortWebViewMode @JvmOverloads constructor(
         observeViewModel(payment) // 관찰할 LiveData
     }
 
-    fun processBankPayPayment(resPair: Pair<String, String>) {
+    open fun processBankPayPayment(resPair: Pair<String, String>) {
         viewModel.processBankPayPayment(resPair)
     }
 
@@ -202,7 +202,7 @@ open class IamPortWebViewMode @JvmOverloads constructor(
             setLayerType(View.LAYER_TYPE_HARDWARE, null)
             clearCache(true)
             addJavascriptInterface(
-                JsNativeInterface(payment, get(named("${CONST.KOIN_KEY}Gson")), get(), evaluateJS),
+                JsNativeInterface(payment, get(named("${CONST.KOIN_KEY}Gson")), evaluateJS),
                 CONST.PAYMENT_WEBVIEW_JS_INTERFACE_NAME
             )
             webViewClient = viewModel.getWebViewClient(payment)

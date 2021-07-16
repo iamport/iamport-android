@@ -8,10 +8,16 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import com.google.gson.GsonBuilder
+import com.iamport.sampleapp.PaymentResultData
+import com.iamport.sampleapp.ViewModel
 import com.iamport.sampleapp.databinding.WebViewModeFragmentBinding
 import com.iamport.sdk.data.sdk.IamPortRequest
+import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.data.sdk.PayMethod
+import com.iamport.sdk.domain.core.ICallbackPaymentResult
 import com.iamport.sdk.domain.core.Iamport
 import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.Util
@@ -25,6 +31,8 @@ import java.util.*
 class WebViewModeFragment : Fragment() {
 
     private var binding: WebViewModeFragmentBinding? = null
+    private val viewModel: ViewModel by activityViewModels()
+    private var request: IamPortRequest? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,7 +40,8 @@ class WebViewModeFragment : Fragment() {
     ): View? {
         Iamport.init(this)
         binding = WebViewModeFragmentBinding.inflate(inflater, container, false)
-        binding?.webview?.loadUrl("https://github.com/iamport/iamport-android")
+//        binding?.webview?.loadUrl("https://github.com/iamport/iamport-android")
+        request = viewModel.createIamPortRequest()
         return binding?.root
     }
 
@@ -40,43 +49,43 @@ class WebViewModeFragment : Fragment() {
         super.onStart()
 
         // 웹뷰 모드 enable
-        binding?.webviewButton?.setOnClickListener {
+        val userCode = viewModel.userCode
+        request?.let { request ->
+
             Log.d("WebViewMode", "결제 요청!")
-
-            val request = IamPortRequest(
-                pg = PG.kcp.makePgRawName(""),         // PG사
-                pay_method = PayMethod.card,                    // 결제수단
-                name = "웹뷰모드도 진짜 쉬워요!",                      // 주문명
-                merchant_uid = getSampleMerchantUid(),     // 주문번호
-                amount = "1000",                                // 결제금액
-                buyer_name = "김개발"
-            )
-
             binding?.webview?.let {
 
                 this.activity?.onBackPressedDispatcher?.addCallback(this, backPressCallback)
 
-                Iamport.enableWebViewMode(it)
                 Log.d("WebViewMode", "iamport sdk webview mode? ${Iamport.isWebViewMode()}")
                 // 아임포트에 결제 요청하기
-                Iamport.payment("iamport", iamPortRequest = request, paymentResultCallback = {
+                Iamport.payment(userCode, webviewMode = it, iamPortRequest = request, paymentResultCallback = { it ->
                     // 결제 완료 후 결과 콜백을 토스트 메시지로 보여줌
-                    Toast.makeText(this.context, "결제결과 => $it", Toast.LENGTH_LONG).show()
+//                Toast.makeText(this.context, "결제결과 => $it", Toast.LENGTH_LONG).show()
+                    callBackListener.result(it)
                 })
-            }
-        }
 
-        binding?.mobilewebButton?.setOnClickListener {
-            // 모바일 웹 단독 모드
-            binding?.webview?.let {
-                it.loadUrl(CONST.PAYMENT_MOBILE_WEB_FILE_URL)
-                Iamport.pluginMobileWebSupporter(it)
+                this.request = null // reload 방지
             }
         }
 
         binding?.normalmodeButton?.setOnClickListener {
             Iamport.close()
             popBackStack()
+        }
+    }
+
+
+    private val callBackListener = object : ICallbackPaymentResult {
+        override fun result(iamPortResponse: IamPortResponse?) {
+            val resJson = GsonBuilder().setPrettyPrinting().create().toJson(iamPortResponse)
+            Log.i("SAMPLE", "결제 결과 콜백\n$resJson")
+            PaymentResultData.result = iamPortResponse
+
+            popBackStack()
+            if (iamPortResponse != null) {
+                (activity as MainActivity).replaceFragment(PaymentResultFragment())
+            }
         }
     }
 
@@ -103,10 +112,6 @@ class WebViewModeFragment : Fragment() {
                 popBackStack()
             }
         }
-    }
-
-    private fun getSampleMerchantUid(): String {
-        return "wvmode_aos_${Date().time}"
     }
 
     override fun onDestroyView() {

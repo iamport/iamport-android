@@ -2,10 +2,6 @@ package com.iamport.sampleapp
 
 import android.app.Application
 import com.iamport.sdk.domain.core.Iamport
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.logger.AndroidLogger
-import org.koin.core.context.startKoin
-import org.koin.core.logger.Level
 
 
 class BaseApplication : Application() {

@@ -3,7 +3,9 @@
     <string name="buy">결제</string>
     <string name="webview_buy">현재 웹뷰에서 결제요청</string>
     <string name="mobileweb_buy">모바일 웹에서 직접 결제요청</string>
-    <string name="certification">본인인증</string>
-    <string name="webviewmode">웹뷰모드</string>
-    <string name="normalmode">일반결제모드</string>
+    <string name="certification">본인인증 하기</string>
+    <string name="webviewmode">웹뷰모드로 결제</string>
+    <string name="normalmode">돌아가기</string>
+    <string name="close">X</string>
+    <string name="mobile_webmode">모바일웹모드 결제</string>
 </resources>

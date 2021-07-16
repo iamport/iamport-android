@@ -1,6 +1,7 @@
 package com.iamport.sdk.domain.core
 
 import android.app.Application
+import android.net.Uri
 import android.util.Log
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
@@ -24,7 +25,6 @@ import com.iamport.sdk.domain.utils.PreventOverlapRun
 import com.iamport.sdk.presentation.activity.IamportSdk
 import com.iamport.sdk.presentation.contract.WebViewActivityContract
 import com.orhanobut.logger.AndroidLogAdapter
-import com.orhanobut.logger.BuildConfig
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Logger.*
 import com.orhanobut.logger.PrettyFormatStrategy
@@ -34,6 +34,7 @@ import org.koin.core.KoinApplication
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
+import org.koin.core.module.Module
 
 
 object Iamport {
@@ -91,13 +92,18 @@ object Iamport {
         createWithKoin(app)
     }
 
+
+    fun getKoinModules(): List<Module> {
+        return listOf(httpClientModule, apiModule, appModule)
+    }
+
     /**
      * Application instance 를 통해 SDK 생명주기 감지, DI 초기화
      */
     // TODO Application 사용하지 않는 방안 모색
     fun createWithKoin(app: Application, koinApp: KoinApplication? = null) {
 
-        val modules = listOf(httpClientModule, apiModule, appModule)
+        val modules = getKoinModules()
         IamportKoinContext.koinApp = if (koinApp == null) {
             stopKoin()
             startKoin {
@@ -106,7 +112,7 @@ object Iamport {
                 modules(modules)
             }
         } else {
-            koinApp.modules(modules)
+            koinApp.modules(modules) // or getKoinModules 를 직접 받아서 사용
         }
 
         Foreground.init(app)
@@ -178,6 +184,7 @@ object Iamport {
 
     // webview 사용 모드
     fun enableWebViewMode(webview: WebView) {
+        d("enableWebViewMode $webview")
         iamportSdk?.enableWebViewMode(webview)
     }
 
@@ -270,6 +277,13 @@ object Iamport {
     }
 
     /**
+     * MobileWebMode 일 때, 웹뷰의 url 이 변경되면 값이 전달됨
+     */
+    fun mobileWebModeShouldOverrideUrlLoading(): LiveData<Event<Uri>>? {
+        return iamportSdk?.mobileWebModeShouldOverrideUrlLoading()
+    }
+
+    /**
      * 결제 요청
      * @param ((IamPortApprove?) -> Unit)? : (옵셔널) 차이 최종 결제 요청전 콜백
      * @param ICallbackPaymentResult? : 결제결과 callback type#1 ICallbackPaymentResult 구현
@@ -322,14 +336,21 @@ object Iamport {
     fun payment(
         userCode: String,
         tierCode: String? = null,
+        webviewMode: WebView? = null,
         iamPortRequest: IamPortRequest,
         approveCallback: ((IamPortApprove) -> Unit)? = null,
         paymentResultCallback: (IamPortResponse?) -> Unit
     ) {
+
+        disableWebViewMode()
         Payment(userCode, tierCode = tierCode, iamPortRequest = iamPortRequest).let {
             if (!checkInit(it)) {
                 return@let
             }
+        }
+
+        if (webviewMode != null) {
+            enableWebViewMode(webviewMode)
         }
 
         preventOverlapRun?.launch {

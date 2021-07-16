@@ -12,7 +12,7 @@ import com.orhanobut.logger.Logger
 /**
  * 뱅크페이 앱 요청 및 응답 데이터 규약
  */
-class BankPayContract : ActivityResultContract<String, Pair<String, String>>() {
+class BankPayContract : ActivityResultContract<String, Pair<String, String>?>() {
 
     override fun createIntent(context: Context, input: String?): Intent {
         if (input == null) {

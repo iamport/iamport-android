@@ -11,10 +11,8 @@ import com.iamport.sdk.domain.strategy.base.BaseWebViewStrategy
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.Util
 import com.orhanobut.logger.Logger.d
-import org.koin.core.component.KoinApiExtension
 
 
-@KoinApiExtension
 open class WebViewStrategy : BaseWebViewStrategy() {
 
     override suspend fun doWork(payment: Payment) {
