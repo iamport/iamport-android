@@ -1,7 +1,7 @@
 // 디펜던시 업데이트 확인 ./gradlew dependencyUpdates -Drevision=release
 object Versions {
-    const val versionCode = 210713001 // yymmdd000
-    const val versionName = "1.0.0-dev07"  // prod(x.y.z), dev(x.y.z-dev00)
+    const val versionCode = 210720001 // yymmdd000
+    const val versionName = "1.0.0-dev08"  // prod(x.y.z), dev(x.y.z-dev00)
 
     const val gradle_versions_plugin = "0.38.0"
     const val gradle_version = "4.1.1"
