@@ -484,7 +484,15 @@ internal class IamportSdk(
     }
 
     private fun checkChaiVersionCode(chaiPackageName: String): Boolean {
-        d("chai app version : ${Util.versionCode(hostHelper.context, chaiPackageName).toLong()}")
-        return Util.versionCode(hostHelper.context, chaiPackageName).toLong() > CHAI.SINGLE_ACTIVITY_VERSION
+        var versionCode = CHAI.SINGLE_ACTIVITY_VERSION
+        
+        runCatching {
+            versionCode = Util.versionCode(hostHelper.context, chaiPackageName).toLong()
+            d("chai app version : $versionCode")
+        }.onFailure {
+            i("Fail to get chai app version [${it.message}]")
+        }
+
+        return versionCode > CHAI.SINGLE_ACTIVITY_VERSION
     }
 }
