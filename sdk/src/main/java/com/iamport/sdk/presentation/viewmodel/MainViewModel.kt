@@ -20,6 +20,8 @@ import org.koin.core.component.KoinApiExtension
 @KoinApiExtension
 class MainViewModel(private val bus: NativeLiveDataEventBus, private val repository: StrategyRepository) : BaseViewModel(), IamportKoinComponent {
 
+    var payment: Payment? = null
+
     private var job = Job()
         get() {
             if (field.isCancelled) field = Job()
@@ -57,8 +59,12 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
         super.onCleared()
     }
 
-    fun failSdkFinish(payment: Payment) {
-        repository.failSdkFinish(payment)
+    fun failSdkFinish() {
+        payment?.let {
+            repository.failSdkFinish(it)
+        } ?: run {
+            Logger.w("Payment 데이터가 없어서 실패처리하지 않음 [$payment]")
+        }
     }
 
     /**

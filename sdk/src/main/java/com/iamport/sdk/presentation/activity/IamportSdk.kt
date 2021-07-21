@@ -16,7 +16,6 @@ import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.data.sdk.ProvidePgPkg
-import com.iamport.sdk.domain.core.Iamport
 import com.iamport.sdk.domain.core.IamportReceiver
 import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.service.ChaiService
@@ -25,6 +24,7 @@ import com.iamport.sdk.domain.utils.Util.observeAlways
 import com.iamport.sdk.presentation.contract.BankPayContract
 import com.iamport.sdk.presentation.contract.ChaiContract
 import com.iamport.sdk.presentation.viewmodel.MainViewModel
+import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Logger.*
 import org.koin.androidx.viewmodel.compat.ViewModelCompat.viewModel
 import org.koin.core.component.KoinApiExtension
@@ -230,11 +230,14 @@ internal class IamportSdk(
      * 관찰할 LiveData 옵저빙
      */
     private fun observeViewModel(payment: Payment) {
+
+        viewModel.payment = payment
+
         d(GsonBuilder().setPrettyPrinting().create().toJson(payment))
         hostHelper.lifecycleOwner.let { owner: LifecycleOwner ->
 
             // 외부에서 sdk 실패종료
-            finish.observeAlways(owner, EventObserver { viewModel.failSdkFinish(payment) })
+            finish.observeAlways(owner, EventObserver { viewModel.failSdkFinish() })
 
             // 결제결과 옵저빙
             viewModel.impResponse().observe(owner, EventObserver(this::sdkFinish))
@@ -266,7 +269,7 @@ internal class IamportSdk(
         hostHelper.lifecycleOwner.let { owner: LifecycleOwner ->
 
             // 외부에서 sdk 실패종료
-            finish.observeAlways(owner, EventObserver { viewModel.failSdkFinish(payment) })
+            finish.observeAlways(owner, EventObserver { viewModel.failSdkFinish() })
 
             // 결제결과 옵저빙
             viewModel.impResponse().observe(owner, EventObserver(this::sdkFinish))

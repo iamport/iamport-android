@@ -1,6 +1,7 @@
 package com.iamport.sdk.domain.repository
 
 import android.webkit.WebViewClient
+import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.data.sdk.PayMethod
 import com.iamport.sdk.data.sdk.Payment
@@ -44,8 +45,11 @@ class StrategyRepository : IamportKoinComponent {
 
     fun failSdkFinish(payment: Payment) {
         when (getPaymentKinds(payment)) {
-            PaymentKinds.CHAI -> chaiStrategy.failFinish("사용자가 결제확인 서비스 종료하셨습니다")
-            else -> Logger.d("사용자가 결제확인 서비스 종료하셨습니다")
+            PaymentKinds.CHAI -> chaiStrategy.failFinish("사용자가 결제확인 서비스를 종료하셨습니다")
+            else -> {
+                // 사실상 호출될 일이 없겠지만 추가
+                webViewStrategy.failureFinish(payment, null, "사용자가 결제확인 서비스를 종료하셨습니다 payment [$payment]")
+            }
         }
     }
 
