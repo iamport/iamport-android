@@ -1,9 +1,12 @@
 package com.iamport.sampleapp
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.iamport.sdk.data.sdk.IamPortRequest
+import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.data.sdk.PayMethod
+import com.iamport.sdk.domain.utils.Event
 import java.util.*
 
 class ViewModel : ViewModel() {
@@ -14,6 +17,8 @@ class ViewModel : ViewModel() {
     var paymentName: String = ""
     var merchantUid: String = ""
     var amount: String = ""
+
+    val resultCallback = MutableLiveData<Event<IamPortResponse>>()
 
     /**
      * SDK 에 결제 요청할 데이터 구성

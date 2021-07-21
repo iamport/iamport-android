@@ -53,6 +53,8 @@ object Iamport {
     private var fragment: Fragment? = null
     private var preventOverlapRun: PreventOverlapRun? = null
 
+    private val webViewActivityContract = WebViewActivityContract()
+
     private var isCreated = false
 
     private fun clear() {
@@ -167,7 +169,7 @@ object Iamport {
         clear()
         createInitialData()
 
-        webViewLauncher = componentActivity.registerForActivityResult(WebViewActivityContract()) {
+        webViewLauncher = componentActivity.registerForActivityResult(webViewActivityContract) {
             callback(it)
         }
 
@@ -221,7 +223,7 @@ object Iamport {
         clear()
         createInitialData()
 
-        webViewLauncher = fragment.registerForActivityResult(WebViewActivityContract()) {
+        webViewLauncher = fragment.registerForActivityResult(webViewActivityContract) {
             callback(it)
         }
 
@@ -272,7 +274,6 @@ object Iamport {
     }
 
     val callback = fun(iamPortResponse: IamPortResponse?) {
-//        impCallbackImpl?.result(iamPortResponse)
         impCallbackFunction?.invoke(iamPortResponse)
     }
 

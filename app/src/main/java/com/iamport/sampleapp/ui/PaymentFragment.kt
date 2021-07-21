@@ -26,6 +26,7 @@ import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.domain.core.ICallbackPaymentResult
 import com.iamport.sdk.domain.core.Iamport
 import com.iamport.sdk.domain.utils.CONST
+import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.EventObserver
 import com.iamport.sdk.domain.utils.Util
 import kotlinx.coroutines.GlobalScope
@@ -40,12 +41,13 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
     val viewModel: ViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        Iamport.init(this) // fragment
+//        Iamport.init(this) // fragment
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        Log.i("SAMPLE", "onAttach")
         registForegroundServiceReceiver(context)
         requireActivity().onBackPressedDispatcher.addCallback(this, backPressCallback)
     }
@@ -221,7 +223,8 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
             Log.i("SAMPLE", "결제 결과 콜백\n$resJson")
             result = iamPortResponse
             if (iamPortResponse != null) {
-                (activity as MainActivity).replaceFragment(PaymentResultFragment())
+//                (activity as MainActivity).replaceFragment(PaymentResultFragment())
+                viewModel.resultCallback.postValue(Event(iamPortResponse))
             }
         }
     }

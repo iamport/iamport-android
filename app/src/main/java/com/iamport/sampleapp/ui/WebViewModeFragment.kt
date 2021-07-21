@@ -20,6 +20,7 @@ import com.iamport.sdk.data.sdk.PayMethod
 import com.iamport.sdk.domain.core.ICallbackPaymentResult
 import com.iamport.sdk.domain.core.Iamport
 import com.iamport.sdk.domain.utils.CONST
+import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.Util
 import java.util.*
 
@@ -38,7 +39,7 @@ class WebViewModeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        Iamport.init(this)
+//        Iamport.init(this)
         binding = WebViewModeFragmentBinding.inflate(inflater, container, false)
 //        binding?.webview?.loadUrl("https://github.com/iamport/iamport-android")
         request = viewModel.createIamPortRequest()
@@ -84,7 +85,8 @@ class WebViewModeFragment : Fragment() {
 
             popBackStack()
             if (iamPortResponse != null) {
-                (activity as MainActivity).replaceFragment(PaymentResultFragment())
+//                (activity as MainActivity).replaceFragment(PaymentResultFragment())
+                viewModel.resultCallback.postValue(Event(iamPortResponse))
             }
         }
     }

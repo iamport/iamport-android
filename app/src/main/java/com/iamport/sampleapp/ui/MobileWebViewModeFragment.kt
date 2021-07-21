@@ -27,7 +27,7 @@ class MobileWebViewModeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        Iamport.init(this)
+//        Iamport.init(this)
         binding = WebViewModeFragmentBinding.inflate(inflater, container, false)
         createdView = true
         return binding?.root

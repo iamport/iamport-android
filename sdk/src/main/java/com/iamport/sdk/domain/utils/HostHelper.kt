@@ -35,7 +35,7 @@ class HostHelper(var activity: ComponentActivity? = null, fragment: Fragment? = 
             }
             fragment != null -> {
                 viewModelStoreOwner = fragment
-                lifecycleOwner = fragment
+                lifecycleOwner = fragment.viewLifecycleOwner
                 lifecycle = fragment.lifecycle
                 activity = fragment.activity
                 context = fragment.context

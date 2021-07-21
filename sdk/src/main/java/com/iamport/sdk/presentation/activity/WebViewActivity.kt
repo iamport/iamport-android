@@ -180,6 +180,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
         close()
         loadingVisible(false)
         setResult(Activity.RESULT_OK, Intent().apply { putExtra(CONST.CONTRACT_OUTPUT, iamPortResponse) })
+//        Iamport.callback(iamPortResponse)
 
         this.finish()
     }

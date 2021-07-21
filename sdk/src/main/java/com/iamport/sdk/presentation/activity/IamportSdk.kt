@@ -23,6 +23,7 @@ import com.iamport.sdk.domain.utils.*
 import com.iamport.sdk.domain.utils.Util.observeAlways
 import com.iamport.sdk.presentation.contract.BankPayContract
 import com.iamport.sdk.presentation.contract.ChaiContract
+import com.iamport.sdk.presentation.contract.WebViewActivityContract
 import com.iamport.sdk.presentation.viewmodel.MainViewModel
 import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Logger.*
@@ -63,6 +64,9 @@ internal class IamportSdk(
     // 포그라운드 서비스 관련 BroadcastReceiver
     private val iamportReceiver: IamportReceiver by inject()
 
+    private val chaiContract = ChaiContract()
+    private val bankPayContract = BankPayContract()
+
     // 스크린 on/off 감지 BroadcastReceiver
     private val screenBrReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -83,19 +87,19 @@ internal class IamportSdk(
 //        viewModel = ViewModelProvider(hostHelper.viewModelStoreOwner, MainViewModelFactory(get(), get())).get(MainViewModel::class.java)
 
         launcherChai = if (hostHelper.mode == MODE.ACTIVITY) {
-            activity?.registerForActivityResult(ChaiContract()) { resultCallback() }
+            activity?.registerForActivityResult(chaiContract) { resultCallback() }
         } else {
-            fragment?.registerForActivityResult(ChaiContract()) { resultCallback() }
+            fragment?.registerForActivityResult(chaiContract) { resultCallback() }
         }
 
         bankPayLauncher = if (hostHelper.mode == MODE.ACTIVITY) {
-            activity?.registerForActivityResult(BankPayContract()) {
+            activity?.registerForActivityResult(bankPayContract) {
                 if (it != null) {
                     resultBankPayAppCallback(it)
                 }
             }
         } else {
-            fragment?.registerForActivityResult(BankPayContract()) {
+            fragment?.registerForActivityResult(bankPayContract) {
                 if (it != null) {
                     resultBankPayAppCallback(it)
                 }

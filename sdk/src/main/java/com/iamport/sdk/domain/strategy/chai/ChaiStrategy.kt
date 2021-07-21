@@ -13,11 +13,13 @@ import com.iamport.sdk.data.remote.ResultWrapper.*
 import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.domain.core.Iamport
 import com.iamport.sdk.domain.di.provideChaiApi
 import com.iamport.sdk.domain.strategy.base.BaseStrategy
 import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.Foreground
+import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Logger.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -61,7 +63,8 @@ open class ChaiStrategy : BaseStrategy() {
      */
     override fun sdkFinish(response: IamPortResponse?) {
         init()
-        super.sdkFinish(response)
+//        super.sdkFinish(response)
+        Iamport.callback(response)
     }
 
     /**
