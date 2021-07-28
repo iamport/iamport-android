@@ -20,7 +20,7 @@ import org.koin.dsl.module
 
 @OptIn(KoinApiExtension::class)
 val appModule = module {
-    viewModel { MainViewModel(get(), get()) }
+    viewModel { MainViewModel(get(), get(), get()) }
     viewModel { WebViewModel(get()) }
     single { IamportReceiver() }
     single(named("${CONST.KOIN_KEY}Gson")) { Gson() }

@@ -16,11 +16,8 @@ import com.orhanobut.logger.Logger.d
 
 open class BaseWebViewStrategy : WebViewClient(), IStrategy {
 
-//    protected val gson: Gson by inject(named("${CONST.KOIN_KEY}Gson"))
-//    protected val bus: WebViewLiveDataEventBus by inject()
-
-    protected val gson: Gson = Gson()
-    protected val bus: WebViewLiveDataEventBus = WebViewLiveDataEventBus
+    protected val gson: Gson by lazy { Gson() }
+    protected val bus: WebViewLiveDataEventBus by lazy { WebViewLiveDataEventBus }
 
     lateinit var payment: Payment
 

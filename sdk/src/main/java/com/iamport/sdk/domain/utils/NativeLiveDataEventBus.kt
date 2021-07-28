@@ -18,7 +18,7 @@ open class NativeLiveDataEventBus {
     val chaiUri = MutableLiveData<Event<String>>()
 
     // 웹뷰 결제 시작
-    val webViewPayment = MutableLiveData<Event<Payment>>()
+    val webViewActivityPayment = MutableLiveData<Event<Payment>>()
 
     // 차이 결제상태 Approve
     val chaiApprove = MutableLiveData<Event<IamPortApprove>>()

@@ -3,6 +3,7 @@ package com.iamport.sdk.presentation.viewmodel
 import android.net.Uri
 import android.webkit.WebViewClient
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
@@ -12,25 +13,19 @@ import com.iamport.sdk.domain.strategy.webview.IamPortMobileModeWebViewClient
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.WebViewLiveDataEventBus
 import com.orhanobut.logger.Logger.d
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinApiExtension
 
 @KoinApiExtension
 class WebViewModel(private val repository: StrategyRepository) : BaseViewModel(), IamportKoinComponent {
 
-    private val bus: WebViewLiveDataEventBus = WebViewLiveDataEventBus
+    private val bus: WebViewLiveDataEventBus by lazy { WebViewLiveDataEventBus }
 
     override fun onCleared() {
         d("onCleared")
         repository.init()
         super.onCleared()
-    }
-
-    /**
-     * 결제 데이터
-     */
-    fun payment(): LiveData<Event<Payment>> {
-        return bus.webViewPayment
     }
 
     /**
@@ -82,13 +77,6 @@ class WebViewModel(private val repository: StrategyRepository) : BaseViewModel()
      */
     fun getWebViewClient(payment: Payment): WebViewClient {
         return repository.getWebViewClient(payment)
-    }
-
-    /**
-     * activity 에서 결제 요청
-     */
-    fun startPayment(payment: Payment) {
-        bus.webViewPayment.postValue(Event(payment))
     }
 
     /**

@@ -18,8 +18,7 @@ import com.iamport.sdk.domain.di.provideChaiApi
 import com.iamport.sdk.domain.strategy.base.BaseStrategy
 import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.Event
-import com.iamport.sdk.domain.utils.Foreground
-import com.orhanobut.logger.Logger
+import com.iamport.sdk.domain.utils.ScreenChecker
 import com.orhanobut.logger.Logger.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -107,12 +106,12 @@ open class ChaiStrategy : BaseStrategy() {
 
     // 백그라운드 또는 스크린 오프
     private fun isBgOrScreenOff(): Boolean {
-        return Foreground.isBackground || !Foreground.isScreenOn
+        return ScreenChecker.isBackground || !ScreenChecker.isScreenOn
     }
 
     // 백그라운드이면서 스크린 온
     private fun isBgAndScreenOn(): Boolean {
-        return Foreground.isBackground && Foreground.isScreenOn
+        return ScreenChecker.isBackground && ScreenChecker.isScreenOn
     }
 
     suspend fun doWork(chaiId: String, payment: Payment) {

@@ -99,16 +99,16 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
         d(GsonBuilder().setPrettyPrinting().create().toJson(payment))
         payment?.let { pay: Payment ->
 
-            viewModel.payment().observe(this, EventObserver(this::requestPayment))
             viewModel.loading().observe(this, EventObserver(this::loadingVisible))
 
             viewModel.openWebView().observe(this, EventObserver(this::openWebView))
+
             viewModel.niceTransRequestParam().observe(this, EventObserver(this::openNiceTransApp))
             viewModel.thirdPartyUri().observe(this, EventObserver(this::openThirdPartyApp))
 
             viewModel.impResponse().observe(this, EventObserver(this::sdkFinish))
 
-            viewModel.startPayment(pay)
+            viewModel.requestPayment(pay)
         }
     }
 
@@ -131,20 +131,19 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
         viewModel.requestPayment(it)
     }
 
-    override fun onBackPressed() {
-        viewDataBinding.webview.run {
-            if (canGoBack()) {
-                goBack()
-            } else {
-                super.onBackPressed()
-            }
-        }
-    }
+//    override fun onBackPressed() {
+//        viewDataBinding.webview.run {
+//            if (canGoBack()) {
+//                goBack()
+//            } else {
+//                super.onBackPressed()
+//            }
+//        }
+//    }
 
     private fun removeObservers() {
         runCatching {
             d("WebViewActivity removeObservers")
-            viewModel.payment().removeObservers(this)
             viewModel.loading().removeObservers(this)
             viewModel.openWebView().removeObservers(this)
             viewModel.niceTransRequestParam().removeObservers(this)

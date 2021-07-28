@@ -1,5 +1,8 @@
 package com.iamport.sdk.presentation.viewmodel
 
+import android.app.Application
+import android.content.Context
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.iamport.sdk.data.sdk.IamPortApprove
@@ -18,7 +21,11 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinApiExtension
 
 @KoinApiExtension
-class MainViewModel(private val bus: NativeLiveDataEventBus, private val repository: StrategyRepository) : BaseViewModel(), IamportKoinComponent {
+class MainViewModel(private val bus: NativeLiveDataEventBus, private val repository: StrategyRepository, application: Application) :
+    AndroidViewModel(application), IamportKoinComponent {
+
+    // AndroidViewModel 이기에 사용가능
+    val app = getApplication<Application>()
 
     var payment: Payment? = null
 
@@ -70,8 +77,8 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
     /**
      * 결제 데이터
      */
-    fun webViewPayment(): LiveData<Event<Payment>> {
-        return bus.webViewPayment
+    fun webViewActivityPayment(): LiveData<Event<Payment>> {
+        return bus.webViewActivityPayment
     }
 
     /**
@@ -124,7 +131,7 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
                 when (first) {
                     JudgeStrategy.JudgeKinds.CHAI -> second?.let { repository.chaiStrategy.doWork(it.pg_id, third) }
                     JudgeStrategy.JudgeKinds.WEB,
-                    JudgeStrategy.JudgeKinds.CERT -> bus.webViewPayment.postValue(Event(third))
+                    JudgeStrategy.JudgeKinds.CERT -> bus.webViewActivityPayment.postValue(Event(third))
                     else -> Logger.e("판단불가 $third")
                 }
             }

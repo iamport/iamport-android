@@ -102,17 +102,19 @@ class WebViewModeFragment : Fragment() {
     // TODO : 이부분은 알맞게 직접 구현해주셔야 합니다.
     private val backPressCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            binding?.webview?.run {
-                if (canGoBack()) { // webview 백버튼 처리 로직
-                    goBack()
-                } else {
-                    remove()
-                    popBackStack()
-                }
-            } ?: run {
-                remove()
-                popBackStack()
-            }
+            remove()
+            popBackStack()
+//            binding?.webview?.run {
+//                if (canGoBack()) { // webview 백버튼 처리 로직
+//                    goBack()
+//                } else {
+//                    remove()
+//                    popBackStack()
+//                }
+//            } ?: run {
+//                remove()
+//                popBackStack()
+//            }
         }
     }
 
