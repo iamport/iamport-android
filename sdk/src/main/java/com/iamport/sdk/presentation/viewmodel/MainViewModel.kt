@@ -1,16 +1,22 @@
 package com.iamport.sdk.presentation.viewmodel
 
 import android.app.Application
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.domain.core.IamportReceiver
 import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.repository.StrategyRepository
+import com.iamport.sdk.domain.service.ChaiService
 import com.iamport.sdk.domain.strategy.base.JudgeStrategy
+import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.NativeLiveDataEventBus
 import com.orhanobut.logger.Logger
@@ -28,6 +34,10 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
     val app = getApplication<Application>()
 
     var payment: Payment? = null
+
+    private val screenBrFilter = IntentFilter(Intent.ACTION_SCREEN_OFF).apply {
+        addAction(Intent.ACTION_SCREEN_ON)
+    }
 
     private var job = Job()
         get() {
@@ -143,10 +153,16 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
      * 차이 데이터 클리어
      */
     fun clearData() {
+
+        // 차이 관련 초기화
         playChai = false
         chaiClearVersion = false
         receiveChaiCallBack = false
+
+        // repository 초기화
         repository.init()
+
+        // 코루틴 job cancel
         job.cancel()
     }
 
@@ -166,7 +182,7 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
      */
     fun pollingChaiStatus() {
         if (!playChai) {
-            d("ignore pollingChaiStatus cause playChai")
+            d("ignore pollingChaiStatus cause playChai is false")
             return
         }
 
@@ -182,7 +198,7 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
      */
     fun checkChaiStatus() {
         if (!playChai) {
-            d("ignore checkChaiStatus cause playChai")
+            d("ignore checkChaiStatus cause playChai is false")
             return
         }
 
@@ -204,5 +220,47 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
     fun checkChaiStatusForResultCallback() {
         checkChaiStatus()
         receiveChaiCallBack = true
+    }
+
+
+    fun registerIamportReceiver(iamportReceiver: IamportReceiver, screenBrReceiver: BroadcastReceiver) {
+        IntentFilter().let {
+            it.addAction(CONST.BROADCAST_FOREGROUND_SERVICE)
+            it.addAction(CONST.BROADCAST_FOREGROUND_SERVICE_STOP)
+            app.applicationContext?.registerReceiver(screenBrReceiver, screenBrFilter)
+            app.registerReceiver(iamportReceiver, it)
+        }
+    }
+
+
+    // 포그라운드 서비스 관련 BroadcastReceiver,
+    // 스크린 ON/OFF 브로드캐스트 리시버 초기화
+    fun unregisterIamportReceiver(iamportReceiver: IamportReceiver, screenBrReceiver: BroadcastReceiver) {
+        runCatching {
+            app.unregisterReceiver(iamportReceiver)
+            app.applicationContext?.unregisterReceiver(screenBrReceiver)
+        }
+    }
+
+
+    fun controlForegroundService(it: Boolean) {
+        if (!ChaiService.enableForegroundService) {
+            d("차이 폴링 포그라운드 서비스 실행하지 않음")
+            return
+        }
+
+        app.run {
+            Intent(this, ChaiService::class.java).also { intent: Intent ->
+                if (it) {
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        startForegroundService(intent)
+                    } else {
+                        startService(intent)
+                    }
+                } else {
+                    stopService(intent)
+                }
+            }
+        }
     }
 }

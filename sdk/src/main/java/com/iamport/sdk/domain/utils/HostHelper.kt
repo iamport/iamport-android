@@ -35,7 +35,17 @@ class HostHelper(private val activityRef: WeakReference<ComponentActivity>? = nu
     }
 
     fun getActivityRef(): ComponentActivity? {
-        return activityRef?.get()
+        return when (mode) {
+            MODE.ACTIVITY -> {
+                activityRef?.get()
+            }
+            MODE.FRAGMENT -> {
+                fragmentRef?.get()?.activity
+            }
+            MODE.NONE -> {
+                null
+            }
+        }
     }
 
     fun getFragmentRef(): Fragment? {

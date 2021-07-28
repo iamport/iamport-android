@@ -11,7 +11,6 @@ import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.domain.IamportWebChromeClient
 import com.iamport.sdk.domain.strategy.webview.IamPortMobileModeWebViewClient
-import com.iamport.sdk.domain.strategy.webview.NiceTransWebViewStrategy
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.EventObserver
 import com.orhanobut.logger.Logger

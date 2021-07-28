@@ -29,8 +29,6 @@ class StrategyRepository : IamportKoinComponent {
 
     private val niceTransWebViewStrategy: NiceTransWebViewStrategy by inject()
 
-    private val certificationWebViewStrategy: CertificationWebViewStrategy by inject() //
-
     /**
      * 실제로 앱 띄울 결제 타입
      */
