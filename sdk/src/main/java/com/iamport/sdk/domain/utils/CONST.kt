@@ -43,10 +43,12 @@ object CONST {
 
 
     const val POLLING_DELAY = 1000L
+    const val TIME_OUT_MIN = 5 // 분
+
+    const val TIME_OUT = TIME_OUT_MIN * 60000L // 차이 폴링 타임아웃
+
     private const val TRY_OUT_ONE_MIN = 60000L / POLLING_DELAY // 1분 단위
-    const val TRY_OUT_MIN = 5 // 분
-    const val TRY_OUT_COUNT = TRY_OUT_ONE_MIN * TRY_OUT_MIN // 차이 폴링 타임아웃
-//    const val TRY_OUT_COUNT = 15
+    const val TRY_OUT_COUNT = TRY_OUT_ONE_MIN * TIME_OUT_MIN // 차이 폴링 타임아웃
 
     const val CHAI_FINAL_PAYMENT_TIME_OUT_SEC = 6 * POLLING_DELAY // 차이 최종결제 위한 머천트 컨펌 타임아웃
 

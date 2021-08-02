@@ -50,8 +50,8 @@ class MobileWebViewModeFragment : Fragment() {
             })
 
             // 모바일 웹 단독 모드
-            it.loadUrl(CONST.PAYMENT_MOBILE_WEB_FILE_URL)
-//            it.loadUrl("https://www.iamport.kr/demo") // 아임포트 데모 페이지
+//            it.loadUrl(CONST.PAYMENT_MOBILE_WEB_FILE_URL)
+            it.loadUrl("https://pay-demo.iamport.kr") // 아임포트 데모 페이지
             Iamport.pluginMobileWebSupporter(it) // 로컬 데모 페이지
             createdView = false
         }
@@ -68,17 +68,5 @@ class MobileWebViewModeFragment : Fragment() {
         }.onFailure {
             Log.e("WebViewMode", "돌아갈 수 없습니다.")
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding?.webview?.removeAllViews()
-        binding = null
-    }
-
-    override fun onDestroy() {
-        binding?.webview?.destroy()
-        Iamport.close()
-        super.onDestroy()
     }
 }

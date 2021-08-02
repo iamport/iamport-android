@@ -47,7 +47,6 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
 
     override fun onDestroy() {
         runCatching {
-//            close()
             removeObservers()
         }.onFailure {
             d("ignore fail close webview $it")
@@ -131,16 +130,6 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
         viewModel.requestPayment(it)
     }
 
-//    override fun onBackPressed() {
-//        viewDataBinding.webview.run {
-//            if (canGoBack()) {
-//                goBack()
-//            } else {
-//                super.onBackPressed()
-//            }
-//        }
-//    }
-
     private fun removeObservers() {
         runCatching {
             d("WebViewActivity removeObservers")
@@ -161,6 +150,8 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
 
             viewDataBinding.webview.run {
                 removeJavascriptInterface(CONST.PAYMENT_WEBVIEW_JS_INTERFACE_NAME)
+                clearHistory()
+                loadUrl("about:blank")
                 removeAllViews()
                 destroy()
             }

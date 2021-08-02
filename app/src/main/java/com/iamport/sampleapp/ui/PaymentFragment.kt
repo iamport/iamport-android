@@ -54,7 +54,6 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
 
     override fun onDestroy() {
         super.onDestroy()
-        Iamport.close()
         backPressCallback.remove()
         this.context?.unregisterReceiver(receiver)
     }
@@ -199,6 +198,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
 //            approveCallback = { approveCallback(it) },
 //            paymentResultCallback = { callBackListener.result(it) })
 
+//        Iamport.payment(userCode, iamPortRequest = request, approveCallback = { approveCallback(it) }) { callBackListener.result(it) }
         Iamport.payment(userCode, iamPortRequest = request) { callBackListener.result(it) }
     }
 
@@ -209,7 +209,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
      */
     private fun approveCallback(iamPortApprove: IamPortApprove) {
         val secUnit = 1000L
-        val sec = 1
+        val sec = 2
         GlobalScope.launch {
             Log.i("SAMPLE", "재고확인 합니다~~")
             delay(sec * secUnit) // sec 초간 재고확인 프로세스를 가정합니다

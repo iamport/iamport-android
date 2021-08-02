@@ -102,6 +102,7 @@ open class IamPortWebViewMode @JvmOverloads constructor(
         removeObservers()
         webview?.run {
             removeJavascriptInterface(CONST.PAYMENT_WEBVIEW_JS_INTERFACE_NAME)
+            loadUrl("about:blank")
             removeAllViews()
             destroy()
         }

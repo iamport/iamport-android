@@ -1,7 +1,6 @@
 package com.iamport.sdk.domain.repository
 
 import android.webkit.WebViewClient
-import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.data.sdk.PayMethod
 import com.iamport.sdk.data.sdk.Payment
@@ -9,7 +8,6 @@ import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.strategy.base.IStrategy
 import com.iamport.sdk.domain.strategy.base.JudgeStrategy
 import com.iamport.sdk.domain.strategy.chai.ChaiStrategy
-import com.iamport.sdk.domain.strategy.webview.CertificationWebViewStrategy
 import com.iamport.sdk.domain.strategy.webview.IamPortMobileModeWebViewClient
 import com.iamport.sdk.domain.strategy.webview.NiceTransWebViewStrategy
 import com.iamport.sdk.domain.strategy.webview.WebViewStrategy
@@ -20,7 +18,7 @@ import org.koin.core.component.inject
 @KoinApiExtension
 class StrategyRepository : IamportKoinComponent {
 
-    val judgeStrategy: JudgeStrategy by inject() // 결제 중 BG 폴링하는 차이 전략
+    val judgeStrategy: JudgeStrategy by inject()
     val chaiStrategy: ChaiStrategy by inject() // 결제 중 BG 폴링하는 차이 전략
     var mobileWebModeStrategy: IamPortMobileModeWebViewClient? = null
 
@@ -37,13 +35,17 @@ class StrategyRepository : IamportKoinComponent {
     }
 
     fun init() {
-        chaiStrategy.init()
+//        chaiStrategy.init()
         mobileWebModeStrategy = null
     }
 
     fun failSdkFinish(payment: Payment) {
         when (getPaymentKinds(payment)) {
-            PaymentKinds.CHAI -> chaiStrategy.failFinish("사용자가 결제확인 서비스를 종료하셨습니다")
+            PaymentKinds.CHAI -> {
+//                chaiStrategy.failFinish("사용자가 결제확인 서비스를 종료하셨습니다")
+                Logger.i("사용자가 결제확인 서비스를 종료하셨습니다")
+                chaiStrategy.init()
+            }
             else -> {
                 // 사실상 호출될 일이 없겠지만 추가
                 webViewStrategy.failureFinish(payment, null, "사용자가 결제확인 서비스를 종료하셨습니다 payment [$payment]")

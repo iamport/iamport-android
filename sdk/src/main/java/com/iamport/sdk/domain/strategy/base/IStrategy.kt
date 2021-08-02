@@ -14,14 +14,29 @@ interface IStrategy {
     fun sdkFinish(response: IamPortResponse?)
     fun successFinish(payment: Payment, prepareData: PrepareData? = null, msg: String) {
         Logger.d(msg)
-        IamPortResponse.makeSuccess(payment, prepareData, msg).run {
+        IamPortResponse.makeSuccess(payment, prepareData?.impUid, msg).run {
             sdkFinish(this)
         }
     }
 
     fun failureFinish(payment: Payment, prepareData: PrepareData? = null, msg: String) {
         Logger.d(msg)
-        IamPortResponse.makeFail(payment, prepareData, msg).run {
+        IamPortResponse.makeFail(payment, prepareData?.impUid, msg).run {
+            sdkFinish(this)
+        }
+    }
+
+    fun successFinish(merchantUid: String, impUid: String, msg: String) {
+        Logger.d(msg)
+        IamPortResponse.makeSuccess(merchantUid, impUid, msg).run {
+            sdkFinish(this)
+        }
+    }
+
+    fun failureFinish(merchantUid: String, impUid: String, msg: String) {
+        Logger.d(msg)
+
+        IamPortResponse.makeFail(merchantUid, impUid, msg).run {
             sdkFinish(this)
         }
     }

@@ -15,9 +15,9 @@ import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.data.sdk.ProvidePgPkg
+import com.iamport.sdk.domain.core.Iamport
 import com.iamport.sdk.domain.core.IamportReceiver
 import com.iamport.sdk.domain.di.IamportKoinComponent
-import com.iamport.sdk.domain.service.ChaiService
 import com.iamport.sdk.domain.utils.*
 import com.iamport.sdk.domain.utils.Util.observeAlways
 import com.iamport.sdk.presentation.contract.BankPayContract
@@ -126,7 +126,10 @@ internal class IamportSdk(
             ScreenChecker.init(it.app)
         }
 
-        initClearData() // 만들어질떄
+//        initClearData() // 만들어질떄
+        updatePolling(false) // 차이 폴링 외부 인터페이스 초기화
+        mainViewModel?.controlForegroundService(false) // 차이 포그라운드 서비스 초기화
+        mainViewModel?.unregisterIamportReceiver(iamportReceiver, screenBrReceiver)
     }
 
     // =============================================
@@ -160,26 +163,26 @@ internal class IamportSdk(
     // =============================================
 
     // 머천트 앱의 생명주기를 따라감
-    private val lifecycleObserver = object : LifecycleObserver {
-
-        @OnLifecycleEvent(Lifecycle.Event.ON_START)
-        fun onStart() {
-            d("onStart")
-            mainViewModel?.checkChaiStatus()
-        }
-
-        @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-        fun onStop() {
-            d("onStop")
-            mainViewModel?.pollingChaiStatus() // 백그라운드 진입시 차이 폴링 시작, (webview 이용시에는 폴링하지 않음)
-        }
-
-        @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-        fun onDestroy() {
-//            d("onDestroy")
-//            initClearData()// FIXME : 이부분 체크, 다른걸로 종료해야 할 듯
-        }
-    }
+//    private val lifecycleObserver = object : LifecycleObserver {
+//
+//        @OnLifecycleEvent(Lifecycle.Event.ON_START)
+//        fun onStart() {
+//            d("onStart")
+//            mainViewModel?.checkChaiStatus()
+//        }
+//
+//        @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+//        fun onStop() {
+//            d("onStop")
+//            mainViewModel?.pollingChaiStatus() // 백그라운드 진입시 차이 폴링 시작, (webview 이용시에는 폴링하지 않음)
+//        }
+//
+//        @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+//        fun onDestroy() {
+////            d("onDestroy")
+////            initClearData()// FIXME : 이부분 체크, 다른걸로 종료해야 할 듯
+//        }
+//    }
 
     // =============================================
 
@@ -205,7 +208,6 @@ internal class IamportSdk(
 
         updatePolling(false) // 차이 폴링 외부 인터페이스 초기화
         mainViewModel?.controlForegroundService(false) // 차이 포그라운드 서비스 초기화
-
         mainViewModel?.clearData() // 메인 뷰모델 클리어
     }
 
@@ -214,7 +216,7 @@ internal class IamportSdk(
     private fun initClearData() {
         clearMainViewModel()
         mainViewModel?.unregisterIamportReceiver(iamportReceiver, screenBrReceiver)
-        hostHelper.getLifecycle()?.removeObserver(lifecycleObserver)
+//        hostHelper.getLifecycle()?.removeObserver(lifecycleObserver)
     }
 
     private fun closeDeleteWebViewMode() {
@@ -230,9 +232,19 @@ internal class IamportSdk(
         d("do Close!")
 
         disableWebViewMode()
-
         closeDeleteWebViewMode() // 외부에서 종료하니까 필요함
         initClearData() // 밖에서 강제로 끌때
+    }
+
+    fun initClose() {
+        d("do initClose!")
+
+        disableWebViewMode() // 웹뷰모드 끄기
+        closeDeleteWebViewMode() // 초기화 하니까 필요함
+
+        updatePolling(false) // 차이 폴링 외부 인터페이스 초기화
+        mainViewModel?.controlForegroundService(false) // 차이 포그라운드 서비스 초기화
+        mainViewModel?.unregisterIamportReceiver(iamportReceiver, screenBrReceiver)
     }
 
     // FIXME : 이부분 체크
@@ -247,10 +259,10 @@ internal class IamportSdk(
         i("HELLO I'MPORT SDK! for cert")
 
         closeDeleteWebViewMode() // 결제 시작할 때
-        initClearData() // 결제 시작할 때
+//        initClearData() // 결제 시작할 때
 
         mainViewModel?.registerIamportReceiver(iamportReceiver, screenBrReceiver)
-        hostHelper.getLifecycle()?.addObserver(lifecycleObserver)
+//        hostHelper.getLifecycle()?.addObserver(lifecycleObserver)
 
         this.paymentResultCallBack = paymentResultCallBack
         observeCertification(payment) // 관찰할 LiveData
@@ -263,10 +275,10 @@ internal class IamportSdk(
         i("HELLO I'MPORT SDK! for payment")
 
         closeDeleteWebViewMode() // 결제 시작할 때
-        initClearData() // 결제 시작할 때
+//        initClearData() // 결제 시작할 때
 
         mainViewModel?.registerIamportReceiver(iamportReceiver, screenBrReceiver)
-        hostHelper.getLifecycle()?.addObserver(lifecycleObserver)
+//        hostHelper.getLifecycle()?.addObserver(lifecycleObserver)
 
         this.chaiApproveCallBack = approveCallback
         this.paymentResultCallBack = paymentResultCallBack
@@ -342,10 +354,18 @@ internal class IamportSdk(
 
 
     private fun askApproveFromChai(approve: IamPortApprove) {
-        chaiApproveCallBack?.run {
-            invoke(approve)
-        } ?: run {
-            requestApprovePayments(approve)
+        when (mainViewModel?.approved) {
+            MainViewModel.Status.Waiting, null -> {
+                // 아무 동작하지 않음
+            }
+            MainViewModel.Status.None -> {
+                mainViewModel?.approved = MainViewModel.Status.Waiting
+                chaiApproveCallBack?.run {
+                    invoke(approve)
+                } ?: run {
+                    requestApprovePayments(approve)
+                }
+            }
         }
     }
 
@@ -358,8 +378,9 @@ internal class IamportSdk(
      * 차이 앱 종료 콜백 감지
      */
     private fun resultCallback() {
+//        d("차이 앱이 종료됐지만 아무것도 안할게!!")
         d("Result Callback ChaiLauncher")
-        mainViewModel?.checkChaiStatusForResultCallback()
+        mainViewModel?.forceChaiStatusCheck()
     }
 
     /**
@@ -378,7 +399,7 @@ internal class IamportSdk(
     /**
      * 결제 요청 실행
      */
-    private fun requestPayment(payment: Payment) {
+    private fun requestPayment(payment: Payment, ignoreNative: Boolean = false) {
         Payment.validator(payment).run {
             if (!first) {
                 sdkFinish(second?.let { IamPortResponse.makeFail(payment, msg = it) })
@@ -399,7 +420,7 @@ internal class IamportSdk(
             return
         }
 
-        mainViewModel?.judgePayment(payment) // 뷰모델에 데이터 판단 요청(native or webview pg)
+        mainViewModel?.judgePayment(payment, ignoreNative) // 뷰모델에 데이터 판단 요청(native or webview pg)
     }
 
     /**
@@ -441,12 +462,32 @@ internal class IamportSdk(
     private fun openChaiApp(it: String) {
         i("openChaiApp")
         d(it)
+
+        var chaiClearVersion = false
+
+        // 우선 chaiClearVersion 인지 체크
+        runCatching {
+            getIntentPackage(Intent.parseUri(it, Intent.URI_INTENT_SCHEME))?.also {
+                chaiClearVersion = checkChaiVersionCode(it)
+            }
+        }.onFailure { thr: Throwable ->
+            i("${thr.message}, chaiClearVersion 가져오는 도중 에러남. 네이티브 모드로 실행.")
+        }
+
+        // 차이 WebStrategy 로 동작
+        if (!chaiClearVersion) {
+            mainViewModel?.payment?.let {
+                clearMainViewModel() // WebStrategy 로 결제 재요청 전, 초기화
+                requestPayment(it, true)
+                return
+            }
+        }
+
+        d("$chaiClearVersion == false 면, 여기까지 안와야함")
+
+        // 네이티브 차이 앱 실행
         runCatching {
             launcherChai?.launch(it to "openchai")
-            mainViewModel?.playChai = true
-            CHAI.pkg = getIntentPackage(Intent.parseUri(it, Intent.URI_INTENT_SCHEME))?.also {
-                mainViewModel?.chaiClearVersion = checkChaiVersionCode(it)
-            }
         }.onFailure { thr: Throwable ->
             i("${thr.message}")
             movePlayStore(Intent.parseUri(it, Intent.URI_INTENT_SCHEME))

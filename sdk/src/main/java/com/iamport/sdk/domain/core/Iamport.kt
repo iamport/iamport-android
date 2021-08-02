@@ -58,6 +58,7 @@ object Iamport {
     private val preventOverlapRun by lazy { PreventOverlapRun() }
     private var isCreated = false
 
+    var response: IamPortResponse? = null // 내부의 imp_uid로 종료 콜백 중복호출 방지
 
     // ===========================================
     // Application class 에서 생성 했는지 확인
@@ -143,7 +144,7 @@ object Iamport {
 //        e("LOG TEST ERROR")
     }
 
-    // ===========================================
+    // ============================================
 
     /**
      * 외부에서 SDK 종료
@@ -165,8 +166,35 @@ object Iamport {
      * 전달받은 결제결과 콜백
      */
     val callback = fun(iamPortResponse: IamPortResponse?) {
+
+        if(iamPortResponse == null) {
+            i("iamPortResponse 없이 결제 종료")
+            impCallbackFunction?.invoke(iamPortResponse)
+            return
+        }
+
+        val isCalledResponse = iamPortResponse.imp_uid?.let {
+            isCalledResponse(it)
+        }
+
+        if (isCalledResponse == true) {
+            return
+        }
+
+        response = iamPortResponse // 호출된적 없는 imp_uid이니 set
+
         impCallbackFunction?.invoke(iamPortResponse)
     }
+
+
+    private fun isCalledResponse(impUid: String): Boolean {
+        if (response?.imp_uid == impUid) {
+            i("이미 종료 호출된 imp_uid[$impUid] 이므로 다시 호출하지 않음")
+            return true
+        }
+        return false
+    }
+
 
     /**
      * SDK Activity 열기 위한 Contract for Activity
@@ -178,7 +206,8 @@ object Iamport {
         }
 
         d("INITIALIZE IAMPORT SDK from activity")
-        close()
+//        close()
+        iamportSdk?.initClose()
 
         preventOverlapRun.init()
         iamportSdk = null
@@ -201,7 +230,8 @@ object Iamport {
         }
 
         d("INITIALIZE IAMPORT SDK from fragment")
-        close()
+//        close()
+        iamportSdk?.initClose()
 
         preventOverlapRun.init()
         iamportSdk = null

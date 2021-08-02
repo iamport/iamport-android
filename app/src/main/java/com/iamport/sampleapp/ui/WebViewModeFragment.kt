@@ -104,29 +104,7 @@ class WebViewModeFragment : Fragment() {
         override fun handleOnBackPressed() {
             remove()
             popBackStack()
-//            binding?.webview?.run {
-//                if (canGoBack()) { // webview 백버튼 처리 로직
-//                    goBack()
-//                } else {
-//                    remove()
-//                    popBackStack()
-//                }
-//            } ?: run {
-//                remove()
-//                popBackStack()
-//            }
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding?.webview?.removeAllViews()
-        binding = null
-    }
-
-    override fun onDestroy() {
-        binding?.webview?.destroy()
-        Iamport.close()
-        super.onDestroy()
-    }
 }

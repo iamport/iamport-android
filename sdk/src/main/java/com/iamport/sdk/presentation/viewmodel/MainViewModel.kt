@@ -2,7 +2,6 @@ package com.iamport.sdk.presentation.viewmodel
 
 import android.app.Application
 import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import androidx.lifecycle.AndroidViewModel
@@ -11,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.domain.core.Iamport
 import com.iamport.sdk.domain.core.IamportReceiver
 import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.repository.StrategyRepository
@@ -34,6 +34,12 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
     val app = getApplication<Application>()
 
     var payment: Payment? = null
+    var approved: Status = Status.None
+
+    sealed class Status {
+        object Waiting : Status()
+        object None : Status()
+    }
 
     private val screenBrFilter = IntentFilter(Intent.ACTION_SCREEN_OFF).apply {
         addAction(Intent.ACTION_SCREEN_ON)
@@ -43,30 +49,6 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
         get() {
             if (field.isCancelled) field = Job()
             return field
-        }
-
-    var playChai: Boolean
-        get() {
-            return bus.playChai
-        }
-        set(value) {
-            bus.playChai = value
-        }
-
-    var chaiClearVersion: Boolean
-        get() {
-            return bus.chaiClearVersion
-        }
-        set(value) {
-            bus.chaiClearVersion = value
-        }
-
-    var receiveChaiCallBack: Boolean
-        get() {
-            return bus.receiveChaiCallBack
-        }
-        set(value) {
-            bus.receiveChaiCallBack = value
         }
 
 
@@ -155,9 +137,7 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
     fun clearData() {
 
         // 차이 관련 초기화
-        playChai = false
-        chaiClearVersion = false
-        receiveChaiCallBack = false
+        approved = Status.None
 
         // repository 초기화
         repository.init()
@@ -166,7 +146,6 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
         job.cancel()
     }
 
-
     /**
      * 차이 최종 결제 요청
      */
@@ -174,54 +153,16 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
         viewModelScope.launch(job) {
             i("차이 최종 결제 요청")
             repository.chaiStrategy.requestApprovePayments(approve)
+            approved = Status.None
         }
     }
 
-    /**
-     * ON_STOP시 차이 결제 스테이터스 확인 with 폴링
-     */
-    fun pollingChaiStatus() {
-        if (!playChai) {
-            d("ignore pollingChaiStatus cause playChai is false")
-            return
-        }
-
+    fun forceChaiStatusCheck() {
         viewModelScope.launch(job) {
-            d("백그라운드라서 폴링 시도")
-            repository.chaiStrategy.requestPollingChaiStatus()
+            d("[차이앱 결제 상태 강제 체크]")
+            repository.chaiStrategy.checkRemoteChaiStatus(doPolling = false)
         }
     }
-
-
-    /**
-     * ON_START시 차이 결제 스테이터스 확인
-     */
-    fun checkChaiStatus() {
-        if (!playChai) {
-            d("ignore checkChaiStatus cause playChai is false")
-            return
-        }
-
-        if (receiveChaiCallBack) {
-            d("ignore checkChaiStatus cause receiveChaiCallBack")
-            receiveChaiCallBack = false // 스킴 액티비티 종료시에 불릴 수 있기 때문에 초기화 해줘야함
-            return
-        }
-
-        viewModelScope.launch(job) {
-            d("차이앱 종료돼서 차이 결제 상태 체크")
-            repository.chaiStrategy.requestCheckChaiStatus()
-        }
-    }
-
-    /**
-     * ResultCallback시 차이 결제 스테이터스 확인
-     */
-    fun checkChaiStatusForResultCallback() {
-        checkChaiStatus()
-        receiveChaiCallBack = true
-    }
-
 
     fun registerIamportReceiver(iamportReceiver: IamportReceiver, screenBrReceiver: BroadcastReceiver) {
         IntentFilter().let {

@@ -6,6 +6,7 @@ import com.iamport.sdk.data.sdk.IamPortRequest
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.data.sdk.PayMethod
+import com.iamport.sdk.domain.core.Iamport
 import com.iamport.sdk.domain.utils.Event
 import java.util.*
 
@@ -19,6 +20,10 @@ class ViewModel : ViewModel() {
     var amount: String = ""
 
     val resultCallback = MutableLiveData<Event<IamPortResponse>>()
+    override fun onCleared() {
+        Iamport.close()
+        super.onCleared()
+    }
 
     /**
      * SDK 에 결제 요청할 데이터 구성
