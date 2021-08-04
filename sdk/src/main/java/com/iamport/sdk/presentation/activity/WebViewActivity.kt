@@ -15,7 +15,6 @@ import com.iamport.sdk.domain.IamportWebChromeClient
 import com.iamport.sdk.domain.JsNativeInterface
 import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.utils.*
-import com.iamport.sdk.presentation.contract.BankPayContract
 import com.iamport.sdk.presentation.viewmodel.WebViewModel
 import com.orhanobut.logger.Logger.*
 import kotlinx.coroutines.*
@@ -37,13 +36,13 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
     /**
      * 뱅크페이 앱 열기 위한 런처
      */
-    private var launcherBankPay =
-        registerForActivityResult(BankPayContract()) { res: Pair<String, String>? ->
-            res?.let {
-                loadingVisible(true)
-                viewModel.processBankPayPayment(res)
-            } ?: e("NICE TRANS result is NULL")
-        }
+//    private var launcherBankPay =
+//        registerForActivityResult(BankPayContract()) { res: Pair<String, String>? ->
+//            res?.let {
+//                loadingVisible(true)
+//                viewModel.processBankPayPayment(res)
+//            } ?: e("NICE TRANS result is NULL")
+//        }
 
     override fun onDestroy() {
         runCatching {
@@ -102,7 +101,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
 
             viewModel.openWebView().observe(this, EventObserver(this::openWebView))
 
-            viewModel.niceTransRequestParam().observe(this, EventObserver(this::openNiceTransApp))
+//            viewModel.niceTransRequestParam().observe(this, EventObserver(this::openNiceTransApp))
             viewModel.thirdPartyUri().observe(this, EventObserver(this::openThirdPartyApp))
 
             viewModel.impResponse().observe(this, EventObserver(this::sdkFinish))
@@ -135,7 +134,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
             d("WebViewActivity removeObservers")
             viewModel.loading().removeObservers(this)
             viewModel.openWebView().removeObservers(this)
-            viewModel.niceTransRequestParam().removeObservers(this)
+//            viewModel.niceTransRequestParam().removeObservers(this)
             viewModel.thirdPartyUri().removeObservers(this)
             viewModel.impResponse().removeObservers(this)
         }.onFailure {
@@ -178,15 +177,15 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
     /**
      * 뱅크페이 외부앱 열기 for nice PG + 실시간계좌이체(trans)
      */
-    override fun openNiceTransApp(it: String) {
-        runCatching {
-            launcherBankPay.launch(it) // 뱅크페이 앱 실행
-        }.onFailure {
-            // 뱅크페이 앱 패키지는 하드코딩
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Util.getMarketId(ProvidePgPkg.BANKPAY.pkg))))
-        }
-        loadingVisible(false)
-    }
+//    override fun openNiceTransApp(it: String) {
+//        runCatching {
+//            launcherBankPay.launch(it) // 뱅크페이 앱 실행
+//        }.onFailure {
+//             뱅크페이 앱 패키지는 하드코딩
+//            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Util.getMarketId(ProvidePgPkg.BANKPAY.pkg))))
+//        }
+//        loadingVisible(false)
+//    }
 
     /**
      * 외부앱 열기
@@ -261,7 +260,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
                 JsNativeInterface(payment, get(named("${CONST.KOIN_KEY}Gson")), evaluateJS),
                 CONST.PAYMENT_WEBVIEW_JS_INTERFACE_NAME
             )
-            webViewClient = viewModel.getWebViewClient(payment)
+            webViewClient = viewModel.getWebViewClient()
             visibility = View.VISIBLE
 
             loadUrl(CONST.PAYMENT_FILE_URL) // load WebView

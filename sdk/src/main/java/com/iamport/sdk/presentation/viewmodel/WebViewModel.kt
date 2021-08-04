@@ -38,9 +38,9 @@ class WebViewModel(private val repository: StrategyRepository) : BaseViewModel()
     /**
      * 뱅크페이 외부앱 열기
      */
-    fun niceTransRequestParam(): LiveData<Event<String>> {
-        return bus.niceTransRequestParam
-    }
+//    fun niceTransRequestParam(): LiveData<Event<String>> {
+//        return bus.niceTransRequestParam
+//    }
 
     /**
      * 외부앱 열기
@@ -75,23 +75,23 @@ class WebViewModel(private val repository: StrategyRepository) : BaseViewModel()
     /**
      * PG(nice or 비nice) 따라 webview client 가져오기
      */
-    fun getWebViewClient(payment: Payment): WebViewClient {
-        return repository.getWebViewClient(payment)
+    fun getWebViewClient(): WebViewClient {
+        return repository.getWebViewClient()
     }
 
     /**
      * 뱅크페이 결과 처리
      */
-    fun processBankPayPayment(resPair: Pair<String, String>) {
-        repository.getNiceTransWebViewClient().processBankPayPayment(resPair)
-    }
+//    fun processBankPayPayment(resPair: Pair<String, String>) {
+//        repository.getNiceTransWebViewClient().processBankPayPayment(resPair)
+//    }
 
     /**
      * MobileWebMode 뱅크페이 결과 처리
      */
-    fun mobileModeProcessBankPayPayment(resPair: Pair<String, String>) {
-        getMobileWebModeClient().processBankPayPayment(resPair)
-    }
+//    fun mobileModeProcessBankPayPayment(resPair: Pair<String, String>) {
+//        getMobileWebModeClient().processBankPayPayment(resPair)
+//    }
 
     /**
      * MobileWebMode WebViewClient
@@ -112,7 +112,7 @@ class WebViewModel(private val repository: StrategyRepository) : BaseViewModel()
      */
     fun requestPayment(payment: Payment) {
         viewModelScope.launch {
-            repository.getWebViewStrategy(payment).doWork(payment)
+            repository.getWebViewStrategy().doWork(payment)
         }
     }
 }

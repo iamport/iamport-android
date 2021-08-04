@@ -5,7 +5,6 @@ import android.net.Uri
 import android.view.View
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
-import androidx.activity.result.ActivityResultLauncher
 import com.google.gson.GsonBuilder
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
@@ -24,7 +23,6 @@ import org.koin.core.qualifier.named
 
 @KoinApiExtension
 open class IamPortWebViewMode @JvmOverloads constructor(
-    val bankPayLauncher: ActivityResultLauncher<String>?,
     scope: BaseCoroutineScope = UICoroutineScope()
 ) : IamportKoinComponent, BaseMain, BaseCoroutineScope by scope {
 
@@ -45,9 +43,9 @@ open class IamPortWebViewMode @JvmOverloads constructor(
         observeViewModel(payment) // 관찰할 LiveData
     }
 
-    open fun processBankPayPayment(resPair: Pair<String, String>) {
-        viewModel.processBankPayPayment(resPair)
-    }
+//    open fun processBankPayPayment(resPair: Pair<String, String>) {
+//        viewModel.processBankPayPayment(resPair)
+//    }
 
     /**
      * 관찰할 LiveData 옵저빙
@@ -58,7 +56,7 @@ open class IamPortWebViewMode @JvmOverloads constructor(
             activity?.let {
                 viewModel.run {
                     openWebView().observe(it, EventObserver(this@IamPortWebViewMode::openWebView))
-                    niceTransRequestParam().observe(it, EventObserver(this@IamPortWebViewMode::openNiceTransApp))
+//                    niceTransRequestParam().observe(it, EventObserver(this@IamPortWebViewMode::openNiceTransApp))
                     thirdPartyUri().observe(it, EventObserver(this@IamPortWebViewMode::openThirdPartyApp))
                     impResponse().observe(it, EventObserver(this@IamPortWebViewMode::sdkFinish))
 
@@ -88,7 +86,7 @@ open class IamPortWebViewMode @JvmOverloads constructor(
             viewModel.run {
                 d("do removeObservers")
                 openWebView().removeObservers(it)
-                niceTransRequestParam().removeObservers(it)
+//                niceTransRequestParam().removeObservers(it)
                 thirdPartyUri().removeObservers(it)
                 impResponse().removeObservers(it)
             }
@@ -125,15 +123,15 @@ open class IamPortWebViewMode @JvmOverloads constructor(
     /**
      * 뱅크페이 외부앱 열기 for nice PG + 실시간계좌이체(trans)
      */
-    override fun openNiceTransApp(it: String) {
-        d("openNiceTransApp $it")
-        runCatching {
-            bankPayLauncher?.launch(it)
-        }.onFailure {
-            // 뱅크페이 앱 패키지는 하드코딩
-            activity?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Util.getMarketId(ProvidePgPkg.BANKPAY.pkg))))
-        }
-    }
+//    override fun openNiceTransApp(it: String) {
+//        d("openNiceTransApp $it")
+//        runCatching {
+//            bankPayLauncher?.launch(it)
+//        }.onFailure {
+////             뱅크페이 앱 패키지는 하드코딩
+//            activity?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Util.getMarketId(ProvidePgPkg.BANKPAY.pkg))))
+//        }
+//    }
 
     /**
      * 외부앱 열기
@@ -200,7 +198,7 @@ open class IamPortWebViewMode @JvmOverloads constructor(
                 JsNativeInterface(payment, get(named("${CONST.KOIN_KEY}Gson")), evaluateJS),
                 CONST.PAYMENT_WEBVIEW_JS_INTERFACE_NAME
             )
-            webViewClient = viewModel.getWebViewClient(payment)
+            webViewClient = viewModel.getWebViewClient()
             visibility = View.VISIBLE
 
             loadUrl(CONST.PAYMENT_FILE_URL) // load WebView

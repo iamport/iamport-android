@@ -15,12 +15,10 @@ import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.data.sdk.ProvidePgPkg
-import com.iamport.sdk.domain.core.Iamport
 import com.iamport.sdk.domain.core.IamportReceiver
 import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.utils.*
 import com.iamport.sdk.domain.utils.Util.observeAlways
-import com.iamport.sdk.presentation.contract.BankPayContract
 import com.iamport.sdk.presentation.contract.ChaiContract
 import com.iamport.sdk.presentation.viewmodel.MainViewModel
 import com.iamport.sdk.presentation.viewmodel.MainViewModelFactory
@@ -63,8 +61,8 @@ internal class IamportSdk(
     // ---------------------------------------------
 
     // 뱅크페이 앱 런처s
-    private var bankPayLauncher: ActivityResultLauncher<String>? = null // 뱅크페이 앱 런처(for webview & mobile web mode)
-    private val bankPayContract by lazy { BankPayContract() }
+//    private var bankPayLauncher: ActivityResultLauncher<String>? = null // 뱅크페이 앱 런처(for webview & mobile web mode)
+//    private val bankPayContract by lazy { BankPayContract() }
 
     // 차이 앱 런처
     private var launcherChai: ActivityResultLauncher<Pair<String, String>>? = null // 차이앱 런처
@@ -100,21 +98,21 @@ internal class IamportSdk(
             MODE.ACTIVITY -> {
                 hostHelper.getActivityRef()?.run {
                     launcherChai = registerForActivityResult(chaiContract) { resultCallback() }
-                    bankPayLauncher = registerForActivityResult(bankPayContract) {
-                        if (it != null) {
-                            resultBankPayAppCallback(it)
-                        }
-                    }
+//                    bankPayLauncher = registerForActivityResult(bankPayContract) {
+//                        if (it != null) {
+//                            resultBankPayAppCallback(it)
+//                        }
+//                    }
                 }
             }
             MODE.FRAGMENT -> {
                 hostHelper.getFragmentRef()?.run {
                     launcherChai = registerForActivityResult(chaiContract) { resultCallback() }
-                    bankPayLauncher = registerForActivityResult(bankPayContract) {
-                        if (it != null) {
-                            resultBankPayAppCallback(it)
-                        }
-                    }
+//                    bankPayLauncher = registerForActivityResult(bankPayContract) {
+//                        if (it != null) {
+//                            resultBankPayAppCallback(it)
+//                        }
+//                    }
                 }
             }
             MODE.NONE -> {
@@ -155,7 +153,7 @@ internal class IamportSdk(
 
         hostHelper.getActivityRef()?.let {
             webviewRef.get()?.let { webview ->
-                iamPortMobileWebMode = IamPortMobileWebMode(bankPayLauncher)
+                iamPortMobileWebMode = IamPortMobileWebMode()
                 iamPortMobileWebMode?.initStart(it, webview) // webview only 모드
             }
         }
@@ -386,14 +384,14 @@ internal class IamportSdk(
     /**
      * 나이스 뱅크페이 앱 종료 콜백 감지 for 웹뷰모드, 모바일웹모드
      */
-    private fun resultBankPayAppCallback(resPair: Pair<String, String>) {
-        d("Result Callback BankPayLauncher")
-        if (modeWebViewRef?.get() != null) {
-            iamPortWebViewMode?.processBankPayPayment(resPair)
-            return
-        }
-        iamPortMobileWebMode?.processBankPayPayment(resPair)
-    }
+//    private fun resultBankPayAppCallback(resPair: Pair<String, String>) {
+//        d("Result Callback BankPayLauncher")
+//        if (modeWebViewRef?.get() != null) {
+//            iamPortWebViewMode?.processBankPayPayment(resPair)
+//            return
+//        }
+//        iamPortMobileWebMode?.processBankPayPayment(resPair)
+//    }
 
 
     /**
@@ -445,7 +443,7 @@ internal class IamportSdk(
         clearMainViewModel()
         modeWebViewRef?.get()?.let { webView ->
             hostHelper.getActivityRef()?.let { activity ->
-                iamPortWebViewMode = IamPortWebViewMode(bankPayLauncher)
+                iamPortWebViewMode = IamPortWebViewMode()
                 iamPortWebViewMode?.initStart(activity, webView, payment, paymentResultCallBack) // webview only 모드
             } ?: run {
                 w("Cannot found activity, So running activity mode")

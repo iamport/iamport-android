@@ -5,7 +5,6 @@ import android.os.Build
 import android.view.View
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
-import androidx.activity.result.ActivityResultLauncher
 import androidx.lifecycle.LiveData
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
@@ -17,7 +16,7 @@ import com.orhanobut.logger.Logger
 import org.koin.core.component.KoinApiExtension
 
 @KoinApiExtension
-open class IamPortMobileWebMode(bankPayLauncher: ActivityResultLauncher<String>?) : IamPortWebViewMode(bankPayLauncher = bankPayLauncher) {
+open class IamPortMobileWebMode() : IamPortWebViewMode() {
 
     fun initStart(activity: ComponentActivity, webview: WebView) {
         Logger.i("HELLO I'MPORT Mobile Web Mode SDK!")
@@ -28,10 +27,10 @@ open class IamPortMobileWebMode(bankPayLauncher: ActivityResultLauncher<String>?
         observeViewModel(null) // 관찰할 LiveData
     }
 
-    override fun processBankPayPayment(resPair: Pair<String, String>) {
-        Logger.d("processBankPayPayment")
-        viewModel.mobileModeProcessBankPayPayment(resPair)
-    }
+//    override fun processBankPayPayment(resPair: Pair<String, String>) {
+//        Logger.d("ignore processBankPayPayment")
+//        viewModel.mobileModeProcessBankPayPayment(resPair)
+//    }
 
 
     /**
@@ -40,7 +39,7 @@ open class IamPortMobileWebMode(bankPayLauncher: ActivityResultLauncher<String>?
     override fun observeViewModel(payment: Payment?) {
         activity?.run {
 
-            viewModel.niceTransRequestParam().observe(this, EventObserver(this@IamPortMobileWebMode::openNiceTransApp))
+//            viewModel.niceTransRequestParam().observe(this, EventObserver(this@IamPortMobileWebMode::openNiceTransApp))
             viewModel.thirdPartyUri().observe(this, EventObserver(this@IamPortMobileWebMode::openThirdPartyApp))
             viewModel.impResponse().observe(this, EventObserver(this@IamPortMobileWebMode::sdkFinish))
 

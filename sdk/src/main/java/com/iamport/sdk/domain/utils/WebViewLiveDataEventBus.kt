@@ -13,7 +13,7 @@ object WebViewLiveDataEventBus {
     val openWebView = MutableLiveData<Event<Payment>>()
 
     // 나이스 + 실시간계좌 뱅크페이 앱 결과
-    val niceTransRequestParam = MutableLiveData<Event<String>>()
+//    val niceTransRequestParam = MutableLiveData<Event<String>>()
 
     // 외부앱
     val thirdPartyUri = MutableLiveData<Event<Uri>>()

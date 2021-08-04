@@ -14,6 +14,12 @@ import com.orhanobut.logger.Logger.*
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 
+/**
+// 해당로직 쓰지 않아도 정상 결제 되는 듯 함
+// NiceTransWebViewStrategy 가 필요없어진 듯
+// bankpay launcher 도 삭제해도 될 듯
+ */
+
 open class NiceTransWebViewStrategy : WebViewStrategy() {
 
 //    private val niceApi: NiceApi by inject()
@@ -29,16 +35,16 @@ open class NiceTransWebViewStrategy : WebViewStrategy() {
 
         request?.url?.let {
             d("아주 나이스~ $it")
-            if (isNiceTransScheme(it)) {
-
-                bankTid = it.getQueryParameter(NiceBankpay.USER_KEY).toString()
-                niceTransUrl = it.getQueryParameter(NiceBankpay.CALLBACKPARAM).toString()
-
-                makeBankPayData(it)?.let { data ->
-                    bus.niceTransRequestParam.postValue(Event(data)) // 뱅크페이 앱 열기
-                }
-                return true
-            }
+//            if (isNiceTransScheme(it)) {
+//
+//                bankTid = it.getQueryParameter(NiceBankpay.USER_KEY).toString()
+//                niceTransUrl = it.getQueryParameter(NiceBankpay.CALLBACKPARAM).toString()
+//
+//                makeBankPayData(it)?.let { data ->
+//                    bus.niceTransRequestParam.postValue(Event(data)) // 뱅크페이 앱 열기
+//                }
+//                return true
+//            }
         }
 
         return super.shouldOverrideUrlLoading(view, request)

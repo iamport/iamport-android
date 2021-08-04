@@ -32,7 +32,7 @@ val appModule = module {
     single { JudgeStrategy() }
     single { ChaiStrategy() }
     single { WebViewStrategy() }
-    single { NiceTransWebViewStrategy() }
+//    single { NiceTransWebViewStrategy() }
     single { CertificationWebViewStrategy() }
 
 }

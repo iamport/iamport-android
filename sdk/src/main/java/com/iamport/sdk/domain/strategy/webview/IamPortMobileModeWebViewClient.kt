@@ -4,10 +4,11 @@ import android.os.Build
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import androidx.annotation.RequiresApi
+import com.iamport.sdk.data.nice.BankPayResultCode
 import com.iamport.sdk.domain.utils.Event
 import com.orhanobut.logger.Logger
 
-open class IamPortMobileModeWebViewClient : NiceTransWebViewStrategy() {
+open class IamPortMobileModeWebViewClient : WebViewStrategy() {
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
@@ -19,5 +20,4 @@ open class IamPortMobileModeWebViewClient : NiceTransWebViewStrategy() {
 
         return super.shouldOverrideUrlLoading(view, request)
     }
-
 }
