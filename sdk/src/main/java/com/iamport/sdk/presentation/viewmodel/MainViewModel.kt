@@ -121,7 +121,11 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
 
                 d("$this")
                 when (first) {
-                    JudgeStrategy.JudgeKinds.CHAI -> second?.let { repository.chaiStrategy.doWork(it.pg_id, third) }
+                    JudgeStrategy.JudgeKinds.CHAI -> second?.let {
+                        it.pg_id?.let { pgId ->
+                            repository.chaiStrategy.doWork(pgId, third)
+                        }
+                    }
                     JudgeStrategy.JudgeKinds.WEB,
                     JudgeStrategy.JudgeKinds.CERT -> bus.webViewActivityPayment.postValue(Event(third))
                     else -> Logger.e("판단불가 $third")
