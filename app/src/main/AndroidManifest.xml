@@ -31,7 +31,6 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="hello"
                     android:scheme="iamportsdkapp" />
             </intent-filter>
 

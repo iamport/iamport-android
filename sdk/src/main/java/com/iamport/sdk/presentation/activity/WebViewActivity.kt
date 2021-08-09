@@ -78,7 +78,9 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
      */
     private fun initLoading() {
         loading = viewDataBinding.loading as ProgressBar
-        loadingVisible(true)
+        if (payment != null) {
+            loadingVisible(true)
+        }
     }
 
 
