@@ -108,7 +108,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
 
             viewModel.impResponse().observe(this, EventObserver(this::sdkFinish))
 
-            viewModel.requestPayment(pay)
+            requestPayment(pay)
         }
     }
 
