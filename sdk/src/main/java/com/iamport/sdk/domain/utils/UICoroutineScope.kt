@@ -16,7 +16,7 @@ class UICoroutineScope(private val dispatchers: CoroutineContext = Dispatchers.M
         get() = dispatchers + job
 
     override fun releaseCoroutine() {
-        Logger.d("UICoroutineScope", "onRelease coroutine")
+        Logger.d("UICoroutineScope onRelease coroutine")
         job.cancel()
     }
 }

@@ -1,13 +1,22 @@
 package com.iamport.sdk.presentation.viewmodel
 
+import android.app.Application
+import android.content.BroadcastReceiver
+import android.content.Intent
+import android.content.IntentFilter
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.domain.core.Iamport
+import com.iamport.sdk.domain.core.IamportReceiver
 import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.repository.StrategyRepository
+import com.iamport.sdk.domain.service.ChaiService
 import com.iamport.sdk.domain.strategy.base.JudgeStrategy
+import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.NativeLiveDataEventBus
 import com.orhanobut.logger.Logger
@@ -18,36 +27,28 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinApiExtension
 
 @KoinApiExtension
-class MainViewModel(private val bus: NativeLiveDataEventBus, private val repository: StrategyRepository) : BaseViewModel(), IamportKoinComponent {
+class MainViewModel(private val bus: NativeLiveDataEventBus, private val repository: StrategyRepository, application: Application) :
+    AndroidViewModel(application), IamportKoinComponent {
+
+    // AndroidViewModel 이기에 사용가능
+    val app = getApplication<Application>()
+
+    var payment: Payment? = null
+    var approved: Status = Status.None
+
+    sealed class Status {
+        object Waiting : Status()
+        object None : Status()
+    }
+
+    private val screenBrFilter = IntentFilter(Intent.ACTION_SCREEN_OFF).apply {
+        addAction(Intent.ACTION_SCREEN_ON)
+    }
 
     private var job = Job()
         get() {
             if (field.isCancelled) field = Job()
             return field
-        }
-
-    var playChai: Boolean
-        get() {
-            return bus.playChai
-        }
-        set(value) {
-            bus.playChai = value
-        }
-
-    var chaiClearVersion: Boolean
-        get() {
-            return bus.chaiClearVersion
-        }
-        set(value) {
-            bus.chaiClearVersion = value
-        }
-
-    var receiveChaiCallBack: Boolean
-        get() {
-            return bus.receiveChaiCallBack
-        }
-        set(value) {
-            bus.receiveChaiCallBack = value
         }
 
 
@@ -57,15 +58,19 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
         super.onCleared()
     }
 
-    fun failSdkFinish(payment: Payment) {
-        repository.failSdkFinish(payment)
+    fun failSdkFinish() {
+        payment?.let {
+            repository.failSdkFinish(it)
+        } ?: run {
+            Logger.w("Payment 데이터가 없어서 실패처리하지 않음 [$payment]")
+        }
     }
 
     /**
      * 결제 데이터
      */
-    fun webViewPayment(): LiveData<Event<Payment>> {
-        return bus.webViewPayment
+    fun webViewActivityPayment(): LiveData<Event<Payment>> {
+        return bus.webViewActivityPayment
     }
 
     /**
@@ -103,9 +108,9 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
     /**
      * 결제 요청
      */
-    fun judgePayment(payment: Payment) {
+    fun judgePayment(payment: Payment, ignoreNative: Boolean = false) {
         viewModelScope.launch(job) {
-            repository.judgeStrategy.judge(payment).run {
+            repository.judgeStrategy.judge(payment, ignoreNative = ignoreNative).run {
 
                 Payment.validator(third).run {
                     if (!first) {
@@ -116,9 +121,13 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
 
                 d("$this")
                 when (first) {
-                    JudgeStrategy.JudgeKinds.CHAI -> second?.let { repository.chaiStrategy.doWork(it.pg_id, third) }
+                    JudgeStrategy.JudgeKinds.CHAI -> second?.let {
+                        it.pg_id?.let { pgId ->
+                            repository.chaiStrategy.doWork(pgId, third)
+                        }
+                    }
                     JudgeStrategy.JudgeKinds.WEB,
-                    JudgeStrategy.JudgeKinds.CERT -> bus.webViewPayment.postValue(Event(third))
+                    JudgeStrategy.JudgeKinds.CERT -> bus.webViewActivityPayment.postValue(Event(third))
                     else -> Logger.e("판단불가 $third")
                 }
             }
@@ -130,13 +139,16 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
      * 차이 데이터 클리어
      */
     fun clearData() {
-        playChai = false
-        chaiClearVersion = false
-        receiveChaiCallBack = false
-        repository.chaiStrategy.init()
+
+        // 차이 관련 초기화
+        approved = Status.None
+
+        // repository 초기화
+        repository.init()
+
+        // 코루틴 job cancel
         job.cancel()
     }
-
 
     /**
      * 차이 최종 결제 요청
@@ -145,51 +157,55 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
         viewModelScope.launch(job) {
             i("차이 최종 결제 요청")
             repository.chaiStrategy.requestApprovePayments(approve)
+            approved = Status.None
         }
     }
 
-    /**
-     * ON_STOP시 차이 결제 스테이터스 확인 with 폴링
-     */
-    fun pollingChaiStatus() {
-        if (!playChai) {
-            d("ignore pollingChaiStatus cause playChai")
-            return
-        }
-
+    fun forceChaiStatusCheck() {
         viewModelScope.launch(job) {
-            d("백그라운드라서 폴링 시도")
-            repository.chaiStrategy.requestPollingChaiStatus()
+            d("[차이앱 결제 상태 강제 체크]")
+            repository.chaiStrategy.checkRemoteChaiStatus(doPolling = false)
+        }
+    }
+
+    fun registerIamportReceiver(iamportReceiver: IamportReceiver, screenBrReceiver: BroadcastReceiver) {
+        IntentFilter().let {
+            it.addAction(CONST.BROADCAST_FOREGROUND_SERVICE)
+            it.addAction(CONST.BROADCAST_FOREGROUND_SERVICE_STOP)
+            app.applicationContext?.registerReceiver(screenBrReceiver, screenBrFilter)
+            app.registerReceiver(iamportReceiver, it)
         }
     }
 
 
-    /**
-     * ON_START시 차이 결제 스테이터스 확인
-     */
-    fun checkChaiStatus() {
-        if (!playChai) {
-            d("ignore checkChaiStatus cause playChai")
-            return
-        }
-
-        if (receiveChaiCallBack) {
-            d("ignore checkChaiStatus cause receiveChaiCallBack")
-            receiveChaiCallBack = false // 스킴 액티비티 종료시에 불릴 수 있기 때문에 초기화 해줘야함
-            return
-        }
-
-        viewModelScope.launch(job) {
-            d("차이앱 종료돼서 차이 결제 상태 체크")
-            repository.chaiStrategy.requestCheckChaiStatus()
+    // 포그라운드 서비스 관련 BroadcastReceiver,
+    // 스크린 ON/OFF 브로드캐스트 리시버 초기화
+    fun unregisterIamportReceiver(iamportReceiver: IamportReceiver, screenBrReceiver: BroadcastReceiver) {
+        runCatching {
+            app.unregisterReceiver(iamportReceiver)
+            app.applicationContext?.unregisterReceiver(screenBrReceiver)
         }
     }
 
-    /**
-     * ResultCallback시 차이 결제 스테이터스 확인
-     */
-    fun checkChaiStatusForResultCallback() {
-        checkChaiStatus()
-        receiveChaiCallBack = true
+
+    fun controlForegroundService(it: Boolean) {
+        if (!ChaiService.enableForegroundService) {
+            d("차이 폴링 포그라운드 서비스 실행하지 않음")
+            return
+        }
+
+        app.run {
+            Intent(this, ChaiService::class.java).also { intent: Intent ->
+                if (it) {
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        startForegroundService(intent)
+                    } else {
+                        startService(intent)
+                    }
+                } else {
+                    stopService(intent)
+                }
+            }
+        }
     }
 }

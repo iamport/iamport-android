@@ -10,7 +10,6 @@ import com.iamport.sdk.domain.strategy.webview.NiceTransWebViewStrategy
 import com.iamport.sdk.domain.strategy.webview.WebViewStrategy
 import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.NativeLiveDataEventBus
-import com.iamport.sdk.domain.utils.WebViewLiveDataEventBus
 import com.iamport.sdk.presentation.viewmodel.MainViewModel
 import com.iamport.sdk.presentation.viewmodel.WebViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -21,19 +20,19 @@ import org.koin.dsl.module
 
 @OptIn(KoinApiExtension::class)
 val appModule = module {
-    viewModel { MainViewModel(get(), get()) }
-    viewModel { WebViewModel(get(), get()) }
+    viewModel { MainViewModel(get(), get(), get()) }
+    viewModel { WebViewModel(get()) }
     single { IamportReceiver() }
     single(named("${CONST.KOIN_KEY}Gson")) { Gson() }
 
     single { StrategyRepository() }
-    single { WebViewLiveDataEventBus() }
+//    single { WebViewLiveDataEventBus() }
     single { NativeLiveDataEventBus() }
 
     single { JudgeStrategy() }
     single { ChaiStrategy() }
     single { WebViewStrategy() }
-    single { NiceTransWebViewStrategy() }
+//    single { NiceTransWebViewStrategy() }
     single { CertificationWebViewStrategy() }
 
 }

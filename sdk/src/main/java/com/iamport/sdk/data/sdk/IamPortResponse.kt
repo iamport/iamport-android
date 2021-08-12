@@ -30,22 +30,30 @@ data class IamPortResponse(
     val error_code: String? = null,
 ) : Parcelable {
     companion object {
-        fun makeSuccess(payment: Payment, prepareData: PrepareData? = null, msg: String): IamPortResponse {
+        fun makeSuccess(payment: Payment, impUid: String? = null, msg: String): IamPortResponse {
+            return makeSuccess(payment.getMerchantUid(), impUid, msg)
+        }
+
+        fun makeFail(payment: Payment, impUid: String? = null, msg: String): IamPortResponse {
+            return makeFail(payment.getMerchantUid(), impUid, msg)
+        }
+
+        fun makeSuccess(merchantUid: String, impUid: String? = null, msg: String): IamPortResponse {
             return IamPortResponse(
                 imp_success = true,
                 success = true,
-                imp_uid = prepareData?.impUid,
-                merchant_uid = payment.getMerchantUid(),
+                imp_uid = impUid,
+                merchant_uid = merchantUid,
                 error_msg = msg,
             )
         }
 
-        fun makeFail(payment: Payment, prepareData: PrepareData? = null, msg: String): IamPortResponse {
+        fun makeFail(merchantUid: String, impUid: String? = null, msg: String): IamPortResponse {
             return IamPortResponse(
                 imp_success = false,
                 success = false,
-                imp_uid = prepareData?.impUid,
-                merchant_uid = payment.getMerchantUid(),
+                imp_uid = impUid,
+                merchant_uid = merchantUid,
                 error_msg = msg
             )
         }

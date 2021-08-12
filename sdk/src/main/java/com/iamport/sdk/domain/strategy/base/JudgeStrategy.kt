@@ -5,12 +5,10 @@ import com.iamport.sdk.data.chai.response.Users
 import com.iamport.sdk.data.remote.ApiHelper
 import com.iamport.sdk.data.remote.IamportApi
 import com.iamport.sdk.data.remote.ResultWrapper
-import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.utils.CONST
-import com.iamport.sdk.domain.utils.Event
 import com.orhanobut.logger.Logger
 import kotlinx.coroutines.Dispatchers
 import org.koin.core.component.KoinApiExtension
@@ -25,6 +23,7 @@ class JudgeStrategy : BaseStrategy(), IamportKoinComponent {
     }
 
     private val iamportApi: IamportApi by inject() // 아임포트 서버 API
+    private var ignoreNative = false
 
     // #1 API imp uid 에 따른 유저정보 가져오기
     private suspend fun apiGetUsers(userCode: String): ResultWrapper<Users> {
@@ -32,7 +31,8 @@ class JudgeStrategy : BaseStrategy(), IamportKoinComponent {
         return ApiHelper.safeApiCall(Dispatchers.IO) { iamportApi.getUsers(userCode) }
     }
 
-    suspend fun judge(payment: Payment): Triple<JudgeKinds, UserData?, Payment> {
+    suspend fun judge(payment: Payment, ignoreNative: Boolean = false): Triple<JudgeKinds, UserData?, Payment> {
+        this.ignoreNative = ignoreNative
 
 //        * 1. IMP 서버에 유저 정보 요청해서 chai id 얻음
         val userDataList: ArrayList<UserData>? = when (val response = apiGetUsers(payment.userCode)) {
@@ -102,6 +102,7 @@ class JudgeStrategy : BaseStrategy(), IamportKoinComponent {
                 it.pg_provider == myPg
             }
         }
+        Logger.d("user :: $user")
 
         return when (user) {
             null -> defUser.pg_provider?.let {
@@ -125,7 +126,12 @@ class JudgeStrategy : BaseStrategy(), IamportKoinComponent {
      */
     private fun getPgTriple(user: UserData, payment: Payment): Triple<JudgeKinds, UserData?, Payment> {
         return when (user.pg_provider?.let { PG.convertPG(it) }) {
-            PG.chai -> Triple(JudgeKinds.CHAI, user, payment)
+            PG.chai -> {
+                if (ignoreNative) { // ignoreNative 인 경우 webview strategy 가 동작하기 위하여
+                   return Triple(JudgeKinds.WEB, user, payment)
+                }
+                Triple(JudgeKinds.CHAI, user, payment)
+            }
             else -> Triple(JudgeKinds.WEB, user, payment)
         }
     }

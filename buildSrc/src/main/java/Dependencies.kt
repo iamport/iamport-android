@@ -1,41 +1,41 @@
 // 디펜던시 업데이트 확인 ./gradlew dependencyUpdates -Drevision=release
 object Versions {
-    const val versionCode = 210623001 // yymmdd000
-    const val versionName = "1.0.0-dev05"  // prod(x.y.z), dev(x.y.z-dev00)
+    const val versionCode = 210812002 // yymmdd000
+    const val versionName = "1.0.0"  // prod(x.y.z), dev(x.y.z-dev00)
 
-    const val gradle_versions_plugin = "0.38.0"
+    const val gradle_versions_plugin = "0.39.0"
     const val gradle_version = "4.1.1"
 
     const val multidex = "2.0.1"
     const val kotlin_stdlib_jdk = "1.5.0"
-    const val core_ktx = "1.3.2"
-    const val appcompat = "1.2.0"
+    const val core_ktx = "1.6.0"
+    const val appcompat = "1.3.1"
 
-    const val mokito = "3.6.28"
+    const val mokito = "3.11.2"
     const val mokito_kotlin= "2.2.0"
 
     const val junit = "4.13.1"
-    const val testJunit = "1.1.2"
-    const val espresso_core = "3.3.0"
+    const val testJunit = "1.1.3"
+    const val espresso_core = "3.4.0"
 
-    const val androidx_test_core = "1.0.0"
+    const val androidx_test_core = "1.4.0"
     const val androidx_test_runner = "1.1.0"
 
-    const val constraintlayout = "2.0.4"
+    const val constraintlayout = "2.1.0"
     const val lifecycle_extensions = "2.2.0"
     const val lifecycle_common = "2.3.1"
 
     const val material = "1.4.0-alpha01"
 
-    const val activity_ktx = "1.3.0-alpha07"
-    const val fragment_ktx = "1.3.3"
+    const val activity_ktx = "1.3.0"
+    const val fragment_ktx = "1.3.6"
 
     const val koin_version = "2.2.3"
     const val retrofit_version = "2.9.0"
     const val logging_interceptor = "4.9.0"
 
     // Gson
-    const val gson = "2.8.6"
+    const val gson = "2.8.7"
 
     // Logger
     const val logger = "2.2.0"
@@ -49,9 +49,9 @@ object Versions {
     const val spinKit = "1.4.0"
 
 //    const val chuck = "1.1.0"
-    const val robolectric = "4.3"
+    const val robolectric = "4.6"
 
-    const val serialization = "1.1.0"
+    const val serialization = "1.2.2"
 }
 
 object Libs {

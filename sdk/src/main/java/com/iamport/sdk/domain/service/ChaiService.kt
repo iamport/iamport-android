@@ -8,7 +8,6 @@ import android.os.Build
 import android.os.IBinder
 import com.iamport.sdk.R
 import com.iamport.sdk.domain.utils.CONST
-import com.iamport.sdk.domain.utils.Foreground
 
 
 open class ChaiService : Service() {

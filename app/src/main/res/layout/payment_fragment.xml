@@ -20,10 +20,22 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <Button
+            android:id="@+id/back_button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:text="@string/close"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@id/top" />
+
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/user_code_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
             android:background="@color/white_12"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -122,46 +134,57 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/merchant_uid" />
 
-        <Button
-            android:id="@+id/back_button"
-            android:layout_width="80dp"
-            android:layout_height="70dp"
-            android:layout_marginBottom="30dp"
-            android:text="종료하기"
-            app:layout_constraintBottom_toTopOf="@id/payment_button"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cert_parent"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            app:layout_constraintBottom_toTopOf="@id/button_parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            />
+            app:layout_constraintRight_toRightOf="parent">
 
-        <Button
-            android:id="@+id/certification_button"
-            android:layout_width="80dp"
-            android:layout_height="70dp"
-            android:layout_marginBottom="30dp"
-            android:text="@string/certification"
-            app:layout_constraintBottom_toTopOf="@id/payment_button"
-            app:layout_constraintLeft_toRightOf="@+id/back_button"/>
+            <Button
+                android:id="@+id/certification_button"
+                android:layout_width="120dp"
+                android:layout_height="match_parent"
+                android:text="@string/certification"
+                app:layout_constraintLeft_toLeftOf="parent" />
 
-        <Button
-            android:id="@+id/webview_mode_button"
-            android:layout_width="80dp"
-            android:layout_height="70dp"
-            android:layout_marginBottom="30dp"
-            android:text="@string/webviewmode"
-            app:layout_constraintBottom_toTopOf="@id/payment_button"
-            app:layout_constraintRight_toLeftOf="@+id/back_button"/>
+            <Button
+                android:id="@+id/mobileweb_mode_button"
+                android:layout_width="120dp"
+                android:layout_height="match_parent"
+                android:text="@string/mobile_webmode"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintWidth_percent="0.5" />
 
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <Button
-            android:id="@+id/payment_button"
-            android:layout_width="200dp"
-            android:layout_height="70dp"
-            android:layout_marginBottom="30dp"
-            android:text="@string/buy"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/button_parent"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent" />
+            app:layout_constraintRight_toRightOf="parent">
 
+            <Button
+                android:id="@+id/payment_button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="@string/buy"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintWidth_percent="0.5" />
+
+            <Button
+                android:id="@+id/webview_mode_button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="@string/webviewmode"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintWidth_percent="0.5" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

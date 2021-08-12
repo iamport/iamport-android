@@ -5,7 +5,7 @@ import com.orhanobut.logger.Logger
 
 // 차이 네이티브 결제 관련
 object CHAI {
-    var pkg: String? = null
+//    var pkg: String? = null
     const val SINGLE_ACTIVITY_VERSION: Long = 2000169
     const val PAYMENT_ID = "paymentId"
     const val SUBSCRIPTION_ID = "subscriptionId"

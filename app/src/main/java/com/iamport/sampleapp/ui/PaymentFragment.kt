@@ -11,15 +11,22 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.activity.OnBackPressedCallback
+import androidx.core.widget.doAfterTextChanged
+import androidx.fragment.app.activityViewModels
 import com.google.gson.GsonBuilder
 import com.iamport.sampleapp.MerchantReceiver
 import com.iamport.sampleapp.PaymentResultData.result
 import com.iamport.sampleapp.R
+import com.iamport.sampleapp.ViewModel
 import com.iamport.sampleapp.databinding.PaymentFragmentBinding
-import com.iamport.sdk.data.sdk.*
+import com.iamport.sdk.data.sdk.IamPortApprove
+import com.iamport.sdk.data.sdk.IamPortCertification
+import com.iamport.sdk.data.sdk.IamPortResponse
+import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.domain.core.ICallbackPaymentResult
 import com.iamport.sdk.domain.core.Iamport
 import com.iamport.sdk.domain.utils.CONST
+import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.EventObserver
 import com.iamport.sdk.domain.utils.Util
 import kotlinx.coroutines.GlobalScope
@@ -28,23 +35,25 @@ import kotlinx.coroutines.launch
 import java.util.*
 
 class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
+
     override val layoutResourceId: Int = R.layout.payment_fragment
     private val receiver = MerchantReceiver()
+    val viewModel: ViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        Iamport.init(this) // fragment
+//        Iamport.init(this) // fragment
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        Log.i("SAMPLE", "onAttach")
         registForegroundServiceReceiver(context)
         requireActivity().onBackPressedDispatcher.addCallback(this, backPressCallback)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Iamport.close()
         backPressCallback.remove()
         this.context?.unregisterReceiver(receiver)
     }
@@ -72,13 +81,16 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
             onClickPayment()
         }
 
-        viewDataBinding.certificationButton.setOnClickListener {
-            onClickCertification()
+        viewDataBinding.webviewModeButton.setOnClickListener {
+            onClickWebViewModePayment()
         }
 
-        viewDataBinding.webviewModeButton.setOnClickListener {
-            Iamport.close()
-            (activity as MainActivity).replaceFragment(WebViewModeFragment())
+        viewDataBinding.mobilewebModeButton.setOnClickListener {
+            onClickMobileWebModePayment()
+        }
+
+        viewDataBinding.certificationButton.setOnClickListener {
+            onClickCertification()
         }
 
         viewDataBinding.backButton.setOnClickListener {
@@ -96,16 +108,35 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
         )
 
         viewDataBinding.userCode.adapter = userCodeAdapter
+        viewDataBinding.userCode.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                viewModel.userCode = Util.getUserCode(viewDataBinding.userCode.selectedItemPosition)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+            }
+
+        }
 
         viewDataBinding.pg.adapter = pgAdapter
         viewDataBinding.pg.onItemSelectedListener = pgSelectListener
 
+        viewDataBinding.name.doAfterTextChanged {
+            viewModel.paymentName = it.toString()
+        }
         viewDataBinding.name.setText("아임포트 Android SDK 결제 테스트")
+        viewDataBinding.amount.doAfterTextChanged {
+            viewModel.amount = it.toString()
+        }
         viewDataBinding.amount.setText("1000")
     }
 
     override fun onStart() {
         super.onStart()
+        viewDataBinding.merchantUid.doAfterTextChanged {
+            viewModel.merchantUid = it.toString()
+        }
         viewDataBinding.merchantUid.setText(getRandomMerchantUid())
 //        onPolling()
     }
@@ -122,43 +153,35 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
     }
 
     fun onClickCertification() {
-        val userCode = "imp00357859"
+        val userCode = "iamport"
         val certification = IamPortCertification(
-            merchant_uid = "muid_aos_123123",
-            min_age = 19,
-            name = "김준혁",
-            phone = "010-4597-5833",
+            merchant_uid = getRandomMerchantUid(),
             company = "유어포트",
         )
 
         Iamport.certification(userCode, iamPortCertification = certification) { callBackListener.result(it) }
     }
 
+    private fun onClickMobileWebModePayment() {
+        Iamport.close()
+        (activity as MainActivity).replaceFragment(MobileWebViewModeFragment())
+    }
+
+    // 웹뷰모드 결제 버튼 클릭
+    private fun onClickWebViewModePayment() {
+        val userCode = viewModel.userCode
+        val request = viewModel.createIamPortRequest()
+        Log.i("SAMPLE", "userCode :: $userCode")
+        Log.i("SAMPLE", GsonBuilder().setPrettyPrinting().create().toJson(request))
+
+        Iamport.close()
+        (activity as MainActivity).replaceFragment(WebViewModeFragment())
+    }
 
     // 결제 버튼 클릭
     private fun onClickPayment() {
-
-        val pg = PG.values()[viewDataBinding.pg.selectedItemPosition]
-        val payMethod = Util.getMappingPayMethod(pg).elementAt(viewDataBinding.pgMethod.selectedItemPosition)
-
-        val paymentName = viewDataBinding.name.text.toString().trim()
-        val merchantUid = viewDataBinding.merchantUid.text.toString().trim()
-        val amount = viewDataBinding.amount.text.toString().trim()
-
-        /**
-         * SDK 에 결제 요청할 데이터 구성
-         */
-        val request = IamPortRequest(
-            pg = pg.makePgRawName(pgId = ""),           // PG 사
-            pay_method = payMethod,                     // 결제수단
-            name = paymentName,                         // 주문명
-            merchant_uid = merchantUid,                 // 주문번호
-            amount = amount,                            // 결제금액
-            buyer_name = "남궁안녕",
-//            customer_uid = getRandomCustomerUid()
-        )
-
-        val userCode = Util.getUserCode(viewDataBinding.userCode.selectedItemPosition)
+        val userCode = viewModel.userCode
+        val request = viewModel.createIamPortRequest()
         Log.i("SAMPLE", "userCode :: $userCode")
         Log.i("SAMPLE", GsonBuilder().setPrettyPrinting().create().toJson(request))
 
@@ -175,6 +198,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
 //            approveCallback = { approveCallback(it) },
 //            paymentResultCallback = { callBackListener.result(it) })
 
+//        Iamport.payment(userCode, iamPortRequest = request, approveCallback = { approveCallback(it) }) { callBackListener.result(it) }
         Iamport.payment(userCode, iamPortRequest = request) { callBackListener.result(it) }
     }
 
@@ -185,7 +209,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
      */
     private fun approveCallback(iamPortApprove: IamPortApprove) {
         val secUnit = 1000L
-        val sec = 1
+        val sec = 2
         GlobalScope.launch {
             Log.i("SAMPLE", "재고확인 합니다~~")
             delay(sec * secUnit) // sec 초간 재고확인 프로세스를 가정합니다
@@ -199,17 +223,28 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
             Log.i("SAMPLE", "결제 결과 콜백\n$resJson")
             result = iamPortResponse
             if (iamPortResponse != null) {
-                (activity as MainActivity).replaceFragment(PaymentResultFragment())
+//                (activity as MainActivity).replaceFragment(PaymentResultFragment())
+                viewModel.resultCallback.postValue(Event(iamPortResponse))
             }
         }
     }
 
     private val pgSelectListener = object : AdapterView.OnItemSelectedListener {
         override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            viewModel.pg = PG.values()[position]
             viewDataBinding.pgMethod.adapter = ArrayAdapter(
                 requireContext(), R.layout.support_simple_spinner_dropdown_item,
                 Util.convertPayMethodNames(PG.values()[position])
             )
+
+            viewDataBinding.pgMethod.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                    viewModel.payMethod = Util.getMappingPayMethod(viewModel.pg).elementAt(viewDataBinding.pgMethod.selectedItemPosition)
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                }
+            }
         }
 
         override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -239,10 +274,6 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
 
     private fun getRandomMerchantUid(): String {
         return "muid_aos_${Date().time}"
-    }
-
-    private fun getRandomCustomerUid(): String {
-        return "mcuid_aos_${Date().time}"
     }
 
 }

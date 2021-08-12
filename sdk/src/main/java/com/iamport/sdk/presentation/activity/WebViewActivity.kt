@@ -3,10 +3,8 @@ package com.iamport.sdk.presentation.activity
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.view.View
 import android.widget.ProgressBar
-import androidx.annotation.RequiresApi
 import com.google.gson.GsonBuilder
 import com.iamport.sdk.R
 import com.iamport.sdk.data.sdk.IamPortResponse
@@ -17,7 +15,6 @@ import com.iamport.sdk.domain.IamportWebChromeClient
 import com.iamport.sdk.domain.JsNativeInterface
 import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.utils.*
-import com.iamport.sdk.presentation.contract.BankPayContract
 import com.iamport.sdk.presentation.viewmodel.WebViewModel
 import com.orhanobut.logger.Logger.*
 import kotlinx.coroutines.*
@@ -39,17 +36,16 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
     /**
      * 뱅크페이 앱 열기 위한 런처
      */
-    private var launcherBankPay =
-        registerForActivityResult(BankPayContract()) { res: Pair<String, String>? ->
-            res?.let {
-                loadingVisible(true)
-                viewModel.processBankPayPayment(res)
-            } ?: e("NICE TRANS result is NULL")
-        }
+//    private var launcherBankPay =
+//        registerForActivityResult(BankPayContract()) { res: Pair<String, String>? ->
+//            res?.let {
+//                loadingVisible(true)
+//                viewModel.processBankPayPayment(res)
+//            } ?: e("NICE TRANS result is NULL")
+//        }
 
     override fun onDestroy() {
         runCatching {
-//            close()
             removeObservers()
         }.onFailure {
             d("ignore fail close webview $it")
@@ -82,7 +78,9 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
      */
     private fun initLoading() {
         loading = viewDataBinding.loading as ProgressBar
-        loadingVisible(true)
+        if (payment != null) {
+            loadingVisible(true)
+        }
     }
 
 
@@ -101,16 +99,16 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
         d(GsonBuilder().setPrettyPrinting().create().toJson(payment))
         payment?.let { pay: Payment ->
 
-            viewModel.payment().observe(this, EventObserver(this::requestPayment))
             viewModel.loading().observe(this, EventObserver(this::loadingVisible))
 
             viewModel.openWebView().observe(this, EventObserver(this::openWebView))
-            viewModel.niceTransRequestParam().observe(this, EventObserver(this::openNiceTransApp))
+
+//            viewModel.niceTransRequestParam().observe(this, EventObserver(this::openNiceTransApp))
             viewModel.thirdPartyUri().observe(this, EventObserver(this::openThirdPartyApp))
 
             viewModel.impResponse().observe(this, EventObserver(this::sdkFinish))
 
-            viewModel.startPayment(pay)
+            requestPayment(pay)
         }
     }
 
@@ -133,23 +131,12 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
         viewModel.requestPayment(it)
     }
 
-    override fun onBackPressed() {
-        viewDataBinding.webview.run {
-            if (canGoBack()) {
-                goBack()
-            } else {
-                super.onBackPressed()
-            }
-        }
-    }
-
     private fun removeObservers() {
         runCatching {
             d("WebViewActivity removeObservers")
-            viewModel.payment().removeObservers(this)
             viewModel.loading().removeObservers(this)
             viewModel.openWebView().removeObservers(this)
-            viewModel.niceTransRequestParam().removeObservers(this)
+//            viewModel.niceTransRequestParam().removeObservers(this)
             viewModel.thirdPartyUri().removeObservers(this)
             viewModel.impResponse().removeObservers(this)
         }.onFailure {
@@ -164,6 +151,8 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
 
             viewDataBinding.webview.run {
                 removeJavascriptInterface(CONST.PAYMENT_WEBVIEW_JS_INTERFACE_NAME)
+                clearHistory()
+                loadUrl("about:blank")
                 removeAllViews()
                 destroy()
             }
@@ -182,6 +171,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
         close()
         loadingVisible(false)
         setResult(Activity.RESULT_OK, Intent().apply { putExtra(CONST.CONTRACT_OUTPUT, iamPortResponse) })
+//        Iamport.callback(iamPortResponse)
 
         this.finish()
     }
@@ -189,15 +179,15 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
     /**
      * 뱅크페이 외부앱 열기 for nice PG + 실시간계좌이체(trans)
      */
-    override fun openNiceTransApp(it: String) {
-        runCatching {
-            launcherBankPay.launch(it) // 뱅크페이 앱 실행
-        }.onFailure {
-            // 뱅크페이 앱 패키지는 하드코딩
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Util.getMarketId(ProvidePgPkg.BANKPAY.pkg))))
-        }
-        loadingVisible(false)
-    }
+//    override fun openNiceTransApp(it: String) {
+//        runCatching {
+//            launcherBankPay.launch(it) // 뱅크페이 앱 실행
+//        }.onFailure {
+//             뱅크페이 앱 패키지는 하드코딩
+//            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Util.getMarketId(ProvidePgPkg.BANKPAY.pkg))))
+//        }
+//        loadingVisible(false)
+//    }
 
     /**
      * 외부앱 열기
@@ -269,10 +259,10 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
             setLayerType(View.LAYER_TYPE_HARDWARE, null)
             clearCache(true)
             addJavascriptInterface(
-                JsNativeInterface(payment, get(named("${CONST.KOIN_KEY}Gson")), get(), evaluateJS),
+                JsNativeInterface(payment, get(named("${CONST.KOIN_KEY}Gson")), evaluateJS),
                 CONST.PAYMENT_WEBVIEW_JS_INTERFACE_NAME
             )
-            webViewClient = viewModel.getWebViewClient(payment)
+            webViewClient = viewModel.getWebViewClient()
             visibility = View.VISIBLE
 
             loadUrl(CONST.PAYMENT_FILE_URL) // load WebView

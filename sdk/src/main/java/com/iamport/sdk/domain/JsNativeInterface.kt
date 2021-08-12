@@ -14,7 +14,8 @@ import com.orhanobut.logger.Logger
 import org.koin.core.component.KoinApiExtension
 
 @KoinApiExtension
-class JsNativeInterface(val payment: Payment, val gson: Gson, private val bus: WebViewLiveDataEventBus, val evaluateJS: ((String) -> Unit)) : IamportKoinComponent {
+class JsNativeInterface(val payment: Payment, val gson: Gson, val evaluateJS: ((String) -> Unit)) : IamportKoinComponent {
+    private val bus: WebViewLiveDataEventBus by lazy { WebViewLiveDataEventBus }
 
     /**
      * 아임포트 JS SDK 에서 콜백 호출시에 해당 함수 동작

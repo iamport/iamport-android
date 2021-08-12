@@ -7,6 +7,11 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
+    <!--  CHAI 앱 버전 가져오는 로직으로 인해 추가  -->
+    <queries>
+        <package android:name="finance.chai.app" />
+    </queries>
+
     <application
         android:allowBackup="true"
         android:supportsRtl="true"
@@ -21,6 +26,7 @@
             android:hardwareAccelerated="true"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
             android:theme="@style/Theme.AppCompat.Transparent.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -32,6 +38,6 @@
                 <data android:scheme="iamport_android_webview" />
             </intent-filter>
         </activity>
-    </application>
 
+    </application>
 </manifest>

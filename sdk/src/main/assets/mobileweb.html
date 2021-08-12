@@ -1,168 +1,111 @@
+
 <html>
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <!-- jQuery -->
-        <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js" ></script>
-        <!-- iamport.payment.js -->
-        <script defer type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.1.8.js"></script>
+    <!-- jQuery -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <!-- iamport.payment.js -->
+    <script defer type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.1.8.js"></script>
 
-        <style type="text/css">
-            html, body, button {
-                font-family: 'Nanum Gothic';
-            }
-            button {
-                /* background-color: #888; */
-                color: #fff;
-                padding: 1rem 2rem;
-                height: 5rem;
-                font-size: 2rem;
-            }
-            #dataList {
-              display: none;
-              height: 120px;
-              overflow: auto;
-              left: 0;
-            }
-            #scrolldatalist {
-              display: none;
-              height: 80px;
-              overflow: auto;
-            }
-            #dataList option ,#scrolldatalist option{
-              cursor: pointer;
-            }
+    <style type="text/css">
+        html, body, button {
+            font-family: 'Nanum Gothic';
+        }
+
+        button {
+            /* background-color: #888; */
+            color: #fff;
+            padding: 1rem 2rem;
+            height: 5rem;
+            font-size: 2rem;
+        }
+
+        #dataList {
+            display: none;
+            height: 120px;
+            overflow: auto;
+            left: 0;
+        }
+
+        #scrolldatalist {
+            display: none;
+            height: 80px;
+            overflow: auto;
+        }
+
+        #dataList option, #scrolldatalist option {
+            cursor: pointer;
+        }
 
 
-            #dataList.show,#scrolldatalist.show {
-              display: block;
-            }
-            /* .imp-dialog.mobile .imp-header {
-              top: env(safe-area-inset-top);
-              top: constant(safe-area-inset-top);
-            } */
-        </style>
-    </head>
-    <body>
+        #dataList.show, #scrolldatalist.show {
+            display: block;
+        }
 
-        <h1 id="header-value"></h1>
+        /* .imp-dialog.mobile .imp-header {
+          top: env(safe-area-inset-top);
+          top: constant(safe-area-inset-top);
+        } */
+    </style>
+</head>
+<body>
 
-        <button onclick="onClickPayment()">결제하기</button>
-        <button onclick="onClickCertification()">본인인증하기</button>
+<h1 id="header-value"></h1>
 
-        <script type="text/javascript">
+<button onclick="onClickPayment()">결제하기</button>
+<button onclick="onClickCertification()">본인인증하기</button>
 
+<script type="text/javascript">
+
+          const userCode = 'iamport'
           document.addEventListener('DOMContentLoaded', () => {
-           
-<!--            IMP.init('imp96304110'); // 빙봉-->
-            IMP.init('iamport');
-
+                  IMP.init(userCode); // 초기화
             });
 
-
+            // 결제
             function onClickPayment() {
-              IMP.request_pay({
-                  pg: 'kcp',
-                  pay_method : 'card',
-                  niceMobileV2: true,
-                  amount: '1000',
-                  // company: '아임포트',
-                  // amount: 0,
-                  // tax_free: 0,
-                  // digital: true, // 휴대폰 소액결제 관련
-                  // digital: false, 
-                  // currency: 'USD',
-                  merchant_uid: `mid_${new Date().getTime()}`,
-                  name: '테스트',
-                  buyer_name: '홍길동',
-                  buyer_email: 'example@example.com',
-                  // buyer_tel: '01012341234',
-                  buyer_addr: '신사동 661-16',
-                  buyer_postcode: '06018',
-                  // bypass : {
-                  //   skin_indx : '8',
-                  //   site_logo : 'https://analytics.iamport.kr/img/img-f19838.svg',
-                  // },
-                  // popup: true,
-                  // customer_uid: `cuid_${new Date().getTime()}`,
-                  // m_redirect_url: 'https://www.naver.com',
-                  // app_scheme: 'iamporttest',
-                  // card: {
-                  //   detail : [
-                  //     { card_code: '*', enabled: false },
-                  //     { card_code: 'hyundai', enabled: true },
-                  //   ],
-                  // },
-                  // period : {
-                  //   from : "~",
-                  //   to : "202004231234",
-                  // },
-                  // 
-                  // bypass : {
-                  //   display: {
-                  //   card_quota: [2,3, 8],
-                  // },P_RESERVED : 'hide_cancel_btn=Y'
-                  // },
-                  m_redirect_url: 'https://www.iamport.kr?orderId=order_uid_123456789#result',
-                  app_scheme: 'iamport',
-              }, function(response) {
-                // console.log(response);
-                console.log(response);
-                // alert(JSON.stringify(response));
-                // jQuery.ajax({
-                //   url: "http://localhost:5000/orders",
-                //   method: "POST",
-                //   headers: { "Content-Type": "application/json" },
-                //   data: JSON.stringify({
-                //     imp_uid: response.imp_uid,
-                //     merchant_uid: response.merchant_uid
-                //   }),
-                // });
-              });
+                const data = {
+                      pg: 'html5_inicis',
+                      pay_method : 'card',
+                      niceMobileV2: true,
+                      amount: '1000',
+                      merchant_uid: `mid_${new Date().getTime()}`,
+                      name: '테스트',
+                      buyer_name: '홍길동',
+                      buyer_email: 'example@example.com',
+                      buyer_addr: '신사동 661-16',
+                      buyer_postcode: '06018',
+                      m_redirect_url: 'https://www.iamport.kr?orderId=order_uid_123456789#result',
+//                      m_redirect_url: 'https://httpstat.us/200',
+                  }
+
+                  IMP.request_pay(data, function(response) {
+                    console.log(response);
+                    alert(JSON.stringify(response))
+                  });
             }
+
+            // 본인인증
             function onClickCertification() {
-                IMP.certification({
+                const data = {
                   merchant_uid: `mid_${new Date().getTime()}`,
                   // birth: '19921010',
                   carrier: '',
                   name: '',
                   phone: '',
                   company: '아임포트',
-                  // min_age: 14,
-                  // popup: false,
-                  // m_redirect_url: 'https://www.naver.com',
-                  // popup: true,
-                }, function(response) {
-                  alert(`${response.error_msg}`)
+                  }
+
+                IMP.certification(data, function(response) {
                   console.log(response);
+                  alert(JSON.stringify(response))
                 });
             }
-            // (async function() {
-                // await axios.get('http://192.168.0.16:3002/users/1')
-                // .then((response) => {
-                //     const { headers } = response;
-                //     const header = JSON.stringify(headers);
-                //     document.getElementById('header-value').innerText = header;
-                // })
-                // .catch((error) => {
-                //     const header = JSON.stringify(error);
-                //     console.log(error.request);
-                //     document.getElementById('header-value').innerText = header;
-                // });
 
-                // await axios.get('http://192.168.0.16:3002/users/2')
-                // .then((response) => {
-                //     const { headers } = response;
-                //     const header = JSON.stringify(headers);
-                //     document.getElementById('header-value').innerText = header;
-                // })
-                // .catch((error) => {
-                //     const header = JSON.stringify(error);
-                //     console.log(error.request);
-                //     document.getElementById('header-value').innerText = header;
-                // });
-            // })();
-        </script>
-    </body>
+
+
+</script>
+</body>
 </html>

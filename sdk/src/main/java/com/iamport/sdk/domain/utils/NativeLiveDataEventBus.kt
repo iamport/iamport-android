@@ -7,10 +7,6 @@ import com.iamport.sdk.data.sdk.Payment
 
 open class NativeLiveDataEventBus {
 
-    var playChai: Boolean = false
-    var chaiClearVersion: Boolean = false
-    var receiveChaiCallBack: Boolean = false
-
     // 결제 완료 콜백
     val impResponse = MutableLiveData<Event<IamPortResponse?>>()
 
@@ -18,7 +14,7 @@ open class NativeLiveDataEventBus {
     val chaiUri = MutableLiveData<Event<String>>()
 
     // 웹뷰 결제 시작
-    val webViewPayment = MutableLiveData<Event<Payment>>()
+    val webViewActivityPayment = MutableLiveData<Event<Payment>>()
 
     // 차이 결제상태 Approve
     val chaiApprove = MutableLiveData<Event<IamPortApprove>>()
