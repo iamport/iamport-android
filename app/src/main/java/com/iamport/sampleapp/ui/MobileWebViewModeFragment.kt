@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.iamport.sampleapp.MyWebViewChromeClient
 import com.iamport.sampleapp.MyWebViewClient
 import com.iamport.sampleapp.databinding.WebViewModeFragmentBinding
 import com.iamport.sdk.domain.core.Iamport
@@ -43,6 +44,7 @@ class MobileWebViewModeFragment : Fragment() {
 
             // 통상적인 경우의 custom webviewClient
             it.webViewClient = MyWebViewClient()
+            it.webChromeClient = MyWebViewChromeClient()
 
             // oreo 미만에서 url 변경만 보고 싶은경우
             Iamport.mobileWebModeShouldOverrideUrlLoading()?.observe(this, EventObserver { uri ->

@@ -7,7 +7,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 
 
-class IamportWebChromeClient : WebChromeClient() {
+open class IamportWebChromeClient : WebChromeClient() {
     override fun onJsConfirm(
         view: WebView,
         url: String,

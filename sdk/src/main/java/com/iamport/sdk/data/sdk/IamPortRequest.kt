@@ -16,14 +16,14 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class IamPortRequest(
     val pg: String,
-    val pay_method: PayMethod = PayMethod.card, // 명세상 필수인지 불명확함, default card
+    val pay_method: PayMethod = PayMethod.card, // default card
     val escrow: Boolean? = null, // default false
     val merchant_uid: String, // default "random"
     val customer_uid: String? = null, // 정기결제용
     val name: String? = null,
     val amount: String,
-    val custom_data: String? = null, // 명세상 불명확
-    val tax_free: String? = null,
+    val custom_data: String? = null,
+    val tax_free: Float? = null,
     val currency: Currency? = null, // default KRW, 페이팔은 USD 이어야 함
     val language: String? = null, // default "ko", en, zh, jp => TODO validator 에 추가
     val buyer_name: String? = null,
@@ -36,7 +36,7 @@ data class IamPortRequest(
     val digital: Boolean? = null, // default false
     val vbank_due: String? = null, // YYYYMMDDhhmm
     private var m_redirect_url: String? = Platform.native.redirectUrl, // 콜백
-    val app_scheme: String? = null, // 명세상 nullable 이나, RN 에서 필수
+    val app_scheme: String? = null,
     val biz_num: String? = null,
     val popup: Boolean? = null,
     private val niceMobileV2 : Boolean = true,
@@ -96,7 +96,7 @@ data class IamPortRequest(
             var name: String? = null
 
             var custom_data: String? = null // 명세상 불명확
-            var tax_free: String? = null
+            var tax_free: Float? = null
             var currency: Currency? = null // default KRW, 페이팔은 USD 이어야 함
             var language: String? = null // default "ko"
             var buyer_name: String? = null
@@ -158,7 +158,7 @@ data class IamPortRequest(
                 this.custom_data = custom_data
             }
 
-            fun tax_free(tax_free: String) = apply {
+            fun tax_free(tax_free: Float) = apply {
                 this.tax_free = tax_free
             }
 

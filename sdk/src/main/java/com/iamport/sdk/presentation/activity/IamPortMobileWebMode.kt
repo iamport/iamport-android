@@ -64,7 +64,18 @@ open class IamPortMobileWebMode() : IamPortWebViewMode() {
             setLayerType(View.LAYER_TYPE_HARDWARE, null)
             clearCache(true) // FIXME: 안지워도 될까? 고민..
             visibility = View.VISIBLE
-            webChromeClient = IamportWebChromeClient()
+//            webChromeClient = IamportWebChromeClient()
+
+            webChromeClient = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                webChromeClient.let {
+                    if (it is IamportWebChromeClient) {
+                        return@let it
+                    }
+                    IamportWebChromeClient()
+                }
+            } else {
+                IamportWebChromeClient()
+            }
 
             webViewClient = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 webViewClient.let {
