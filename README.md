@@ -220,7 +220,7 @@ Iamport.pluginMobileWebSupporter(webview)
 
 - Custom WebViewClient 의 사용
 
-[샘플앱의 예시 MyWebViewClient.kt](./app/src/main/java/com/iamport/sampleapp/ui/MyWebViewClient.kt)
+[샘플앱의 예시 MyWebViewClient class](./app/src/main/java/com/iamport/sampleapp/MyWebViewClient.kt)
 
 ```kotlin
 /**
@@ -246,6 +246,35 @@ class MobileWebViewModeFragment : Fragment() {
         Iamport.mobileWebModeShouldOverrideUrlLoading()?.observe(this, EventObserver { uri ->
             Log.i("SAMPLE", "changed url :: $uri")
         })
+    }
+}
+
+```  
+  
+
+- Custom WebChromeClient 의 사용
+
+[샘플앱의 예시 MyWebViewChromeClient class](./app/src/main/java/com/iamport/sampleapp/MyWebViewClient.kt)
+
+
+
+```kotlin
+/**
+ [IamportWebChromeClient] 상속하여 사용
+ */
+// CASE 1 : IamportWebChromeClient 상속
+open class MyWebViewChromeClient : IamportWebChromeClient() {
+    override fun onJsConfirm(view: WebView, url: String, message: String, result: JsResult): Boolean {
+        Log.i("MyWebViewChromeClient", "called this function")
+        return super.onJsConfirm(view, url, message, result)
+    }
+}
+
+class MobileWebViewModeFragment : Fragment() {
+    override fun setupWebView() {
+        // IamportWebChromeClient 사용
+        it.webChromeClient = MyWebViewChromeClient()
+        // ..
     }
 }
 

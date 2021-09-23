@@ -18,7 +18,7 @@ data class PrepareRequest(
     val pay_method: PayMethod = PayMethod.trans,//fixed
     val escrow: Boolean?, // true or false
     val amount: String, // 결제금액
-    val tax_free: String?, // 결제금액 중 면세공급가액,
+    val tax_free: Float?, // 결제금액 중 면세공급가액,
     val name: String, //주문명,
     val merchant_uid: String, // 가맹점 주문번호,
     val customer_uid: String?, // 정기결제용
@@ -47,7 +47,7 @@ data class PrepareRequest(
                 PrepareRequest(
                     escrow = false,
                     amount = amount,
-                    tax_free = Util.getOrZeroString(tax_free),
+                    tax_free = tax_free,
                     name = Util.getOrEmpty(name),
                     merchant_uid = merchant_uid,
                     customer_uid = customer_uid,
