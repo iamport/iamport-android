@@ -61,6 +61,31 @@ android {
 }
 
 
+afterEvaluate {
+    publishing {
+        publications {
+            paidRelease(MavenPublication) {
+                // The following applies a component to this publication
+                // which results in publishing an app bundle.
+                from components.release
+
+                groupId = 'com.iamport.sdk'
+                artifactId = 'iamport'
+                version = Versions.versionName
+            }
+            paidDebug(MavenPublication) {
+                // The following applies a component to this publication
+                // which results in publishing APKs in a ZIP file.
+                from components.debug
+
+                groupId = 'com.iamport.sdk'
+                artifactId = 'iamport-debug'
+                version = Versions.versionName
+            }
+        }
+    }
+}
+
 dependencies {
 
     implementation Libs.multidex
