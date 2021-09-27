@@ -33,7 +33,7 @@ public class MainActivity_JAVA extends AppCompatActivity {
 
         IamPortRequest request = IamPortRequest.builder()
                 .pg(PG.kcp.makePgRawName(""))
-                .pay_method(PayMethod.card)
+                .pay_method(PayMethod.card.name())
                 .name("JAVA칩 프라푸치노 주문이요")
                 .merchant_uid("mid_" + (new Date()).getTime())
                 .amount("3200")

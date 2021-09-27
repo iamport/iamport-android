@@ -15,7 +15,7 @@ import com.orhanobut.logger.Logger
 data class PrepareRequest(
     val channel: String = CHAI.CHANNEL,//fixed
     val provider: PG = PG.chai, //fixed
-    val pay_method: PayMethod = PayMethod.trans,//fixed
+    val pay_method: String = PayMethod.trans.name,//fixed
     val escrow: Boolean?, // true or false
     val amount: String, // 결제금액
     val tax_free: Float?, // 결제금액 중 면세공급가액,

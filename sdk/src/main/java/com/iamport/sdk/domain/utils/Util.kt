@@ -98,7 +98,7 @@ object Util {
                 PayMethod.smartculture,
                 PayMethod.happymoney
             )
-            kcp -> defaultPayMethod + setOf(PayMethod.samsung)
+            kcp -> defaultPayMethod + setOf(PayMethod.samsung, PayMethod.naverpay)
             kcp_billing, kakaopay,
             paypal, payco, smilepay, alipay, settle_firm ->
                 setOf(PayMethod.card)

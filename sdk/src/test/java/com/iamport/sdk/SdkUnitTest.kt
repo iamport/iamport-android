@@ -57,7 +57,7 @@ class SdkUnitTest : AbstractKoinTest() {
         val userCode = "12345"
         val request = IamPortRequest(
             pg = PG.kcp.makePgRawName(),
-            pay_method = PayMethod.card,
+            pay_method = PayMethod.card.name,
             name = "주문명001",
             merchant_uid = "주문번호001",
             amount = "1000",
@@ -94,7 +94,7 @@ class SdkUnitTest : AbstractKoinTest() {
                 userCode = Util.SampleUserCode.imp37739582.name,
                 iamPortRequest = iamPortRequest?.copy(
                     pg = PG.chai.makePgRawName(),
-                    pay_method = PayMethod.trans,
+                    pay_method = PayMethod.trans.name,
                 )
             )
         }
@@ -112,7 +112,7 @@ class SdkUnitTest : AbstractKoinTest() {
                 userCode = Util.SampleUserCode.imp37739582.name,
                 iamPortRequest = iamPortRequest?.copy(
                     pg = PG.chai.makePgRawName(),
-                    pay_method = PayMethod.trans,
+                    pay_method = PayMethod.trans.name,
                 )
             )
         }
@@ -135,7 +135,7 @@ class SdkUnitTest : AbstractKoinTest() {
             copy(
                 iamPortRequest = iamPortRequest?.copy(
                     pg = PG.kcp.makePgRawName(),
-                    pay_method = PayMethod.vbank,
+                    pay_method = PayMethod.vbank.name,
                 )
             )
         }
@@ -155,7 +155,7 @@ class SdkUnitTest : AbstractKoinTest() {
             copy(
                 iamPortRequest = iamPortRequest?.copy(
                     pg = PG.kcp.makePgRawName(),
-                    pay_method = PayMethod.vbank,
+                    pay_method = PayMethod.vbank.name,
                     vbank_due = "2020121211302",
                 )
             )
@@ -175,7 +175,7 @@ class SdkUnitTest : AbstractKoinTest() {
             copy(
                 iamPortRequest = iamPortRequest?.copy(
                     pg = PG.kcp.makePgRawName(),
-                    pay_method = PayMethod.phone,
+                    pay_method = PayMethod.phone.name,
                 )
             )
         }
@@ -195,7 +195,7 @@ class SdkUnitTest : AbstractKoinTest() {
             copy(
                 iamPortRequest = iamPortRequest?.copy(
                     pg = PG.kcp.makePgRawName(),
-                    pay_method = PayMethod.phone,
+                    pay_method = PayMethod.phone.name,
                     digital = true,
                 )
             )
@@ -215,7 +215,7 @@ class SdkUnitTest : AbstractKoinTest() {
             copy(
                 iamPortRequest = iamPortRequest?.copy(
                     pg = PG.danal_tpay.makePgRawName(),
-                    pay_method = PayMethod.vbank,
+                    pay_method = PayMethod.vbank.name,
                     vbank_due = "2020121211302",
                 )
             )
@@ -236,7 +236,7 @@ class SdkUnitTest : AbstractKoinTest() {
             copy(
                 iamPortRequest = iamPortRequest?.copy(
                     pg = PG.danal_tpay.makePgRawName(),
-                    pay_method = PayMethod.vbank,
+                    pay_method = PayMethod.vbank.name,
                     vbank_due = "2020121211302",
                     biz_num = "1234567890"
                 )
@@ -277,7 +277,7 @@ class SdkUnitTest : AbstractKoinTest() {
             copy(
                 iamPortRequest = iamPortRequest?.copy(
                     pg = PG.paypal.makePgRawName(),
-                    pay_method = PayMethod.card,
+                    pay_method = PayMethod.card.name,
                     m_redirect_url = CONST.IAMPORT_PROD_URL,
                 )
             )

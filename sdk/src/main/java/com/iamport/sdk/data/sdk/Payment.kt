@@ -60,19 +60,19 @@ data class Payment(
             }
 
             payment.iamPortRequest?.run {
-                if (pay_method == PayMethod.vbank) {
+                if (pay_method == PayMethod.vbank.name) {
                     if (vbank_due.isNullOrBlank()) {
                         return false to CONST.ERR_PAYMENT_VALIDATOR_VBANK
                     }
                 }
 
-                if (pay_method == PayMethod.phone) {
+                if (pay_method == PayMethod.phone.name) {
                     if (digital == null) {
                         return false to CONST.ERR_PAYMENT_VALIDATOR_PHONE
                     }
                 }
 
-                if (PG.convertPG(pg) == PG.danal_tpay && pay_method == PayMethod.vbank) {
+                if (PG.convertPG(pg) == PG.danal_tpay && pay_method == PayMethod.vbank.name) {
                     if (biz_num.isNullOrBlank()) {
                         return false to CONST.ERR_PAYMENT_VALIDATOR_DANAL_VBANK
                     }
