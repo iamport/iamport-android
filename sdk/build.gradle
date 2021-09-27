@@ -72,8 +72,8 @@ afterEvaluate {
                 from components.release
 
                 // You can then customize attributes of the publication as shown below.
-                groupId = 'com.iamport.sdk'
-                artifactId = 'iamport'
+                groupId = 'com.github.iamport'
+                artifactId = 'iamport-android'
                 version = Versions.versionName
             }
             // Creates a Maven publication called “debug”.
@@ -81,8 +81,8 @@ afterEvaluate {
                 // Applies the component for the debug build variant.
                 from components.debug
 
-                groupId = 'com.iamport.sdk'
-                artifactId = 'iamport-debug'
+                groupId = 'com.github.iamport'
+                artifactId = 'iamport-android-debug'
                 version = Versions.versionName
             }
         }
