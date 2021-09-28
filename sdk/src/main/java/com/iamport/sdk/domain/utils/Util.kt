@@ -165,10 +165,12 @@ object Util {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             cm?.run {
                 getNetworkCapabilities(activeNetwork)?.run {
+                    Logger.w(this.toString())
                     result = when {
                         hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
                         hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
                         hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+                        hasTransport(NetworkCapabilities.TRANSPORT_VPN) -> true
                         else -> false
                     }
                 }

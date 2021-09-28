@@ -105,6 +105,6 @@ dependencies {
 //    implementation "io.insert-koin:koin-androidx-ext:$Versions.koin_version"
 
     implementation project(':sdk')
-//    implementation 'com.github.iamport:iamport-android:v1.0.0-dev12'
+//    implementation 'com.github.iamport:iamport-android:v1.1.0-hotfix04'
 }
 

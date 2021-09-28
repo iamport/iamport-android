@@ -35,11 +35,11 @@ data class IamPortRequest(
     val display: CardQuota? = null,
     val digital: Boolean? = null, // default false
     val vbank_due: String? = null, // YYYYMMDDhhmm
-    private var m_redirect_url: String? = Platform.native.redirectUrl, // 콜백
+//    private var m_redirect_url: String? = Platform.native.redirectUrl, // 콜백
     val app_scheme: String? = null,
     val biz_num: String? = null,
     val popup: Boolean? = null,
-    private val niceMobileV2 : Boolean = true,
+//    private val niceMobileV2 : Boolean = true,
 
     // 네이버 관련
     val naverPopupMode: Boolean? = null,
@@ -52,8 +52,10 @@ data class IamPortRequest(
     val cultureBenefit: Boolean? = null,
     val naverInterface: NaverInterface? = null,
 
-
 ) : Parcelable {
+
+    private var m_redirect_url: String? = Platform.native.redirectUrl // 콜백
+    private val niceMobileV2 : Boolean = true
 
     /**
      * string pg 으로 enum PG 가져옴
@@ -79,6 +81,7 @@ data class IamPortRequest(
         get() {
             return null
         }
+
 
     companion object {
         @JvmStatic
@@ -276,11 +279,11 @@ data class IamPortRequest(
                 display,
                 digital,
                 vbank_due,
-                m_redirect_url,
+//                m_redirect_url,
                 app_scheme,
                 biz_num,
                 popup,
-                niceMobileV2,
+//                niceMobileV2,
                 naverPopupMode,
                 naverUseCfm,
                 naverProducts,
