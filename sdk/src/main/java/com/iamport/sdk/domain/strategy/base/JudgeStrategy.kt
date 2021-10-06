@@ -11,10 +11,8 @@ import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.utils.CONST
 import com.orhanobut.logger.Logger
 import kotlinx.coroutines.Dispatchers
-import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.inject
 
-@KoinApiExtension
 class JudgeStrategy : BaseStrategy(), IamportKoinComponent {
 
     // 유저 정보 판단 결과 타입

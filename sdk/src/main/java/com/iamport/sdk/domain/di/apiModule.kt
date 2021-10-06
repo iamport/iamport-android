@@ -9,7 +9,6 @@ import com.iamport.sdk.data.remote.NiceApi
 import com.iamport.sdk.domain.utils.CONST
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import org.koin.core.component.KoinApiExtension
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import retrofit2.Retrofit
@@ -65,12 +64,10 @@ fun provideChaiApi(url: String, gson : Gson, client: OkHttpClient?): ChaiApi {
         .create(ChaiApi::class.java)
 }
 
-@OptIn(KoinApiExtension::class)
-val httpClientModule = module(override = true) {
+val httpClientModule = module {
     single(named("${CONST.KOIN_KEY}provideOkHttpClient")) { provideOkHttpClient(get()) }
 }
 
-@OptIn(KoinApiExtension::class)
 val apiModule = module {
     single { provideIamportApi(get(named("${CONST.KOIN_KEY}Gson")), get(named("${CONST.KOIN_KEY}provideOkHttpClient")),) }
 //    single { provideChaiApi(false, get(), get()) }

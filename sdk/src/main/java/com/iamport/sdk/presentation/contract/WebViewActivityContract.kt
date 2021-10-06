@@ -9,14 +9,12 @@ import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.presentation.activity.WebViewActivity
-import org.koin.core.component.KoinApiExtension
 
 /**
  * WebView 앱 요청 및 응답 데이터 규약
  */
 class WebViewActivityContract : ActivityResultContract<Payment, IamPortResponse>() {
 
-    @KoinApiExtension
     override fun createIntent(context: Context, input: Payment): Intent {
         return Intent(context, WebViewActivity::class.java).apply {
             // 액티비티 하나 제한

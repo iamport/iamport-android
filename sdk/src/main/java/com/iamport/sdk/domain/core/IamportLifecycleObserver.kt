@@ -6,9 +6,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.iamport.sdk.presentation.contract.BankPayContract
 import com.orhanobut.logger.Logger
-import org.koin.core.component.KoinApiExtension
 
-@KoinApiExtension
 class IamportLifecycleObserver(private val registry: ActivityResultRegistry) : DefaultLifecycleObserver {
     private lateinit var bankPayLauncher: ActivityResultLauncher<String>
     lateinit var resultCallback: (Pair<String, String>) -> Unit

@@ -20,12 +20,10 @@ import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.Event
 import com.orhanobut.logger.Logger.*
 import kotlinx.coroutines.*
-import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.get
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 
-@KoinApiExtension
 open class ChaiStrategy : BaseStrategy() {
 
     private val job = SupervisorJob()

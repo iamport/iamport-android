@@ -11,10 +11,8 @@ import com.iamport.sdk.domain.strategy.chai.ChaiStrategy
 import com.iamport.sdk.domain.strategy.webview.IamPortMobileModeWebViewClient
 import com.iamport.sdk.domain.strategy.webview.WebViewStrategy
 import com.orhanobut.logger.Logger
-import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.inject
 
-@KoinApiExtension
 class StrategyRepository : IamportKoinComponent {
 
     val judgeStrategy: JudgeStrategy by inject()

@@ -12,7 +12,7 @@ object Versions {
     const val appcompat = "1.3.1"
 
     const val mokito = "3.11.2"
-    const val mokito_kotlin= "2.2.0"
+    const val mokito_kotlin = "2.2.0"
 
     const val junit = "4.13.1"
     const val testJunit = "1.1.3"
@@ -30,7 +30,7 @@ object Versions {
     const val activity_ktx = "1.3.0"
     const val fragment_ktx = "1.3.6"
 
-    const val koin_version = "2.2.3"
+    const val koin_version = "3.1.2"
     const val retrofit_version = "2.9.0"
     const val logging_interceptor = "4.9.0"
 
@@ -48,7 +48,7 @@ object Versions {
     // loading animation
     const val spinKit = "1.4.0"
 
-//    const val chuck = "1.1.0"
+    //    const val chuck = "1.1.0"
     const val robolectric = "4.6"
 
     const val serialization = "1.2.2"
@@ -90,15 +90,18 @@ object Libs {
     const val activity_ktx = "androidx.activity:activity-ktx:${Versions.activity_ktx}"
     const val fragment_ktx = "androidx.fragment:fragment-ktx:${Versions.fragment_ktx}"
 
+    // Koin main features for Android (Scope,ViewModel ...)
+    const val koin_android = "io.insert-koin:koin-android:${Versions.koin_version}"
+
     const val koin_core = "io.insert-koin:koin-core:${Versions.koin_version}"
-    const val koin_core_ext = "io.insert-koin:koin-core-ext:${Versions.koin_version}"
     const val koin_test = "io.insert-koin:koin-test:${Versions.koin_version}"
 
-    // AndroidX Scope 생성 - 삭제 자동화
-    const val koin_androidx_scope = "io.insert-koin:koin-androidx-scope:${Versions.koin_version}"
-    const val koin_androidx_viewmodel = "io.insert-koin:koin-androidx-viewmodel:${Versions.koin_version}"
-    const val koin_androidx_fragment = "io.insert-koin:koin-androidx-fragment:${Versions.koin_version}"
-    const val koin_androidx_ext = "io.insert-koin:koin-androidx-ext:${Versions.koin_version}"
+    // Koin Java Compatibility
+    const val koin_android_compat = "io.insert-koin:koin-android-compat:${Versions.koin_version}"
+    // Koin for Jetpack WorkManager
+    const val koin_android_workmanager = "io.insert-koin:koin-androidx-workmanager:${Versions.koin_version}"
+    // Koin for Jetpack Compose
+    const val koin_android_compose = "io.insert-koin:koin-androidx-compose:${Versions.koin_version}"
 
 
     // Retorofit

@@ -29,7 +29,6 @@ import com.orhanobut.logger.PrettyFormatStrategy
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.logger.AndroidLogger
 import org.koin.core.KoinApplication
-import org.koin.core.component.KoinApiExtension
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.core.module.Module
@@ -64,7 +63,7 @@ object Iamport {
     // Application class 에서 생성 했는지 확인
     private fun isSDKCreate(): Boolean {
         if (!isCreated) {
-            Log.e(CONST.IAMPORT_LOG, "IAMPORT SDK was not created. Please initialize it in Application class")
+            Log.i(CONST.IAMPORT_LOG, "IAMPORT SDK was not created yet.")
         }
         return isCreated
     }
@@ -113,6 +112,7 @@ object Iamport {
             // TODO : koinApp.androidContext(app) 필요할까?
             koinApp.modules(modules) // or getKoinModules 를 직접 받아서 사용
         }
+
 
         val formatStrategy = PrettyFormatStrategy.newBuilder().apply {
             tag(CONST.IAMPORT_LOG)
@@ -167,7 +167,7 @@ object Iamport {
      */
     val callback = fun(iamPortResponse: IamPortResponse?) {
 
-        if(iamPortResponse == null) {
+        if (iamPortResponse == null) {
             i("iamPortResponse 없이 결제 종료")
             impCallbackFunction?.invoke(iamPortResponse)
             return
@@ -202,7 +202,9 @@ object Iamport {
      */
     fun init(componentActivity: ComponentActivity) {
         if (!isSDKCreate()) {
-            return
+            create(componentActivity.application)
+//            init(componentActivity)
+//            return
         }
 
         d("INITIALIZE IAMPORT SDK from activity")
@@ -226,7 +228,11 @@ object Iamport {
      */
     fun init(fragment: Fragment) {
         if (!isSDKCreate()) {
-            return
+            fragment.activity?.let {
+                create(it.application)
+            }
+//            init(fragment)
+//            return
         }
 
         d("INITIALIZE IAMPORT SDK from fragment")
@@ -299,7 +305,6 @@ object Iamport {
         }
     }
 
-    @KoinApiExtension
     internal fun coreCertification(
         payment: Payment,
         paymentResultCallback: ((IamPortResponse?) -> Unit)?
@@ -308,7 +313,6 @@ object Iamport {
         iamportSdk?.initStart(payment, paymentResultCallback)
     }
 
-    @KoinApiExtension
     internal fun corePayment(
         payment: Payment,
         approveCallback: ((IamPortApprove) -> Unit)?,
