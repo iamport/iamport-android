@@ -104,10 +104,10 @@ Iamport.close()
 
 // SDK 에 결제 요청할 데이터 구성
 val request = IamPortRequest(
-    pg = "chai",                                   // PG 사
-    pay_method = PayMethod.trans,                 // 결제수단
-    name = "여기주문이요",                          // 주문명
-    merchant_uid = "mid_123456",                // 주문번호
+    pg = "chai",                                 // PG 사
+    pay_method = PayMethod.trans.name,          // 결제수단
+    name = "여기주문이요",                         // 주문명
+    merchant_uid = "mid_123456",               // 주문번호
     amount = "3000",                           // 결제금액
     buyer_name = "홍길동"
 )
@@ -388,7 +388,7 @@ val request = IamPortRequest(
   IamPortRequest request
           = IamPortRequest.builder()
           .pg("chai")
-          .pay_method(PayMethod.trans)
+          .pay_method(PayMethod.trans.name)
           .name("여기주문이요")
           .merchant_uid("mid_123456")
           .amount("3000")

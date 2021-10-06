@@ -31,7 +31,7 @@ enum class PayMethod(val korName: String) : Parcelable {
     smartculture("스마트문상 / 이니시스, LGU+, KCP 전용"), happymoney("해피머니 / 이니시스, KCP 전용"),
     booknlife("도서문화상품권 / LGU+, KCP 전용"), point("베네피아 포인트 등 포인트 결제 / KCP 전용"),
     unionpay("유니온페이"), alipay("알리페이"), tenpay("텐페이"), wechat("위챗페이"),
-    molpay("몰페이"), paysbuy("태국 paysbuy");
+    molpay("몰페이"), paysbuy("태국 paysbuy"), naverpay("네이버페이");
 
     fun getPayMethodName(): String {
         return "$korName ($name)"

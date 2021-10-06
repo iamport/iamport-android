@@ -98,7 +98,7 @@ object Util {
                 PayMethod.smartculture,
                 PayMethod.happymoney
             )
-            kcp -> defaultPayMethod + setOf(PayMethod.samsung)
+            kcp -> defaultPayMethod + setOf(PayMethod.samsung, PayMethod.naverpay)
             kcp_billing, kakaopay,
             paypal, payco, smilepay, alipay, settle_firm ->
                 setOf(PayMethod.card)
@@ -165,10 +165,12 @@ object Util {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             cm?.run {
                 getNetworkCapabilities(activeNetwork)?.run {
+                    Logger.w(this.toString())
                     result = when {
                         hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
                         hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
                         hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+                        hasTransport(NetworkCapabilities.TRANSPORT_VPN) -> true
                         else -> false
                     }
                 }

@@ -16,7 +16,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class IamPortRequest(
     val pg: String,
-    val pay_method: PayMethod = PayMethod.card, // default card
+    val pay_method: String = PayMethod.card.name, // default card
     val escrow: Boolean? = null, // default false
     val merchant_uid: String, // default "random"
     val customer_uid: String? = null, // 정기결제용
@@ -24,7 +24,7 @@ data class IamPortRequest(
     val amount: String,
     val custom_data: String? = null,
     val tax_free: Float? = null,
-    val currency: Currency? = null, // default KRW, 페이팔은 USD 이어야 함
+    val currency: String? = null, // default KRW, 페이팔은 USD 이어야 함
     val language: String? = null, // default "ko", en, zh, jp => TODO validator 에 추가
     val buyer_name: String? = null,
     val buyer_tel: String? = null,
@@ -35,11 +35,11 @@ data class IamPortRequest(
     val display: CardQuota? = null,
     val digital: Boolean? = null, // default false
     val vbank_due: String? = null, // YYYYMMDDhhmm
-    private var m_redirect_url: String? = Platform.native.redirectUrl, // 콜백
+//    private var m_redirect_url: String? = Platform.native.redirectUrl, // 콜백
     val app_scheme: String? = null,
     val biz_num: String? = null,
     val popup: Boolean? = null,
-    private val niceMobileV2 : Boolean = true,
+//    private val niceMobileV2 : Boolean = true,
 
     // 네이버 관련
     val naverPopupMode: Boolean? = null,
@@ -52,8 +52,10 @@ data class IamPortRequest(
     val cultureBenefit: Boolean? = null,
     val naverInterface: NaverInterface? = null,
 
-
 ) : Parcelable {
+
+    private var m_redirect_url: String? = Platform.native.redirectUrl // 콜백
+    private val niceMobileV2 : Boolean = true
 
     /**
      * string pg 으로 enum PG 가져옴
@@ -80,6 +82,7 @@ data class IamPortRequest(
             return null
         }
 
+
     companion object {
         @JvmStatic
         fun builder() = Builder()
@@ -89,7 +92,7 @@ data class IamPortRequest(
             lateinit var merchant_uid: String
             lateinit var amount: String
 
-            var pay_method: PayMethod = PayMethod.card // 명세상 필수인지 불명확함, default card
+            var pay_method: String = PayMethod.card.name // 명세상 필수인지 불명확함, default card
             var escrow: Boolean? = null // default false
 
             var customer_uid: String? = null
@@ -97,7 +100,7 @@ data class IamPortRequest(
 
             var custom_data: String? = null // 명세상 불명확
             var tax_free: Float? = null
-            var currency: Currency? = null // default KRW, 페이팔은 USD 이어야 함
+            var currency: String? = null // default KRW, 페이팔은 USD 이어야 함
             var language: String? = null // default "ko"
             var buyer_name: String? = null
             var buyer_tel: String? = null
@@ -130,7 +133,7 @@ data class IamPortRequest(
                 this.pg = pg
             }
 
-            fun pay_method(pay_method: PayMethod) = apply {
+            fun pay_method(pay_method: String) = apply {
                 this.pay_method = pay_method
             }
 
@@ -162,7 +165,7 @@ data class IamPortRequest(
                 this.tax_free = tax_free
             }
 
-            fun currency(currency: Currency) = apply {
+            fun currency(currency: String) = apply {
                 this.currency = currency
             }
 
@@ -276,11 +279,11 @@ data class IamPortRequest(
                 display,
                 digital,
                 vbank_due,
-                m_redirect_url,
+//                m_redirect_url,
                 app_scheme,
                 biz_num,
                 popup,
-                niceMobileV2,
+//                niceMobileV2,
                 naverPopupMode,
                 naverUseCfm,
                 naverProducts,

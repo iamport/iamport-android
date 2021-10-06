@@ -31,7 +31,7 @@ class ViewModel : ViewModel() {
     fun createIamPortRequest(): IamPortRequest {
         return IamPortRequest(
             pg = pg.makePgRawName(pgId = ""),           // PG 사
-            pay_method = payMethod,                     // 결제수단
+            pay_method = payMethod.name,                // 결제수단
             name = paymentName,                         // 주문명
             merchant_uid = merchantUid,                 // 주문번호
             amount = amount,                            // 결제금액

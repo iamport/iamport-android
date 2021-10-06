@@ -68,7 +68,7 @@ class StrategyRepository : IamportKoinComponent {
 
         payment.iamPortRequest?.let { request ->
             request.pgEnum?.let {
-                Pair(it, request.pay_method).let { pair: Pair<PG, PayMethod> ->
+                Pair(it, PayMethod.from(request.pay_method)).let { pair: Pair<PG, PayMethod> ->
                     return when {
                         isChaiPayment(pair) -> PaymentKinds.CHAI
                         isNiceTransPayment(pair) -> PaymentKinds.WEB // PaymentKinds.NICE 사용 안함
