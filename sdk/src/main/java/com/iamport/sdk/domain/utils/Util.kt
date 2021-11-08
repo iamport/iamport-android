@@ -124,8 +124,8 @@ object Util {
                 PayMethod.molpay,
                 PayMethod.paysbuy
             )
-            jtnet, nice, danal_tpay, kicc,
-            naverco, naverpay -> defaultPayMethod
+            jtnet, nice, danal_tpay, kicc, -> defaultPayMethod
+            /*naverco,*/ naverpay -> setOf(PayMethod.card)
             smartro -> setOf(PayMethod.card, PayMethod.vbank, PayMethod.trans)
             else -> defaultPayMethod
         }
@@ -165,7 +165,7 @@ object Util {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             cm?.run {
                 getNetworkCapabilities(activeNetwork)?.run {
-                    Logger.w(this.toString())
+                    Logger.d(this.toString())
                     result = when {
                         hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
                         hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true

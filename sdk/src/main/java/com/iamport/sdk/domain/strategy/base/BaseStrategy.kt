@@ -8,11 +8,9 @@ import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.NativeLiveDataEventBus
 import kotlinx.coroutines.CancellationException
-import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 
-@KoinApiExtension
 abstract class BaseStrategy : IStrategy, IamportKoinComponent {
 
     protected val gson: Gson by inject(named("${CONST.KOIN_KEY}Gson"))

@@ -16,12 +16,10 @@ import com.iamport.sdk.domain.utils.*
 import com.iamport.sdk.presentation.viewmodel.WebViewModel
 import com.orhanobut.logger.Logger.*
 import kotlinx.coroutines.*
-import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
 
 
-@KoinApiExtension
 open class IamPortWebViewMode @JvmOverloads constructor(
     scope: BaseCoroutineScope = UICoroutineScope()
 ) : IamportKoinComponent, BaseMain, BaseCoroutineScope by scope {

@@ -20,11 +20,9 @@ import com.orhanobut.logger.Logger.*
 import kotlinx.coroutines.*
 import org.koin.android.ext.android.get
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.component.KoinApiExtension
 import org.koin.core.qualifier.named
 
 
-@KoinApiExtension
 class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), IamportKoinComponent {
 
     override val layoutResourceId: Int = R.layout.webview_activity

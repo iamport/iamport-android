@@ -138,14 +138,10 @@ dependencies {
 
     implementation Libs.koin_core
     testImplementation Libs.koin_test
-    implementation Libs.koin_core_ext
-//    androidTestImplementation Libs.koin_test
-
-    // AndroidX Scope 생성 - 삭제 자동화
-    implementation Libs.koin_androidx_scope
-    implementation Libs.koin_androidx_viewmodel
-    implementation Libs.koin_androidx_fragment
-    implementation Libs.koin_androidx_ext
+    implementation Libs.koin_android
+    implementation Libs.koin_android_compat
+    implementation Libs.koin_android_workmanager
+    implementation Libs.koin_android_compose
 
     // Retorofit
     implementation Libs.retrofit

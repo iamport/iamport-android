@@ -33,7 +33,7 @@ enum class PG(val korName: String) {
     /*kakao("카카오"), */ danal("다날휴대폰소액결제"), danal_tpay("다날일반결제"),
     kicc("한국정보통신"), paypal("페이팔"), mobilians("모빌리언스 휴대폰소액결제"),
     payco("페이코"), eximbay("엑심베이"), settle("세틀뱅크"), settle_firm("세틀뱅크_펌"),
-    naverco("네이버페이-주문형"), naverpay("네이버페이-결제형"), smilepay("스마일페이"),
+    /*naverco("네이버페이-주문형"),*/ naverpay("네이버페이-결제형"), smilepay("스마일페이"),
     payple("페이플"), alipay("알리페이"),
     bluewalnut("bluewalnut"), tosspay("간편결제 - 토스"), smartro("스마트로"); /*, inicis("이니시스ActiveX결제창"), syrup("시럽페이");*/
 

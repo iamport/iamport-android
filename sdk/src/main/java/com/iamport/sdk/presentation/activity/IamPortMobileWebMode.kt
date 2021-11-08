@@ -13,9 +13,7 @@ import com.iamport.sdk.domain.strategy.webview.IamPortMobileModeWebViewClient
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.EventObserver
 import com.orhanobut.logger.Logger
-import org.koin.core.component.KoinApiExtension
 
-@KoinApiExtension
 open class IamPortMobileWebMode() : IamPortWebViewMode() {
 
     fun initStart(activity: ComponentActivity, webview: WebView) {

@@ -7,7 +7,10 @@ import com.iamport.sdk.domain.core.Iamport
 class BaseApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        Iamport.create(this)
+        /**
+         * activity 를 통해 application 을 가져올 수 있기에 제거
+         */
+//        Iamport.create(this)
 
         /**
          * DI 로 KOIN 사용시 아래와 같이 사용
@@ -19,3 +22,4 @@ class BaseApplication : Application() {
          */
     }
 }
+

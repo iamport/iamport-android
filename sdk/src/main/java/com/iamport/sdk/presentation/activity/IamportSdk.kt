@@ -23,7 +23,6 @@ import com.iamport.sdk.presentation.contract.ChaiContract
 import com.iamport.sdk.presentation.viewmodel.MainViewModel
 import com.iamport.sdk.presentation.viewmodel.MainViewModelFactory
 import com.orhanobut.logger.Logger.*
-import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.get
 import org.koin.core.component.inject
 import java.lang.ref.WeakReference
@@ -33,7 +32,6 @@ import java.util.*
 /**
  * 사실상 여기가 activity 같은 역할
  */
-@KoinApiExtension
 internal class IamportSdk(
     val activity: WeakReference<ComponentActivity>? = null,
     val fragment: WeakReference<Fragment>? = null,
