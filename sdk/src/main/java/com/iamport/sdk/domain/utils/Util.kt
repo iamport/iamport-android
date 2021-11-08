@@ -124,8 +124,8 @@ object Util {
                 PayMethod.molpay,
                 PayMethod.paysbuy
             )
-            jtnet, nice, danal_tpay, kicc,
-            naverco, naverpay -> defaultPayMethod
+            jtnet, nice, danal_tpay, kicc, -> defaultPayMethod
+            /*naverco,*/ naverpay -> setOf(PayMethod.card)
             smartro -> setOf(PayMethod.card, PayMethod.vbank, PayMethod.trans)
             else -> defaultPayMethod
         }
