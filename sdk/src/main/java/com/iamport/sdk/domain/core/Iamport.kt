@@ -31,6 +31,7 @@ import org.koin.android.logger.AndroidLogger
 import org.koin.core.KoinApplication
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
+import org.koin.core.logger.Level
 import org.koin.core.module.Module
 import java.lang.ref.WeakReference
 
@@ -104,7 +105,7 @@ object Iamport {
         IamportKoinContext.koinApp = if (koinApp == null) {
             stopKoin()
             startKoin {
-                logger(AndroidLogger())
+                logger(AndroidLogger(Level.ERROR))
                 androidContext(app)
                 modules(modules)
             }
