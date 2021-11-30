@@ -8,6 +8,7 @@ import android.webkit.WebView
 import androidx.annotation.RequiresApi
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.domain.strategy.base.BaseWebViewStrategy
+import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.Util
 import com.orhanobut.logger.Logger.d
@@ -39,6 +40,10 @@ open class WebViewStrategy : BaseWebViewStrategy() {
 
         request?.url?.let {
             d(it)
+
+            if (it.scheme == CONST.ABOUT_BLANK_SCHEME) {
+                return true // 이동하지 않음
+            }
 
             if (isAppUrl(it)) {
                 bus.thirdPartyUri.postValue(Event(it))

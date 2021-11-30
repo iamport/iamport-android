@@ -5,7 +5,7 @@ object CONST {
     const val APP_SCHME = "iamport_android"
     const val HTTP_SCHEME = "http"
     const val HTTPS_SCHEME = "https"
-    const val ABOUT_BLANK_SCHEME = "about:blank"
+    const val ABOUT_BLANK_SCHEME = "about"
 
     const val EMPTY_STR = ""
 
@@ -62,9 +62,12 @@ object CONST {
 
     // payment 객체 validation 관련
     const val PASS_PAYMENT_VALIDATOR = "성공"
-    const val ERR_PAYMENT_VALIDATOR_VBANK = "가상계좌 결제는 만료일자(vbank_due) 항목 필수입니다 (YYYYMMDDhhmm 형식)"
-    const val ERR_PAYMENT_VALIDATOR_PHONE = "휴대폰 소액결제는 digital 항목 필수입니다"
-    const val ERR_PAYMENT_VALIDATOR_DANAL_VBANK = "다날 가상계좌 결제는 사업자 등록번호(biz_num) 항목 필수입니다 (계약된 사업자등록번호 10자리)"
-//    const val ERR_PAYMENT_VALIDATOR_PAYPAL = "페이팔 결제는 m_redirect_url 항목 필수입니다"
+
+    private const val PREFIX_ERR = "[SDK ERR]"
+    const val ERR_PAYMENT_VALIDATOR_VBANK = "$PREFIX_ERR 가상계좌 결제는 만료일자(vbank_due) 항목 필수입니다 (YYYYMMDDhhmm 형식)"
+    const val ERR_PAYMENT_VALIDATOR_PHONE = "$PREFIX_ERR 휴대폰 소액결제는 digital 항목 필수입니다"
+    const val ERR_PAYMENT_VALIDATOR_DANAL_VBANK = "$PREFIX_ERR 다날 가상계좌 결제는 사업자 등록번호(biz_num) 항목 필수입니다 (계약된 사업자등록번호 10자리)"
+    const val ERR_PAYMENT_VALIDATOR_EXIMBAY = "$PREFIX_ERR eximbay 는 모바일앱 결제시 IamPortRequest popup 파라미터를 false 로 지정해야 결제창이 열립니다."
+//    const val ERR_PAYMENT_VALIDATOR_PAYPAL = "$PREFIX_ERR 페이팔 결제는 m_redirect_url 항목 필수입니다"
 
 }
