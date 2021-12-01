@@ -4,13 +4,13 @@ apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "com.iamport.sdk"
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -91,18 +91,6 @@ dependencies {
 
     // Logger
 //    implementation 'com.orhanobut:logger:2.2.0'
-
-//    implementation "io.insert-koin:koin-androidx-scope:$Versions.koin_version"
-//// Koin AndroidX ViewModel features
-//    implementation "io.insert-koin:koin-androidx-viewmodel:$Versions.koin_version"
-//// Koin AndroidX Fragment features
-//    implementation "io.insert-koin:koin-androidx-fragment:$Versions.koin_version"
-//// Koin AndroidX WorkManager
-//    implementation "io.insert-koin:koin-androidx-workmanager:$Versions.koin_version"
-//// Koin AndroidX Jetpack Compose
-////    implementation "io.insert-koin:koin-androidx-compose:$Versions.koin_version"
-//// Koin AndroidX Experimental features
-//    implementation "io.insert-koin:koin-androidx-ext:$Versions.koin_version"
 
     implementation project(':sdk')
 //    implementation 'com.github.iamport:iamport-android:v1.2.0'

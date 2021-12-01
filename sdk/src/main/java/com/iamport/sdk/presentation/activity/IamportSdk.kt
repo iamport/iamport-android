@@ -16,15 +16,13 @@ import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.data.sdk.ProvidePgPkg
 import com.iamport.sdk.domain.core.IamportReceiver
-import com.iamport.sdk.domain.di.IamportKoinComponent
+import com.iamport.sdk.domain.di.ModuleProvider
 import com.iamport.sdk.domain.utils.*
 import com.iamport.sdk.domain.utils.Util.observeAlways
 import com.iamport.sdk.presentation.contract.ChaiContract
 import com.iamport.sdk.presentation.viewmodel.MainViewModel
 import com.iamport.sdk.presentation.viewmodel.MainViewModelFactory
 import com.orhanobut.logger.Logger.*
-import org.koin.core.component.get
-import org.koin.core.component.inject
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -36,14 +34,16 @@ internal class IamportSdk(
     val activity: WeakReference<ComponentActivity>? = null,
     val fragment: WeakReference<Fragment>? = null,
     val webViewActivityLauncher: ActivityResultLauncher<Payment>?,
-) : IamportKoinComponent {
+) {
 
     private val hostHelper: HostHelper = HostHelper(activity, fragment)
 
     //    private val mainViewModel: MainViewModel by viewModel(hostHelper.getViewModelStoreOwner(), MainViewModel::class.java) // 요청할 뷰모델
-    private val mainViewModel by lazy {
+    private val mainViewModel: MainViewModel? by lazy {
         hostHelper.getViewModelStoreOwner()?.let {
-            ViewModelProvider(it, MainViewModelFactory(get(), get(), get())).get(MainViewModel::class.java)
+            hostHelper.getActivityRef()?.application?.let { app ->
+                ViewModelProvider(it, MainViewModelFactory(ModuleProvider.nativeLiveDataEventBus, ModuleProvider.strategyRepository, app)).get(MainViewModel::class.java)
+            }
         }
     }
 
@@ -74,7 +74,7 @@ internal class IamportSdk(
     private val preventOverlapRun by lazy { PreventOverlapRun() }// 딜레이 호출
 
     // 포그라운드 서비스 관련 BroadcastReceiver
-    private val iamportReceiver: IamportReceiver by inject()
+    private val iamportReceiver: IamportReceiver = ModuleProvider.iamportReceiver
 
     // 스크린 on/off 감지 BroadcastReceiver
     private val screenBrReceiver = object : BroadcastReceiver() {

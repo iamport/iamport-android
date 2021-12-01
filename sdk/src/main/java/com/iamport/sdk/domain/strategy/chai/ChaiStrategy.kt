@@ -14,22 +14,18 @@ import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.domain.core.Iamport
-import com.iamport.sdk.domain.di.provideChaiApi
+import com.iamport.sdk.domain.di.ModuleProvider
 import com.iamport.sdk.domain.strategy.base.BaseStrategy
 import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.Event
 import com.orhanobut.logger.Logger.*
 import kotlinx.coroutines.*
-import org.koin.core.component.get
-import org.koin.core.component.inject
-import org.koin.core.qualifier.named
 
-open class ChaiStrategy : BaseStrategy() {
+open class ChaiStrategy(private val iamportApi: IamportApi) : BaseStrategy() {
 
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.Main + job)
 
-    private val iamportApi: IamportApi by inject() // 아임포트 서버 API
     private lateinit var chaiApi: ChaiApi // 차이 서버 API
 
     private lateinit var chaiId: String // 차이 PG 아이디
@@ -408,11 +404,7 @@ open class ChaiStrategy : BaseStrategy() {
                     timeOutTime = System.currentTimeMillis() + CONST.TIME_OUT
                     d("set timeOutTime $timeOutTime")
 
-                    chaiApi = provideChaiApi(
-                        CHAI_MODE.getChaiUrl(mode),
-                        get(named("${CONST.KOIN_KEY}Gson")),
-                        get(named("${CONST.KOIN_KEY}provideOkHttpClient"))
-                    ) // mode 에 따라 chaiApi 생성
+                    chaiApi = ModuleProvider.apiModule.provideChaiApi(CHAI_MODE.getChaiUrl(mode)) // mode 에 따라 chaiApi 생성
 
                     tryPolling(0)
                 }
@@ -438,7 +430,6 @@ open class ChaiStrategy : BaseStrategy() {
     private suspend fun isPolling(isPolling: Boolean) = withContext(Dispatchers.Main) {
         bus.isPolling.value = Event(isPolling)
     }
-
 
 
 }

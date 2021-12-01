@@ -6,21 +6,26 @@ import android.view.View
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModelProvider
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.domain.IamportWebChromeClient
+import com.iamport.sdk.domain.di.ModuleProvider
 import com.iamport.sdk.domain.strategy.webview.IamPortMobileModeWebViewClient
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.EventObserver
+import com.iamport.sdk.presentation.viewmodel.WebViewModel
+import com.iamport.sdk.presentation.viewmodel.WebViewModelFactory
 import com.orhanobut.logger.Logger
 
-open class IamPortMobileWebMode() : IamPortWebViewMode() {
+open class IamPortMobileWebMode : IamPortWebViewMode() {
 
     fun initStart(activity: ComponentActivity, webview: WebView) {
         Logger.i("HELLO I'MPORT Mobile Web Mode SDK!")
 
         this.activity = activity
         this.webview = webview
+        viewModel = ViewModelProvider(activity.viewModelStore, WebViewModelFactory(ModuleProvider.webViewLiveDataEventBus, ModuleProvider.strategyRepository)).get(WebViewModel::class.java)
 
         observeViewModel(null) // 관찰할 LiveData
     }

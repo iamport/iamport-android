@@ -11,7 +11,6 @@ import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.domain.core.IamportReceiver
-import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.repository.StrategyRepository
 import com.iamport.sdk.domain.service.ChaiService
 import com.iamport.sdk.domain.strategy.base.JudgeStrategy
@@ -25,7 +24,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val bus: NativeLiveDataEventBus, private val repository: StrategyRepository, application: Application) :
-    AndroidViewModel(application), IamportKoinComponent {
+    AndroidViewModel(application) {
 
     // AndroidViewModel 이기에 사용가능
     val app = getApplication<Application>()

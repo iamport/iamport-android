@@ -3,11 +3,8 @@ package com.iamport.sampleapp.ui
 import android.app.AlertDialog.Builder
 import android.content.Context
 import android.content.IntentFilter
-import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.activity.OnBackPressedCallback
@@ -39,11 +36,6 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
     override val layoutResourceId: Int = R.layout.payment_fragment
     private val receiver = MerchantReceiver()
     val viewModel: ViewModel by activityViewModels()
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-//        Iamport.init(this) // fragment
-        return super.onCreateView(inflater, container, savedInstanceState)
-    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -145,7 +137,7 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
     private fun onPolling() {
         // 차이 결제 상태체크 폴링 여부를 확인하실 수 있습니다.
         Iamport.isPolling()?.observe(this, EventObserver {
-            Log.i("SAMPLE", "차이 폴링? :: $it")
+            Log.i("SAMPLE", "차이 폴링중? :: $it")
         })
 
         // 또는, 폴링 상태를 보고 싶을 때 명시적으로 호출
@@ -156,7 +148,6 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
         val userCode = "iamport"
         val certification = IamPortCertification(
             merchant_uid = getRandomMerchantUid(),
-            company = "유어포트",
         )
 
         Iamport.certification(userCode, iamPortCertification = certification) { callBackListener.result(it) }
