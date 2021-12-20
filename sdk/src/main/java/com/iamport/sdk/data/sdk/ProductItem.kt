@@ -2,21 +2,18 @@ package com.iamport.sdk.data.sdk
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
-import kotlinx.parcelize.RawValue
 import kotlinx.serialization.Serializable
 
 /**
  * for naverpay
  */
 @Parcelize
-@Serializable
 open class BaseProductItem : Parcelable
 
 // 결제형
 // https://github.com/iamport/iamport-manual/blob/master/NAVERPAY/sample/naverpay-pg.md#2-naverproducts-%ED%8C%8C%EB%9D%BC%EB%A9%94%ED%84%B0
 // https://developer.pay.naver.com/docs/v1/api/payments
 @Parcelize
-@Serializable
 data class ProductItem(
     val categoryType: String,
     val categoryId: String,
@@ -32,7 +29,6 @@ data class ProductItem(
 // 주문형
 // https://github.com/iamport/iamport-manual/blob/master/NAVERPAY/sample/README.md#21-paramnaverproducts-%EC%9D%98-%EA%B5%AC%EC%A1%B0
 @Parcelize
-@Serializable
 data class ProductItemForOrder(
     val id: String,   //상품고유ID
     val merchantProductId: String? = null, //상품관리ID(필요한 경우만 선언. 정의하지 않으면 id값과 동일한 값을 자동 적용합니다)
@@ -52,7 +48,6 @@ data class ProductItemForOrder(
 
 // 확실치 않은 정보들은 nullable 처리.. 어차피 네이버가 따로 검수!
 @Parcelize
-@Serializable
 data class Option(
     val optionQuantity: Int,
     val optionPrice: Int? = null,
@@ -62,7 +57,6 @@ data class Option(
 
 
 @Parcelize
-@Serializable
 data class Selection(
     val code: String? = null,
     val label: String? = null,
@@ -71,7 +65,6 @@ data class Selection(
 
 
 @Parcelize
-@Serializable
 data class Supplement(
     val id: String? = null,    //추가구성품의 ID
     val name: String? = null,    //추가구성품 상품명
@@ -81,7 +74,6 @@ data class Supplement(
 
 
 @Parcelize
-@Serializable
 data class Shipping(
     val groupId: String? = null,
     val method: String? = null,
@@ -92,7 +84,6 @@ data class Shipping(
 
 
 @Parcelize
-@Serializable
 data class FeeRule(
     val freeByThreshold: Int? = null,
 ) : Parcelable

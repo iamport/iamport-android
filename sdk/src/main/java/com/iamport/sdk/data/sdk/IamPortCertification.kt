@@ -11,7 +11,6 @@ import kotlinx.serialization.Serializable
  * https://docs.iamport.kr/tech/mobile-authentication
  */
 @Parcelize
-@Serializable
 data class IamPortCertification(
     val merchant_uid: String,
     val min_age: Int? = null,
