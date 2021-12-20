@@ -1,11 +1,12 @@
 package com.iamport.sdk.data.sdk
 
 import android.os.Parcelable
-import com.iamport.sdk.domain.utils.CONST
+import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
+import com.google.gson.internal.LinkedTreeMap
 import com.iamport.sdk.domain.utils.Util
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
-import kotlinx.serialization.Serializable
 
 /**
  * SDK 에 결제 요청할 데이터
@@ -13,7 +14,6 @@ import kotlinx.serialization.Serializable
  */
 
 @Parcelize
-@Serializable
 data class IamPortRequest(
     val pg: String,
     val pay_method: String = PayMethod.card.name, // default card
@@ -22,6 +22,8 @@ data class IamPortRequest(
     val customer_uid: String? = null, // 정기결제용
     val name: String? = null,
     val amount: String,
+    @IgnoredOnParcel
+    @Transient
     val custom_data: String? = null,
     val tax_free: Float? = null,
     val currency: String? = null, // default KRW, 페이팔은 USD 이어야 함
@@ -52,10 +54,19 @@ data class IamPortRequest(
     val cultureBenefit: Boolean? = null,
     val naverInterface: NaverInterface? = null,
 
-) : Parcelable {
+    ) : Parcelable {
 
     private var m_redirect_url: String? = Platform.native.redirectUrl // 콜백
-    private val niceMobileV2 : Boolean = true
+    private val niceMobileV2: Boolean = true
+
+    @SerializedName("custom_data")
+    private var _customData: LinkedTreeMap<*, *>? = null
+
+    init {
+        if (!custom_data.isNullOrBlank()) {
+            _customData = Gson().fromJson(custom_data, LinkedTreeMap::class.java)
+        }
+    }
 
     /**
      * string pg 으로 enum PG 가져옴
@@ -115,7 +126,7 @@ data class IamPortRequest(
             var app_scheme: String? = null // 명세상 nullable 이나, RN 에서 필수
             var biz_num: String? = null
             var popup: Boolean? = null // 명세상 없으나, RN 에 있음
-            private val niceMobileV2 : Boolean = true
+            private val niceMobileV2: Boolean = true
 
             // 네이버 관련
             var naverPopupMode: Boolean? = null

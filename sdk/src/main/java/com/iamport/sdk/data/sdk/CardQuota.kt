@@ -5,7 +5,6 @@ import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
 @Parcelize
-@Serializable
 data class CardQuota(val card_quota : List<Int>?) : Parcelable
 //if (method === 'card' && cardQuota !== 0) {
 //    params.display = {

@@ -9,7 +9,6 @@ import kotlinx.serialization.Serializable
  */
 
 @Parcelize
-@Serializable
 data class NaverInterface(
     val cpaInflowCode: String?,
     val naverInflowCode: String?,
