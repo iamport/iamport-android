@@ -13,7 +13,8 @@ import com.iamport.sdk.data.sdk.Payment
 interface BaseMain {
     fun openWebView(payment: Payment)
     fun openThirdPartyApp(it: Uri)
-//    fun openNiceTransApp(it: String)
+
+    //    fun openNiceTransApp(it: String)
     fun observeViewModel(payment: Payment?)
     fun requestPayment(it: Payment)
     fun sdkFinish(iamPortResponse: IamPortResponse?)
@@ -27,7 +28,7 @@ interface BaseMain {
             javaScriptEnabled = true
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                WebView.setWebContentsDebuggingEnabled(true);
+                WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
             }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -42,8 +43,8 @@ interface BaseMain {
             blockNetworkImage = false
             loadsImagesAutomatically = true
 
-            if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                safeBrowsingEnabled = true  // api 26
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                safeBrowsingEnabled = BuildConfig.DEBUG  // api 26
             }
 
             useWideViewPort = false

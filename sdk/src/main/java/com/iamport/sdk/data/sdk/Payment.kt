@@ -78,6 +78,13 @@ data class Payment(
                     }
                 }
 
+                // 엑심베이eximbay 의 경우 popup 파라미터를 false 로 해야 redirect 로 열림
+                if (PG.convertPG(pg) == PG.eximbay) {
+                    if (popup == null || popup == true) {
+                        return false to CONST.ERR_PAYMENT_VALIDATOR_EXIMBAY
+                    }
+                }
+
 //                if (PG.convertPG(pg) == PG.paypal) {
 //                    if (m_redirect_url.isNullOrBlank() || m_redirect_url == CONST.IAMPORT_DETECT_URL) {
 //                        return false to CONST.ERR_PAYMENT_VALIDATOR_PAYPAL
