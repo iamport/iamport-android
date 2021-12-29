@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.iamport.sdk.data.sdk.*
 import com.iamport.sdk.domain.core.Iamport
 import com.iamport.sdk.domain.utils.Event
+import com.iamport.sdk.domain.utils.escapeJsonString
 import java.util.*
 
 class ViewModel : ViewModel() {
@@ -36,7 +37,34 @@ class ViewModel : ViewModel() {
             merchant_uid = merchantUid,                 // 주문번호
             amount = amount,                            // 결제금액
             buyer_name = "남궁안녕",
-            card = card // 카드사 다이렉트
+            card = card, // 카드사 다이렉트
+            custom_data = """
+                {
+                  "employees": {
+                    "employee": [
+                      {
+                        "id": "1",
+                        "firstName": "Tom",
+                        "lastName": "Cruise",
+                        "photo": "https://jsonformatter.org/img/tom-cruise.jpg",
+                        "cuppingnote": "[\"일\",\"이\",\"삼\",\"사\",\"오\",\"육\",\"칠\"]"
+                      },
+                      {
+                        "id": "2",
+                        "firstName": "Maria",
+                        "lastName": "Sharapova",
+                        "photo": "https://jsonformatter.org/img/Maria-Sharapova.jpg"
+                      },
+                      {
+                        "id": "3",
+                        "firstName": "Robert",
+                        "lastName": "Downey Jr.",
+                        "photo": "https://jsonformatter.org/img/Robert-Downey-Jr.jpg"
+                      }
+                    ]
+                  }
+                }
+            """.trimIndent().escapeJsonString()
 //            customer_uid = getRandomCustomerUid() // 정기결제
         )
     }
