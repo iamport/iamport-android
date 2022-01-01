@@ -122,6 +122,10 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
             viewModel.amount = it.toString()
         }
         viewDataBinding.amount.setText("1000")
+
+        viewDataBinding.cardDirectCode.doAfterTextChanged {
+            viewModel.cardDirectCode = it.toString()
+        }
     }
 
     override fun onStart() {

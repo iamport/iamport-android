@@ -54,7 +54,9 @@ data class IamPortRequest(
     val cultureBenefit: Boolean? = null,
     val naverInterface: NaverInterface? = null,
 
-    ) : Parcelable {
+    val card: Card? = null// 카드사 다이렉트 호출
+
+) : Parcelable {
 
     private var m_redirect_url: String? = Platform.native.redirectUrl // 콜백
     private val niceMobileV2: Boolean = true
