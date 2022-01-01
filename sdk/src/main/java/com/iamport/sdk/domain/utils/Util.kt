@@ -33,7 +33,7 @@ object Util {
 
     enum class SampleUserCode(val desc: String) {
         imp19424728("default 테스트"),
-        iamport ("관리자 체험하기 계정"),
+        iamport("관리자 체험하기 계정"),
         imp10391932("kakao 테스트"),
         imp09350031("paypal 테스트"),
         imp60029475("mobilians 테스트"),
@@ -124,7 +124,7 @@ object Util {
                 PayMethod.molpay,
                 PayMethod.paysbuy
             )
-            jtnet, nice, danal_tpay, kicc, -> defaultPayMethod
+            jtnet, nice, danal_tpay, kicc -> defaultPayMethod
             /*naverco,*/ naverpay -> setOf(PayMethod.card)
             smartro -> setOf(PayMethod.card, PayMethod.vbank, PayMethod.trans)
             else -> defaultPayMethod
@@ -236,4 +236,15 @@ object Util {
         return "${CONST.IAMPORT_DETECT_SCHEME}${CONST.IAMPORT_DETECT_ADDRESS}/${str}"
     }
 
+}
+
+fun String.escapeJsonString(): String {
+    return this.replace("\\", "\\\\")
+        .replace("\t", "\\t")
+        .replace("\b", "\\b")
+        .replace("\n", "\\n")
+        .replace("\r", "\\r")
+        .replace("\u000C", "\\f")
+        .replace("\'", "\\'")
+        .replace("\"", "\\\"");
 }

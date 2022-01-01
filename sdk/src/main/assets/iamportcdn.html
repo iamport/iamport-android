@@ -37,6 +37,20 @@
                 IMP.request_pay(JSON.parse(impRequest), callback);
             }
 
+            function requestPayWithCustomData(impRequest, customData) {
+                var data = JSON.parse(impRequest)
+
+                try {
+                    dLog(customData)
+                    data.custom_data = JSON.parse(customData)
+                } catch (error) {
+                    dLog(error.message)
+                    data.custom_data = customData
+                }
+
+                IMP.request_pay(data, callback);
+            }
+
             function certification(impCertification) {
                 dLog("certification :: " + impCertification)
                 IMP.certification(JSON.parse(impCertification), callback);

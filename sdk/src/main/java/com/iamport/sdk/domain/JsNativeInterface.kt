@@ -74,8 +74,21 @@ class JsNativeInterface(val payment: Payment, val gson: Gson, val bus: WebViewLi
     }
 
     private fun requestPay(request: IamPortRequest) {
+        if(request.custom_data.isNullOrEmpty()) {
+            requestPayNormal(request)
+        } else {
+            requestPayWithCustomData(request)
+        }
+    }
+
+    private fun requestPayNormal(request: IamPortRequest) {
         Logger.d(request)
         evaluateJS("requestPay('${gson.toJson(request)}');")
+    }
+
+    private fun requestPayWithCustomData(request: IamPortRequest) {
+        Logger.d(request)
+        evaluateJS("requestPayWithCustomData('${gson.toJson(request)}', '${request.custom_data}');")
     }
 
     private fun certification(certification: IamPortCertification) {

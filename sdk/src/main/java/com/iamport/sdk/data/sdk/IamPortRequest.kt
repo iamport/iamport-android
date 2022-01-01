@@ -1,9 +1,6 @@
 package com.iamport.sdk.data.sdk
 
 import android.os.Parcelable
-import com.google.gson.Gson
-import com.google.gson.annotations.SerializedName
-import com.google.gson.internal.LinkedTreeMap
 import com.iamport.sdk.domain.utils.Util
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
@@ -61,14 +58,14 @@ data class IamPortRequest(
     private var m_redirect_url: String? = Platform.native.redirectUrl // 콜백
     private val niceMobileV2: Boolean = true
 
-    @SerializedName("custom_data")
-    private var _customData: LinkedTreeMap<*, *>? = null
+//    @SerializedName("custom_data")
+//    private var _customData: LinkedTreeMap<*, *>? = null
 
-    init {
-        if (!custom_data.isNullOrBlank()) {
-            _customData = Gson().fromJson(custom_data, LinkedTreeMap::class.java)
-        }
-    }
+//    init {
+//        if (!custom_data.isNullOrBlank()) {
+//            _customData = Gson().fromJson(custom_data, LinkedTreeMap::class.java)
+//        }
+//    }
 
     /**
      * string pg 으로 enum PG 가져옴
