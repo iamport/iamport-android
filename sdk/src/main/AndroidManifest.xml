@@ -5,11 +5,65 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
-    <!--  CHAI 앱 버전 가져오는 로직으로 인해 추가  -->
     <queries>
-        <package android:name="finance.chai.app" />
+        <!--간편결제-->
+        <package android:name="finance.chai.app" /> <!--차이페이-->
+        <package android:name="com.nhnent.payapp" /> <!--페이코-->
+        <package android:name="com.lottemembers.android" /> <!--LPAY-->
+        <package android:name="com.ssg.serviceapp.android.egiftcertificate" /> <!--SSGPAY-->
+        <package android:name="com.inicis.kpay" /> <!--KPAY-->
+        <package android:name="com.tmoney.tmpay" /> <!--티머니페이-->
+        <package android:name="viva.republica.toss" /> <!--토스페이-->
+        <package android:name="com.samsung.android.spay" /> <!--삼성페이-->
+        <package android:name="com.kakao.talk" /> <!--카카오페이-->
+        <package android:name="com.nhn.android.search" /> <!--네이버-->
+        <package android:name="com.mysmilepay.app" /> <!--스마일페이-->
+        <!--카드-->
+        <package android:name="kvp.jjy.MispAndroid320" /> <!--ISP페이북-->
+        <package android:name="com.kbcard.cxh.appcard" /> <!--KBPay-->
+        <package android:name="com.kbstar.liivbank" /> <!--liivbank-->
+        <package android:name="com.kbstar.reboot" /> <!--newliiv-->
+        <package android:name="com.samsung.android.spaylite" /> <!--삼성페이니-->
+        <package android:name="com.nhnent.payapp" /> <!--페이코-->
+        <package android:name="com.lge.lgpay" /> <!--엘지페이-->
+        <package android:name="com.hanaskcard.paycla" /> <!--하나-->
+        <package android:name="kr.co.hanamembers.hmscustomer" /> <!--하나멤버스-->
+        <package android:name="com.hanaskcard.rocomo.potal" /> <!--하나공인인증-->
+        <package android:name="com.citibank.cardapp" /> <!--씨티-->
+        <package android:name="kr.co.citibank.citimobile" /> <!--씨티모바일-->
+        <package android:name="com.lcacApp" /> <!--롯데-->
+        <package android:name="kr.co.samsungcard.mpocket" /><!--삼성-->
+        <package android:name="com.shcard.smartpay" /> <!--신한-->
+        <package android:name="com.shinhancard.smartshinhan" /> <!--신한(ARS/일반/smart)-->
+        <package android:name="com.hyundaicard.appcard" /> <!--현재-->
+        <package android:name="nh.smart.nhallonepay" /> <!--농협-->
+        <package android:name="kr.co.citibank.citimobile" /> <!--씨티-->
+        <package android:name="com.wooricard.smartapp" /> <!--우리WON카드-->
+        <package android:name="com.wooribank.smart.npib" /> <!--우리WON뱅킹-->
+        <!--백신-->
+        <package android:name="com.TouchEn.mVaccine.webs" /> <!--TouchEn-->
+        <package android:name="com.ahnlab.v3mobileplus" /> <!--V3-->
+        <package android:name="kr.co.shiftworks.vguardweb" /> <!--vguard-->
+        <!--신용카드 공인인증-->
+        <package android:name="com.hanaskcard.rocomo.potal" /> <!--하나-->
+        <package android:name="com.lumensoft.touchenappfree" /> <!--현대-->
+        <!--계좌이체-->
+        <package android:name="com.kftc.bankpay.android" /> <!--뱅크페이-->
+        <package android:name="kr.co.kfcc.mobilebank" /> <!--MG 새마을금고-->
+        <package android:name="com.kbstar.liivbank" /> <!--뱅크페이-->
+        <package android:name="com.nh.cashcardapp" /> <!--뱅크페이-->
+        <package android:name="com.knb.psb" /> <!--BNK경남은행-->
+        <package android:name="com.lguplus.paynow" /> <!--페이나우-->
+        <package android:name="com.kbankwith.smartbank" /> <!--케이뱅크-->
+        <!--해외결제-->
+        <package android:name="com.eg.android.AlipayGphone" /> <!--페이나우-->
+        <!--기타-->
+        <package android:name="com.sktelecom.tauth" /> <!--PASS-->
+        <package android:name="com.lguplus.smartotp" /> <!--PASS-->
+        <package android:name="com.kt.ktauth" /> <!--PASS-->
+        <package android:name="kr.danal.app.damoum" /> <!--다날 다모음-->
     </queries>
 
     <application
