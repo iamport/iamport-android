@@ -92,7 +92,9 @@ dependencies {
     // Logger
 //    implementation 'com.orhanobut:logger:2.2.0'
 
-    implementation project(':sdk')
-//    implementation 'com.github.iamport:iamport-android:v1.2.0'
+    implementation project(':sdk') // 가맹점은 이 코드가 아닌 아래와 같은 "버전"을 통한 implementation 으로 반영해주세요
+//    implementation 'com.github.iamport:iamport-android:1.2.0'
+//    implementation 'com.github.iamport:iamport-android:fix~custom_data-SNAPSHOT'
+
 }
 
