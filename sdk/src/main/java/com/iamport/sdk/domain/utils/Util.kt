@@ -237,14 +237,3 @@ object Util {
     }
 
 }
-
-fun String.escapeJsonString(): String {
-    return this.replace("\\", "\\\\")
-        .replace("\t", "\\t")
-        .replace("\b", "\\b")
-        .replace("\n", "\\n")
-        .replace("\r", "\\r")
-        .replace("\u000C", "\\f")
-        .replace("\'", "\\'")
-        .replace("\"", "\\\"");
-}
