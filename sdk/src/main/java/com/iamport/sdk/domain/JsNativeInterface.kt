@@ -1,5 +1,6 @@
 package com.iamport.sdk.domain
 
+import android.util.Base64
 import android.webkit.JavascriptInterface
 import com.google.gson.Gson
 import com.iamport.sdk.data.sdk.IamPortCertification
@@ -74,10 +75,10 @@ class JsNativeInterface(val payment: Payment, val gson: Gson, val bus: WebViewLi
     }
 
     private fun requestPay(request: IamPortRequest) {
-        if(request.custom_data.isNullOrEmpty()) {
+        if (request.custom_data.isNullOrEmpty()) {
             requestPayNormal(request)
         } else {
-            requestPayWithCustomData(request)
+            requestPayWithCustomData(request, request.custom_data)
         }
     }
 
@@ -86,9 +87,11 @@ class JsNativeInterface(val payment: Payment, val gson: Gson, val bus: WebViewLi
         evaluateJS("requestPay('${gson.toJson(request)}');")
     }
 
-    private fun requestPayWithCustomData(request: IamPortRequest) {
+    private fun requestPayWithCustomData(request: IamPortRequest, customData: String) {
         Logger.d(request)
-        evaluateJS("requestPayWithCustomData('${gson.toJson(request)}', '${request.custom_data}');")
+
+        val encodedString: String = Base64.encodeToString(customData.toByteArray(), Base64.NO_WRAP)
+        evaluateJS("requestPayWithCustomData('${gson.toJson(request)}', '${encodedString}');")
     }
 
     private fun certification(certification: IamPortCertification) {

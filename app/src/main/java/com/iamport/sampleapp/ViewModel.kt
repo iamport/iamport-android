@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import com.iamport.sdk.data.sdk.*
 import com.iamport.sdk.domain.core.Iamport
 import com.iamport.sdk.domain.utils.Event
-import com.iamport.sdk.domain.utils.escapeJsonString
 import java.util.*
 
 class ViewModel : ViewModel() {
@@ -64,7 +63,7 @@ class ViewModel : ViewModel() {
                     ]
                   }
                 }
-            """.trimIndent().escapeJsonString()
+            """.trimIndent()
 //            customer_uid = getRandomCustomerUid() // 정기결제
         )
     }
