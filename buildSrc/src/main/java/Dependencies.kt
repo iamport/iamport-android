@@ -7,7 +7,7 @@ object Versions {
     const val gradle_version = "4.1.1"
 
     const val multidex = "2.0.1"
-    const val kotlin_stdlib_jdk = "1.5.0"
+    const val kotlin_stdlib_jdk = "1.5.30"
     const val core_ktx = "1.6.0"
     const val appcompat = "1.3.1"
 
