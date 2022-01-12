@@ -20,7 +20,6 @@ https://docs.iamport.kr/tech/imp?lang=ko#param
 // 모두 명세상 필수인지 모르겠음
 // 이니시스 실시간 계좌이체 -> imp_success, success 없음?
 @Parcelize
-@Serializable
 data class IamPortResponse(
     val imp_success: Boolean? = false,
     val success: Boolean? = false,

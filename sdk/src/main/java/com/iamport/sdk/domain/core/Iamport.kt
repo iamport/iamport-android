@@ -9,6 +9,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.MainThread
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
+import com.iamport.sdk.BuildConfig
 import com.iamport.sdk.BuildConfig.DEBUG
 import com.iamport.sdk.data.sdk.*
 import com.iamport.sdk.domain.di.IamportKoinContext
@@ -27,10 +28,11 @@ import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Logger.*
 import com.orhanobut.logger.PrettyFormatStrategy
 import org.koin.android.ext.koin.androidContext
-import org.koin.android.logger.AndroidLogger
+import org.koin.android.ext.koin.androidLogger
 import org.koin.core.KoinApplication
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
+import org.koin.core.logger.Level
 import org.koin.core.module.Module
 import java.lang.ref.WeakReference
 
@@ -104,7 +106,8 @@ object Iamport {
         IamportKoinContext.koinApp = if (koinApp == null) {
             stopKoin()
             startKoin {
-                logger(AndroidLogger())
+                androidLogger(if (BuildConfig.DEBUG) Level.ERROR else Level.NONE)
+//                logger(AndroidLogger())
                 androidContext(app)
                 modules(modules)
             }
