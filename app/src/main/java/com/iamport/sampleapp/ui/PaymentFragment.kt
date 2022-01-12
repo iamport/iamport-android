@@ -203,6 +203,8 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
 //            paymentResultCallback = { callBackListener.result(it) })
 
 //        Iamport.payment(userCode, iamPortRequest = request, approveCallback = { approveCallback(it) }) { callBackListener.result(it) }
+
+//        Iamport.webViewCacheMode = WebSettings.LOAD_DEFAULT // 필요시 추가 default WebSettings.LOAD_NO_CACHE (ex: PG 세틀뱅크 이용시, 뒤로가기 때 LOAD_DEFAULT 설정)
         Iamport.payment(userCode, iamPortRequest = request) { callBackListener.result(it) }
     }
 

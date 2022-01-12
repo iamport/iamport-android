@@ -42,7 +42,8 @@ object Util {
         imp37739582("chai 테스트"),
         imp87936124("alipay 테스트"),
         imp02690184("smartro 테스트"),
-        imp42284830("payple 테스트");
+        imp42284830("payple 테스트"),
+        imp46277621("settlebank 테스트");
 
         companion object {
             fun getUserCodes(): List<String> {
