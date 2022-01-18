@@ -9,6 +9,7 @@ import android.webkit.WebView
 import com.iamport.sdk.BuildConfig
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.domain.core.Iamport
 
 interface BaseMain {
     fun openWebView(payment: Payment)
@@ -38,7 +39,7 @@ interface BaseMain {
                 cookieManager.setAcceptThirdPartyCookies(webView, true)
             }
 
-            cacheMode = WebSettings.LOAD_NO_CACHE
+            cacheMode = Iamport.webViewCacheMode // default WebSettings.LOAD_NO_CACHE
 
             blockNetworkImage = false
             loadsImagesAutomatically = true

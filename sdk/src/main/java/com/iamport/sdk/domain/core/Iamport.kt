@@ -3,6 +3,7 @@ package com.iamport.sdk.domain.core
 import android.app.Application
 import android.net.Uri
 import android.util.Log
+import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
@@ -58,6 +59,11 @@ object Iamport {
     // 중복호출 방지 Utils
     private val preventOverlapRun by lazy { PreventOverlapRun() }
     private var isCreated = false
+
+
+    // WebView CacheMode
+    // default WebSettings.LOAD_NO_CACHE 이나, 세틀뱅크 뒤로가기시 오동작하여(캐시가 필요) 가맹점에서 선택할 수 있게 수정
+    var webViewCacheMode: Int = WebSettings.LOAD_NO_CACHE
 
     var response: IamPortResponse? = null // 내부의 imp_uid로 종료 콜백 중복호출 방지
 
@@ -386,4 +392,5 @@ object Iamport {
         iamportSdk?.requestApprovePayments(approve)
     }
     // ======================================================
+
 }
