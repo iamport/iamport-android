@@ -23,6 +23,7 @@ import kotlinx.coroutines.*
 import org.koin.core.component.get
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
+import java.util.concurrent.atomic.AtomicInteger
 
 open class ChaiStrategy : BaseStrategy() {
 
@@ -37,6 +38,8 @@ open class ChaiStrategy : BaseStrategy() {
     private var prepareData: PrepareData? = null // 차이 api 에 호출하기 위한 데이터
 
     private var timeOutTime: Long = 0 // 차이 결제 타임 아웃이 동작할 타임
+
+    private val pollingId = AtomicInteger() // 폴링 아이디로 이전 폴링을 클렌징 하기 위해 사용
 
     /**
      *  SDK init
@@ -161,10 +164,15 @@ open class ChaiStrategy : BaseStrategy() {
     }
 
 
+    // 현재 pollingId 로 딱 리모트 상태 한번 체크
+    suspend fun onceCheckRemoteChaiStatus() {
+        checkRemoteChaiStatus(pollingId.get(), doPolling = false)
+    }
+
     /**
      * 4.  chai 서버 결제 상태 체크
      */
-    suspend fun checkRemoteChaiStatus(doPolling: Boolean = true) {
+    private suspend fun checkRemoteChaiStatus(currentId: Int, doPolling: Boolean = true) {
 
         prepareData?.let { prepareData: PrepareData ->
 
@@ -173,7 +181,7 @@ open class ChaiStrategy : BaseStrategy() {
             when (val response = requestGetChaiStatus(prepareData)) {
                 is NetworkError -> {
                     i("네트워크 통신실패로 인한 폴링 시도!! ${response.error}")
-                    tryPolling()
+                    tryPolling(currentId)
                 }
                 is GenericError -> {
                     failureFinish(payment, this.prepareData, "GenericError ${response.code} ${response.error}")
@@ -193,7 +201,7 @@ open class ChaiStrategy : BaseStrategy() {
                         else -> CONST.EMPTY_STR
                     }
 
-                    processStatus(displayStatus, payment, prepareData, impUid, doPolling)
+                    processStatus(displayStatus, payment, prepareData, impUid, doPolling, currentId)
                 }
             }
 
@@ -323,30 +331,43 @@ open class ChaiStrategy : BaseStrategy() {
         }
     }
 
-    private suspend fun tryPolling(pollingDelay: Long = CONST.POLLING_DELAY) {
+    private suspend fun tryPolling(currentId: Int, pollingDelay: Long = CONST.POLLING_DELAY) {
         i("폴링!!")
+
         if (isTimeOut()) { // 타임아웃
             if (prepareData == null) {
-                print("isTimeOut 이나, payment : ${payment}, prepareData : ${prepareData}")
+                d("isTimeOut 이나, payment : ${payment}, prepareData : ${prepareData}")
                 clearData() // timeout && prepareData == null
                 return
             }
 
             val msg = "[${CONST.TIME_OUT_MIN}] 분 이상 결제되지 않아 미결제 처리합니다. 결제를 재시도 해주세요."
-            w(msg)
+            i(msg)
             clearData() // timeout
 //            failureFinish(payment, this.prepareData, msg)
             return
         }
+        if (currentId < pollingId.get()) {
+            d("[이전 폴링 클렌징, 지울 ID : $currentId, 최신 ID : $pollingId]")
+            return
+        }
 
+        d("폴링 동작 currentId($currentId)")
         delay(pollingDelay)
-        checkRemoteChaiStatus()
+        checkRemoteChaiStatus(currentId)
     }
 
     /**
      * 차이 서버에서 데이터 가져왔을 때 처리
      */
-    private suspend fun processStatus(displayStatus: String, payment: Payment, prepareData: PrepareData, impUid: String, doPolling: Boolean = true) {
+    private suspend fun processStatus(
+        displayStatus: String,
+        payment: Payment,
+        prepareData: PrepareData,
+        impUid: String,
+        doPolling: Boolean = true,
+        currentId: Int,
+    ) {
 
         when (val status = ChaiPaymentStatus.from(displayStatus)) {
             approved -> confirmMerchant(payment, prepareData, status)
@@ -360,7 +381,7 @@ open class ChaiStrategy : BaseStrategy() {
                     d("this period is just check, not remote polling.")
                     return
                 }
-                tryPolling()
+                tryPolling(currentId)
             }
 
             user_canceled, canceled, failed, timeout, inactive, churn -> {
@@ -414,7 +435,8 @@ open class ChaiStrategy : BaseStrategy() {
                         get(named("${CONST.KOIN_KEY}provideOkHttpClient"))
                     ) // mode 에 따라 chaiApi 생성
 
-                    tryPolling(0)
+                    // 최초 polling 시작점 pollingId 업데이트 하고 시작(이전 폴링 동작은 클렌징 됨)
+                    tryPolling(pollingId.incrementAndGet(), 0)
                 }
             }
         }
@@ -438,7 +460,6 @@ open class ChaiStrategy : BaseStrategy() {
     private suspend fun isPolling(isPolling: Boolean) = withContext(Dispatchers.Main) {
         bus.isPolling.value = Event(isPolling)
     }
-
 
 
 }

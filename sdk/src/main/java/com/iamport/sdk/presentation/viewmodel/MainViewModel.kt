@@ -1,9 +1,7 @@
 package com.iamport.sdk.presentation.viewmodel
 
 import android.app.Application
-import android.content.BroadcastReceiver
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
@@ -19,8 +17,7 @@ import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.NativeLiveDataEventBus
 import com.orhanobut.logger.Logger
-import com.orhanobut.logger.Logger.d
-import com.orhanobut.logger.Logger.i
+import com.orhanobut.logger.Logger.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
@@ -161,7 +158,7 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
     fun forceChaiStatusCheck() {
         viewModelScope.launch(job) {
             d("[차이앱 결제 상태 강제 체크]")
-            repository.chaiStrategy.checkRemoteChaiStatus(doPolling = false)
+            repository.chaiStrategy.onceCheckRemoteChaiStatus()
         }
     }
 
@@ -192,14 +189,19 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
         }
 
         app.run {
+
             Intent(this, ChaiService::class.java).also { intent: Intent ->
                 if (it) {
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        d("startForegroundService")
+                        intent.action = ChaiService.START_SERVICE // notify 호출 위해 명시 선언
                         startForegroundService(intent)
                     } else {
+                        d("startForegroundService")
                         startService(intent)
                     }
                 } else {
+                    d("stopService")
                     stopService(intent)
                 }
             }

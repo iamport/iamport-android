@@ -8,19 +8,35 @@ import android.os.Build
 import android.os.IBinder
 import com.iamport.sdk.R
 import com.iamport.sdk.domain.utils.CONST
+import com.orhanobut.logger.Logger
 
 
 open class ChaiService : Service() {
     private val channelId = "Iamport Pamyent SDK"
 
     companion object {
-        var enableForegroundService : Boolean = true // 폴링시 포그라운드 서비스 enable
-        var enableForegroundServiceStopButton : Boolean = false // 폴링시 포그라운드 서비스 결제실패 버튼 enable
+        var enableForegroundService: Boolean = true // 폴링시 포그라운드 서비스 enable
+        var enableForegroundServiceStopButton: Boolean = false // 폴링시 포그라운드 서비스 결제실패 버튼 enable
+
+        const val START_SERVICE = "start-chai-service"
+        const val STOP_SERVICE = "stop-chai-service"
+    }
+
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        when (intent?.action) {
+            START_SERVICE -> {
+                Logger.i("Start Foreground ChaiService startNotification")
+                startNotification()
+            }
+            else -> Logger.w("ChaiService 미지원 동작")
+        }
+        return START_STICKY
     }
 
     @Override
     override fun onCreate() {
-        startNotification()
+//        startNotification()
     }
 
     override fun onBind(p0: Intent?): IBinder? {
@@ -81,6 +97,8 @@ open class ChaiService : Service() {
             }
         }
 
+
+        Logger.d("차이 서비스 시작")
         startForeground(33, notification)
     }
 

@@ -479,7 +479,7 @@ internal class IamportSdk(
             }
         }
 
-        d("$chaiClearVersion == false 면, 여기까지 안와야함")
+        d("chaiClearVersion($chaiClearVersion) == false 면, 여기까지 안와야함")
 
         // 네이티브 차이 앱 실행
         runCatching {
