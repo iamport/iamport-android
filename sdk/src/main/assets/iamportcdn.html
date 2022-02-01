@@ -51,6 +51,11 @@
                 data.custom_data = decodeCustom
             }
 
+                data.bypass = {
+                    product_code: 'asdf',
+                    product_type: '2', // 1(디지털) 2(실물)
+                 }
+
             IMP.request_pay(data, callback);
         }
 
