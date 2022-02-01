@@ -50,7 +50,9 @@ data class IamPortRequest(
     val cultureBenefit: Boolean? = null,
     val naverInterface: NaverInterface? = null,
 
-    val card: Card? = null// 카드사 다이렉트 호출
+    val card: Card? = null,// 카드사 다이렉트 호출
+
+    val confirm_url: String? = null, // 컨펌 프로스세스시 사용, 컨펌 프로스세스는 별도 아임포트 기능 승인 요청해야 함
 
 ) : Parcelable {
 
@@ -128,6 +130,8 @@ data class IamPortRequest(
 
             var cultureBenefit: Boolean? = null
             var naverInterface: NaverInterface? = null
+            var confirm_url: String? = null
+            var card: Card? = null
 
             fun pg(pg: String) = apply {
                 this.pg = pg
@@ -257,6 +261,14 @@ data class IamPortRequest(
                 this.naverInterface = naverInterface
             }
 
+            fun confirm_url(confirm_url: String) = apply {
+                this.confirm_url = confirm_url
+            }
+
+            fun card(card: Card) = apply {
+                this.card = card
+            }
+
 
             fun build() = IamPortRequest(
                 pg,
@@ -291,7 +303,8 @@ data class IamPortRequest(
                 naverProductCode,
                 naverActionType,
                 cultureBenefit,
-                naverInterface
+                naverInterface,
+                card
             )
         }
     }

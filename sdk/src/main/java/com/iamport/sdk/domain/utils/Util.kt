@@ -22,7 +22,7 @@ object Util {
 
     // FIXME: 11/20/20 임시로 놔둔거임
     enum class DevUserCode(val desc: String) {
-        imp96304110("bingbong 테스트"), imp55870459("kicc 테스트"), imp60029475("mobilians 테스트");
+        imp77825694("페이조아 테스트"), imp96304110("bingbong 테스트"), imp55870459("kicc 테스트"), imp60029475("mobilians 테스트");
 
         companion object {
             fun getUserCodes(): List<String> {
@@ -99,7 +99,7 @@ object Util {
                 PayMethod.smartculture,
                 PayMethod.happymoney
             )
-            kcp -> defaultPayMethod + setOf(PayMethod.samsung, PayMethod.naverpay)
+            kcp -> defaultPayMethod + setOf(PayMethod.samsung, PayMethod.naverpay, PayMethod.kakaopay)
             kcp_billing, kakaopay,
             paypal, payco, smilepay, alipay, settle_firm ->
                 setOf(PayMethod.card)
