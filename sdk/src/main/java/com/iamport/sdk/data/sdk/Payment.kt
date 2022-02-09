@@ -60,11 +60,11 @@ data class Payment(
             }
 
             payment.iamPortRequest?.run {
-                if (pay_method == PayMethod.vbank.name) {
-                    if (vbank_due.isNullOrBlank()) {
-                        return false to CONST.ERR_PAYMENT_VALIDATOR_VBANK
-                    }
-                }
+                // if (pay_method == PayMethod.vbank.name) {
+                //     if (vbank_due.isNullOrBlank()) {
+                //         return false to CONST.ERR_PAYMENT_VALIDATOR_VBANK
+                //     }
+                // }
 
                 if (pay_method == PayMethod.phone.name) {
                     if (digital == null) {
