@@ -21,11 +21,7 @@ object CONST {
     const val IAMPORT_DETECT_ADDRESS = "detectchangingwebview/iamport/a" // a == android
     const val IAMPORT_DETECT_URL = "$IAMPORT_DETECT_SCHEME$IAMPORT_DETECT_ADDRESS"
 
-//    const val IAMPORT_PROD_URL = "https://service.iamport.kr"
-    const val IAMPORT_PROD_URL = "https://pay3.iamport-dev.co"
-//    const val IAMPORT_TEST_URL = "http://1b8309246be2.ngrok.io"
-//    const val IAMPORT_TEST_URL = "https://kicc.iamport.kr"
-
+   const val IAMPORT_PROD_URL = "https://service.iamport.kr"
 
     const val CHAI_SERVICE_URL = "https://api.chai.finance"
     const val CHAI_SERVICE_DEV_URL = "https://api-dev.chai.finance"
