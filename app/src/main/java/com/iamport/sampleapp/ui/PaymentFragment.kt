@@ -12,6 +12,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.activity.OnBackPressedCallback
 import androidx.core.widget.doAfterTextChanged
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.google.gson.GsonBuilder
 import com.iamport.sampleapp.MerchantReceiver
@@ -34,15 +35,17 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
 
-class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
+class PaymentFragment: Fragment() {
 
-    override val layoutResourceId: Int = R.layout.payment_fragment
+    private lateinit var binding: PaymentFragmentBinding
+
     private val receiver = MerchantReceiver()
     val viewModel: ViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-//        Iamport.init(this) // fragment
-        return super.onCreateView(inflater, container, savedInstanceState)
+        binding = PaymentFragmentBinding.inflate(inflater, container, false)
+        initStart()
+        return binding.root
     }
 
     override fun onAttach(context: Context) {
@@ -75,25 +78,25 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
 
     }
 
-    override fun initStart() {
+    private fun initStart() {
 
-        viewDataBinding.paymentButton.setOnClickListener {
+        binding.paymentButton.setOnClickListener {
             onClickPayment()
         }
 
-        viewDataBinding.webviewModeButton.setOnClickListener {
+        binding.webviewModeButton.setOnClickListener {
             onClickWebViewModePayment()
         }
 
-        viewDataBinding.mobilewebModeButton.setOnClickListener {
+        binding.mobilewebModeButton.setOnClickListener {
             onClickMobileWebModePayment()
         }
 
-        viewDataBinding.certificationButton.setOnClickListener {
+        binding.certificationButton.setOnClickListener {
             onClickCertification()
         }
 
-        viewDataBinding.backButton.setOnClickListener {
+        binding.backButton.setOnClickListener {
             backPressCallback.handleOnBackPressed()
         }
 
@@ -107,10 +110,10 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
             PG.getPGNames()
         )
 
-        viewDataBinding.userCode.adapter = userCodeAdapter
-        viewDataBinding.userCode.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        binding.userCode.adapter = userCodeAdapter
+        binding.userCode.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                viewModel.userCode = Util.getUserCode(viewDataBinding.userCode.selectedItemPosition)
+                viewModel.userCode = Util.getUserCode(binding.userCode.selectedItemPosition)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -119,29 +122,29 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
 
         }
 
-        viewDataBinding.pg.adapter = pgAdapter
-        viewDataBinding.pg.onItemSelectedListener = pgSelectListener
+        binding.pg.adapter = pgAdapter
+        binding.pg.onItemSelectedListener = pgSelectListener
 
-        viewDataBinding.name.doAfterTextChanged {
+        binding.name.doAfterTextChanged {
             viewModel.paymentName = it.toString()
         }
-        viewDataBinding.name.setText("아임포트 Android SDK 결제 테스트")
-        viewDataBinding.amount.doAfterTextChanged {
+        binding.name.setText("아임포트 Android SDK 결제 테스트")
+        binding.amount.doAfterTextChanged {
             viewModel.amount = it.toString()
         }
-        viewDataBinding.amount.setText("1000")
+        binding.amount.setText("1000")
 
-        viewDataBinding.cardDirectCode.doAfterTextChanged {
+        binding.cardDirectCode.doAfterTextChanged {
             viewModel.cardDirectCode = it.toString()
         }
     }
 
     override fun onStart() {
         super.onStart()
-        viewDataBinding.merchantUid.doAfterTextChanged {
+        binding.merchantUid.doAfterTextChanged {
             viewModel.merchantUid = it.toString()
         }
-        viewDataBinding.merchantUid.setText(getRandomMerchantUid())
+        binding.merchantUid.setText(getRandomMerchantUid())
 //        onPolling()
     }
 
@@ -238,14 +241,14 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
     private val pgSelectListener = object : AdapterView.OnItemSelectedListener {
         override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
             viewModel.pg = PG.values()[position]
-            viewDataBinding.pgMethod.adapter = ArrayAdapter(
+            binding.pgMethod.adapter = ArrayAdapter(
                 requireContext(), R.layout.support_simple_spinner_dropdown_item,
                 Util.convertPayMethodNames(PG.values()[position])
             )
 
-            viewDataBinding.pgMethod.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            binding.pgMethod.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                    viewModel.payMethod = Util.getMappingPayMethod(viewModel.pg).elementAt(viewDataBinding.pgMethod.selectedItemPosition)
+                    viewModel.payMethod = Util.getMappingPayMethod(viewModel.pg).elementAt(binding.pgMethod.selectedItemPosition)
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
