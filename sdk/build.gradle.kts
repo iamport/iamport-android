@@ -9,13 +9,12 @@ plugins {
 
 
 android {
-    compileSdk = 31
+    compileSdk = 30
     buildToolsVersion = "30.0.3"
-
 
     defaultConfig {
         minSdk = 21
-        targetSdk = 31
+        targetSdk = 30
 //        versionCode = Versions.versionCode // yymmdd000
 //        versionName = Versions.versionName // prod(x.y.z), dev(x.y.z-dev00), poc(x.y.z-poc00)
         multiDexEnabled = true
