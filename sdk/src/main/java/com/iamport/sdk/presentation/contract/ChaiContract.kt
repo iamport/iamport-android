@@ -4,13 +4,13 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
+import com.orhanobut.logger.Logger
 import com.orhanobut.logger.Logger.d
-import com.orhanobut.logger.Logger.i
 
 /**
  * 차이 앱 요청 및 응답 데이터 규약
  */
-class ChaiContract : ActivityResultContract<Pair<String, String>, String>() {
+class ChaiContract : ActivityResultContract<Pair<String, String>, String?>() {
 
     override fun createIntent(context: Context, input: Pair<String, String>): Intent {
         d("createIntent :: $input")
@@ -26,7 +26,10 @@ class ChaiContract : ActivityResultContract<Pair<String, String>, String>() {
                 d("${intent?.getStringExtra("output")}")
                 intent?.getStringExtra("output")
             }
-            else -> null
+            else -> {
+                Logger.w("ChaiContract RESULT IS NOT OK :: ${resultCode}")
+                null
+            }
         }
     }
 }

@@ -11,6 +11,10 @@ fun isNonStable(version: String): Boolean {
     return isStable.not()
 }
 
+/**
+ * 디펜던시 업데이트 확인 ./gradlew dependencyUpdates
+ */
+
 tasks.named("dependencyUpdates", DependencyUpdatesTask::class).configure {
     // using the full syntax
     resolutionStrategy {

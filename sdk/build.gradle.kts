@@ -56,9 +56,9 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
-    buildFeatures {
-        dataBinding = true
-    }
+//    buildFeatures {
+//        dataBinding = true
+//    }
 
     lint {
         isAbortOnError = false
@@ -149,4 +149,6 @@ dependencies {
     implementation(Libs.spinKit)
 
     implementation(Libs.serialization)
+    implementation(Libs.workRuntimeKtx)
+
 }

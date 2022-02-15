@@ -19,14 +19,14 @@ object Versions {
     const val androidx_test_core = "1.4.0"
     const val androidx_test_runner = "1.1.0"
 
-    const val constraintlayout = "2.2.3"
+    const val constraintlayout = "2.1.3"
     const val lifecycle_extensions = "2.2.0"
     const val lifecycle_common = "2.4.1"
 
     const val material = "1.5.0"
 
     const val activity_ktx = "1.4.0"
-    const val fragment_ktx = "1.4.6"
+    const val fragment_ktx = "1.4.1"
 
     const val koin_version = "3.1.6"
     const val retrofit_version = "2.9.0"
@@ -49,6 +49,8 @@ object Versions {
     const val robolectric = "4.7.3"
 
     const val serialization = "1.3.2"
+
+    const val workRuntimeKtx = "2.7.1"
 }
 
 object Libs {
@@ -120,8 +122,9 @@ object Libs {
 
     const val serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.serialization}"
 
-//    const val chuck = "com.readystatesoftware.chuck:library:${Versions.chuck}"
-//    const val releaseChuck = "com.readystatesoftware.chuck:library-no-op:${Versions.chuck}"
+    // target android 12 pending intent 처리를 위해 추가
+    // Targeting S+ (version 31 and above) requires that one of FLAG_IMMUTABLE or FLAG_MUTABLE be specified when creating a PendingIntent.
+    const val workRuntimeKtx = "androidx.work:work-runtime-ktx:${Versions.workRuntimeKtx}"
 
 }
 
