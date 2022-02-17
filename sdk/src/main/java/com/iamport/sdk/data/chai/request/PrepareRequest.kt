@@ -62,7 +62,7 @@ data class PrepareRequest(
                     app_scheme = app_scheme,
                     custom_data = custom_data,
                     notice_url = notice_url,
-                    confirm_url = null,
+                    confirm_url = confirm_url,
                     _extra = Extra(native = OS.aos, bypass = empty)
                 )
             } ?: run {
