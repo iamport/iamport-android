@@ -50,7 +50,8 @@ data class IamPortRequest(
     val cultureBenefit: Boolean? = null,
     val naverInterface: NaverInterface? = null,
 
-    val card: Card? = null// 카드사 다이렉트 호출
+    val confirm_url: String? = null, // 컨펌프로세스
+    val card: Card? = null, // 카드사 다이렉트 호출
 
 ) : Parcelable {
 
@@ -128,6 +129,8 @@ data class IamPortRequest(
 
             var cultureBenefit: Boolean? = null
             var naverInterface: NaverInterface? = null
+
+            var confirm_url: String? = null
 
             fun pg(pg: String) = apply {
                 this.pg = pg
@@ -257,41 +260,44 @@ data class IamPortRequest(
                 this.naverInterface = naverInterface
             }
 
+            fun confirm_url(confirm_url: String) = apply {
+                this.confirm_url = confirm_url
+            }
+
 
             fun build() = IamPortRequest(
-                pg,
-                pay_method,
-                escrow,
-                merchant_uid,
-                customer_uid,
-                name,
-                amount,
-                custom_data,
-                tax_free,
-                currency,
-                language,
-                buyer_name,
-                buyer_tel,
-                buyer_email,
-                buyer_addr,
-                buyer_postcode,
-                notice_url,
-                display,
-                digital,
-                vbank_due,
-//                m_redirect_url,
-                app_scheme,
-                biz_num,
-                popup,
-//                niceMobileV2,
-                naverPopupMode,
-                naverUseCfm,
-                naverProducts,
-                naverCultureBenefit,
-                naverProductCode,
-                naverActionType,
-                cultureBenefit,
-                naverInterface
+                pg = pg,
+                pay_method = pay_method,
+                escrow = escrow,
+                merchant_uid = merchant_uid,
+                customer_uid = customer_uid,
+                name = name,
+                amount = amount,
+                custom_data = custom_data,
+                tax_free = tax_free,
+                currency = currency,
+                language = language,
+                buyer_name = buyer_name,
+                buyer_tel = buyer_tel,
+                buyer_email = buyer_email,
+                buyer_addr = buyer_addr,
+                buyer_postcode = buyer_postcode,
+                notice_url = notice_url,
+                display = display,
+                digital = digital,
+                vbank_due = vbank_due,
+                app_scheme = app_scheme,
+                biz_num = biz_num,
+                popup = popup,
+                naverPopupMode = naverPopupMode,
+                naverUseCfm = naverUseCfm,
+                naverProducts = naverProducts,
+                naverCultureBenefit = naverCultureBenefit,
+                naverProductCode = naverProductCode,
+                naverActionType = naverActionType,
+                cultureBenefit = cultureBenefit,
+                naverInterface = naverInterface,
+                confirm_url = confirm_url
             )
         }
     }
