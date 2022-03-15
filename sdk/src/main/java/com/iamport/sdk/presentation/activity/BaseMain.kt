@@ -28,10 +28,6 @@ interface BaseMain {
         webView.settings.apply {
             javaScriptEnabled = true
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
-            }
-
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
                 val cookieManager = CookieManager.getInstance()
