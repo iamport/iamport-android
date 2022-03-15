@@ -1,11 +1,14 @@
 package com.iamport.sampleapp.ui
 
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.webkit.WebView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.iamport.sampleapp.BuildConfig
 import com.iamport.sampleapp.R
 import com.iamport.sampleapp.ViewModel
 import com.iamport.sdk.domain.core.Iamport
@@ -24,6 +27,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.main_activity)
         Iamport.init(this)
 
+        // SDK 웹 디버깅을 위해 추가
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
+        }
+        
         // use fragment
 //        replaceFragment(paymentFragment)
         supportFragmentManager.beginTransaction()
