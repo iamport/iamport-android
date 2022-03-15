@@ -1,7 +1,7 @@
 // 디펜던시 업데이트 확인 ./gradlew dependencyUpdates -Drevision=release
 object Versions {
-    const val versionCode = 220120001 // yymmdd000
-    const val versionName = "1.3.2"  // https://www.notion.so/chaifinance/QA-Process-d1a4be396337493b81c6e85fff2d5cd6
+    const val versionCode = 220315001 // yymmdd000
+    const val versionName = "1.3.4"  // https://www.notion.so/chaifinance/QA-Process-d1a4be396337493b81c6e85fff2d5cd6
 
     const val gradle_versions_plugin = "0.39.0"
     const val gradle_version = "4.1.1"
