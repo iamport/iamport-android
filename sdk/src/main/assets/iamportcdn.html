@@ -34,7 +34,7 @@
 
             function requestPay(impRequest) {
                 dLog("requestPay :: " + impRequest)
-                data.pg = 'daou.CTS17337';
+                data.pg = 'daou.CMP62818';
                 data.escrow = true;
                 // data.vbank_due = '20220301000000'
                 IMP.request_pay(JSON.parse(impRequest), callback);
@@ -54,7 +54,7 @@
                 data.custom_data = decodeCustom
             }
 
-            data.pg = 'daou.CTS17337';
+            data.pg = 'daou.CMP62818';
             data.escrow = true;
             // data.vbank_due = '20220301000000'
 
