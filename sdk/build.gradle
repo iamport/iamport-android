@@ -6,12 +6,12 @@ apply plugin: 'kotlinx-serialization'
 apply plugin: 'maven-publish'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     buildToolsVersion "30.0.3"
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode Versions.versionCode // yymmdd000
         versionName Versions.versionName // prod(x.y.z), dev(x.y.z-dev00), poc(x.y.z-poc00)
         multiDexEnabled true
@@ -140,7 +140,6 @@ dependencies {
     testImplementation Libs.koin_test
     implementation Libs.koin_android
     implementation Libs.koin_android_compat
-    implementation Libs.koin_android_workmanager
     implementation Libs.koin_android_compose
 
     // Retorofit

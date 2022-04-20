@@ -69,10 +69,22 @@ open class ChaiService : Service() {
         val stopBtnName = "중지"
 
         val broadcastIntent = Intent(CONST.BROADCAST_FOREGROUND_SERVICE)
-        val pendingIntent = PendingIntent.getBroadcast(this, 0, broadcastIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-
         val stopIntent = Intent(CONST.BROADCAST_FOREGROUND_SERVICE_STOP)
-        val pendingStopIntent = PendingIntent.getBroadcast(this, 0, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        // Android 12 대응 (참고: https://developer.android.com/guide/components/intents-filters#DeclareMutabilityPendingIntent)
+        val pendingIntent =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                PendingIntent.getBroadcast(this, 0, broadcastIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+            } else {
+                PendingIntent.getBroadcast(this, 0, broadcastIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+            }
+
+        // Android 12 대응 (참고: https://developer.android.com/guide/components/intents-filters#DeclareMutabilityPendingIntent)
+        val pendingStopIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PendingIntent.getBroadcast(this, 0, stopIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+        } else {
+            PendingIntent.getBroadcast(this, 0, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        }
 
         val notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val action = Notification.Action.Builder(Icon.createWithResource(CONST.EMPTY_STR, stopIcon), stopBtnName, pendingStopIntent).build()
