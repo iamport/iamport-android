@@ -22,7 +22,8 @@ object Util {
 
     // FIXME: 11/20/20 임시로 놔둔거임
     enum class DevUserCode(val desc: String) {
-        imp96304110("bingbong 테스트"), imp55870459("kicc 테스트"), imp60029475("mobilians 테스트");
+//        imp96304110("bingbong 테스트"), imp55870459("kicc 테스트"), imp60029475("mobilians 테스트");
+        imp55525921("토스 신모듈 테스트");
 
         companion object {
             fun getUserCodes(): List<String> {
@@ -32,18 +33,19 @@ object Util {
     }
 
     enum class SampleUserCode(val desc: String) {
-        imp19424728("default 테스트"),
-        iamport("관리자 체험하기 계정"),
-        imp10391932("kakao 테스트"),
-        imp09350031("paypal 테스트"),
-        imp60029475("mobilians 테스트"),
-        imp41073887("naverco, naverpay 테스트"),
-        imp49241793("smilepay 테스트"),
-        imp37739582("chai 테스트"),
-        imp87936124("alipay 테스트"),
-        imp02690184("smartro 테스트"),
-        imp42284830("payple 테스트"),
-        imp46277621("settlebank 테스트");
+        EMPTY("EMPTY");
+//        imp19424728("default 테스트"),
+//        iamport("관리자 체험하기 계정"),
+//        imp10391932("kakao 테스트"),
+//        imp09350031("paypal 테스트"),
+//        imp60029475("mobilians 테스트"),
+//        imp41073887("naverco, naverpay 테스트"),
+//        imp49241793("smilepay 테스트"),
+//        imp37739582("chai 테스트"),
+//        imp87936124("alipay 테스트"),
+//        imp02690184("smartro 테스트"),
+//        imp42284830("payple 테스트"),
+//        imp46277621("settlebank 테스트");
 
         companion object {
             fun getUserCodes(): List<String> {

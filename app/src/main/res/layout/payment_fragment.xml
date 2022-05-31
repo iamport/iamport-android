@@ -134,6 +134,32 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/merchant_uid" />
 
+        <EditText
+            android:id="@+id/pg_mid"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="15dp"
+            android:background="@color/white_12"
+            android:hint="PG MID"
+            android:paddingStart="10dp"
+            android:textSize="16sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/amount" />
+
+        <EditText
+            android:id="@+id/customer_uid"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="15dp"
+            android:background="@color/white_12"
+            android:hint="Customer UID"
+            android:paddingStart="10dp"
+            android:textSize="16sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/pg_mid" />
+
 
 
         <EditText
@@ -145,6 +171,7 @@
             android:hint="카드사 다이렉트"
             android:paddingStart="10dp"
             android:textSize="16sp"
+            android:visibility="gone"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/amount" />
