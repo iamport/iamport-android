@@ -142,6 +142,14 @@ class PaymentFragment : BaseFragment<PaymentFragmentBinding>() {
             viewModel.merchantUid = it.toString()
         }
         viewDataBinding.merchantUid.setText(getRandomMerchantUid())
+
+        viewDataBinding.customerUid.doAfterTextChanged {
+            viewModel.customerUid = it.toString()
+        }
+
+        viewDataBinding.pgMid.doAfterTextChanged {
+            viewModel.pgMid = it.toString()
+        }
 //        onPolling()
     }
 
