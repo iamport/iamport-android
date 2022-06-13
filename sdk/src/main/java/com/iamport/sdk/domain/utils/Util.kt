@@ -23,7 +23,7 @@ object Util {
     // FIXME: 11/20/20 임시로 놔둔거임
     enum class DevUserCode(val desc: String) {
 //        imp96304110("bingbong 테스트"), imp55870459("kicc 테스트"), imp60029475("mobilians 테스트");
-        imp55525921("토스 신모듈 테스트");
+        imp89347847("크림 토스 신모듈 테스트");
 
         companion object {
             fun getUserCodes(): List<String> {
