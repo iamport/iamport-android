@@ -1,7 +1,7 @@
 // 디펜던시 업데이트 확인 ./gradlew dependencyUpdates -Drevision=release
 object Versions {
-    const val versionCode = 220315001 // yymmdd000
-    const val versionName = "1.3.4"  // https://www.notion.so/chaifinance/QA-Process-d1a4be396337493b81c6e85fff2d5cd6
+    const val versionCode = 220420001 // yymmdd000
+    const val versionName = "1.3.5"  // https://www.notion.so/chaifinance/QA-Process-d1a4be396337493b81c6e85fff2d5cd6
 
     const val gradle_versions_plugin = "0.39.0"
     const val gradle_version = "4.1.1"
@@ -30,7 +30,7 @@ object Versions {
     const val activity_ktx = "1.3.0"
     const val fragment_ktx = "1.3.6"
 
-    const val koin_version = "3.1.2"
+    const val koin_version = "3.1.6"
     const val retrofit_version = "2.9.0"
     const val logging_interceptor = "4.9.0"
 
@@ -98,8 +98,6 @@ object Libs {
 
     // Koin Java Compatibility
     const val koin_android_compat = "io.insert-koin:koin-android-compat:${Versions.koin_version}"
-    // Koin for Jetpack WorkManager
-    const val koin_android_workmanager = "io.insert-koin:koin-androidx-workmanager:${Versions.koin_version}"
     // Koin for Jetpack Compose
     const val koin_android_compose = "io.insert-koin:koin-androidx-compose:${Versions.koin_version}"
 
