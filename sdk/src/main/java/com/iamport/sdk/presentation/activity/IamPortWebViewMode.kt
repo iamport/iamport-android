@@ -5,26 +5,25 @@ import android.net.Uri
 import android.view.View
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
+import androidx.lifecycle.ViewModelProvider
 import com.google.gson.GsonBuilder
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.data.sdk.ProvidePgPkg
 import com.iamport.sdk.domain.IamportWebChromeClient
-import com.iamport.sdk.domain.JsNativeInterface
-import com.iamport.sdk.domain.di.IamportKoinComponent
+import com.iamport.sdk.domain.di.ModuleProvider
 import com.iamport.sdk.domain.utils.*
 import com.iamport.sdk.presentation.viewmodel.WebViewModel
+import com.iamport.sdk.presentation.viewmodel.WebViewModelFactory
 import com.orhanobut.logger.Logger.*
 import kotlinx.coroutines.*
-import org.koin.core.component.get
-import org.koin.core.qualifier.named
 
 
 open class IamPortWebViewMode @JvmOverloads constructor(
     scope: BaseCoroutineScope = UICoroutineScope()
-) : IamportKoinComponent, BaseMain, BaseCoroutineScope by scope {
+) : BaseMain, BaseCoroutineScope by scope {
 
-    val viewModel: WebViewModel = WebViewModel(get())
+    lateinit var viewModel : WebViewModel
 
     var activity: ComponentActivity? = null
     var webview: WebView? = null
@@ -38,6 +37,9 @@ open class IamPortWebViewMode @JvmOverloads constructor(
         this.activity = activity
         this.webview = webview
         this.paymentResultCallBack = paymentResultCallBack
+
+        viewModel = ViewModelProvider(activity.viewModelStore, WebViewModelFactory(ModuleProvider.webViewLiveDataEventBus, ModuleProvider.strategyRepository)).get(WebViewModel::class.java)
+
         observeViewModel(payment) // 관찰할 LiveData
     }
 
@@ -193,7 +195,7 @@ open class IamPortWebViewMode @JvmOverloads constructor(
             setLayerType(View.LAYER_TYPE_HARDWARE, null)
             clearCache(true)
             addJavascriptInterface(
-                JsNativeInterface(payment, get(named("${CONST.KOIN_KEY}Gson")), evaluateJS),
+                ModuleProvider.apiModule.provideJsNativeInterface(payment, evaluateJS),
                 CONST.PAYMENT_WEBVIEW_JS_INTERFACE_NAME
             )
             webViewClient = viewModel.getWebViewClient()

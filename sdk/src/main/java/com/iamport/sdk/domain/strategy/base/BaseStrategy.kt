@@ -3,18 +3,15 @@ package com.iamport.sdk.domain.strategy.base
 import com.google.gson.Gson
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
-import com.iamport.sdk.domain.di.IamportKoinComponent
-import com.iamport.sdk.domain.utils.CONST
+import com.iamport.sdk.domain.di.ModuleProvider
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.NativeLiveDataEventBus
 import kotlinx.coroutines.CancellationException
-import org.koin.core.component.inject
-import org.koin.core.qualifier.named
 
-abstract class BaseStrategy : IStrategy, IamportKoinComponent {
+abstract class BaseStrategy : IStrategy {
 
-    protected val gson: Gson by inject(named("${CONST.KOIN_KEY}Gson"))
-    protected val bus: NativeLiveDataEventBus by inject()
+    protected val gson: Gson = ModuleProvider.gson
+    protected val bus: NativeLiveDataEventBus = ModuleProvider.nativeLiveDataEventBus
     lateinit var payment: Payment
 
     override fun init() {}

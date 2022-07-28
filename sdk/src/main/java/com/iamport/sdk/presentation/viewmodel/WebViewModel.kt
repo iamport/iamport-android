@@ -6,7 +6,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
-import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.repository.StrategyRepository
 import com.iamport.sdk.domain.strategy.webview.IamPortMobileModeWebViewClient
 import com.iamport.sdk.domain.utils.Event
@@ -14,9 +13,7 @@ import com.iamport.sdk.domain.utils.WebViewLiveDataEventBus
 import com.orhanobut.logger.Logger.d
 import kotlinx.coroutines.launch
 
-class WebViewModel(private val repository: StrategyRepository) : BaseViewModel(), IamportKoinComponent {
-
-    private val bus: WebViewLiveDataEventBus by lazy { WebViewLiveDataEventBus }
+class WebViewModel(val bus: WebViewLiveDataEventBus, val repository: StrategyRepository) : BaseViewModel() {
 
     override fun onCleared() {
         d("onCleared")

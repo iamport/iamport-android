@@ -13,11 +13,6 @@ import androidx.lifecycle.LiveData
 import com.iamport.sdk.BuildConfig
 import com.iamport.sdk.BuildConfig.DEBUG
 import com.iamport.sdk.data.sdk.*
-import com.iamport.sdk.domain.di.IamportKoinContext
-import com.iamport.sdk.domain.di.IamportKoinContext.koinApp
-import com.iamport.sdk.domain.di.apiModule
-import com.iamport.sdk.domain.di.appModule
-import com.iamport.sdk.domain.di.httpClientModule
 import com.iamport.sdk.domain.service.ChaiService
 import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.Event
@@ -26,15 +21,9 @@ import com.iamport.sdk.presentation.activity.IamportSdk
 import com.iamport.sdk.presentation.contract.WebViewActivityContract
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
-import com.orhanobut.logger.Logger.*
+import com.orhanobut.logger.Logger.d
+import com.orhanobut.logger.Logger.i
 import com.orhanobut.logger.PrettyFormatStrategy
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
-import org.koin.core.KoinApplication
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.core.logger.Level
-import org.koin.core.module.Module
 import java.lang.ref.WeakReference
 
 
@@ -58,7 +47,7 @@ object Iamport {
 
     // 중복호출 방지 Utils
     private val preventOverlapRun by lazy { PreventOverlapRun() }
-    private var isCreated = false
+    private var isLogFormatBuild = false
 
 
     // WebView CacheMode
@@ -66,15 +55,6 @@ object Iamport {
     var webViewCacheMode: Int = WebSettings.LOAD_NO_CACHE
 
     var response: IamPortResponse? = null // 내부의 imp_uid로 종료 콜백 중복호출 방지
-
-    // ===========================================
-    // Application class 에서 생성 했는지 확인
-    private fun isSDKCreate(): Boolean {
-        if (!isCreated) {
-            Log.i(CONST.IAMPORT_LOG, "IAMPORT SDK was not created yet.")
-        }
-        return isCreated
-    }
 
     // Activity or Fragment 레벨에서 생성 했는지 확인
     private fun isSDKInit(payment: Payment): Boolean {
@@ -89,43 +69,24 @@ object Iamport {
 
 
     // ===========================================
-    // Koin 관련
-    fun getKoinApplition(): KoinApplication? {
-        return koinApp
-    }
 
-    fun getKoinModules(): List<Module> {
-        return listOf(httpClientModule, apiModule, appModule)
-    }
-
+    // 하위 호환
+    @Deprecated(message = "이 함수는 아무 동작하지 않으며, 호출할 필요가 없습니다. (sdk version > 1.2.0)")
     fun create(app: Application) {
-        createWithKoin(app)
+        // Do Nothing
     }
 
-    /**
-     * Application instance 를 통해, DI 초기화
-     */
-    // TODO Application 사용하지 않는 방안 모색
-    fun createWithKoin(app: Application, koinApp: KoinApplication? = null) {
+    // 하위 호환
+    @Deprecated(message = "이 함수는 아무 동작하지 않으며, 호출할 필요가 없습니다. (sdk version > 1.2.0)")
+    fun createWithKoin(app: Application) {
+        // Do Nothing
+    }
 
-        val modules = getKoinModules()
-        IamportKoinContext.koinApp = if (koinApp == null) {
-            stopKoin()
-            startKoin {
-                androidLogger(if (BuildConfig.DEBUG) Level.ERROR else Level.NONE)
-//                logger(AndroidLogger())
-                androidContext(app)
-                modules(modules)
-            }
-        } else {
-            // TODO : koinApp.androidContext(app) 필요할까?
-            koinApp.modules(modules) // or getKoinModules 를 직접 받아서 사용
-        }
-
+    private fun buildLogFormat() {
 
         val formatStrategy = PrettyFormatStrategy.newBuilder().apply {
             tag(CONST.IAMPORT_LOG)
-            if (DEBUG) {
+            if (BuildConfig.DEBUG) {
                 methodCount(3)
             } else {
                 showThreadInfo(false)       // (Optional) Whether to show thread info or not. Default true
@@ -134,24 +95,25 @@ object Iamport {
             }
         }.build()
 
-        addLogAdapter(object : AndroidLogAdapter(formatStrategy) {
+        Logger.addLogAdapter(object : AndroidLogAdapter(formatStrategy) {
             override fun isLoggable(priority: Int, tag: String?): Boolean {
-                if (!DEBUG && priority <= Logger.DEBUG) {
+                if (!BuildConfig.DEBUG && priority <= Logger.DEBUG) {
                     return false
                 }
                 return true
             }
         })
 
-        isCreated = true
-        d("Create IAMPORT SDK")
+        isLogFormatBuild = true
+        d("Log Format build for IAMPORT SDK")
 
-//        v("LOG TEST VERBOSE")
-//        d("LOG TEST DEBUG")
-//        i("LOG TEST INFO")
-//        w("LOG TEST WANRING")
-//        e("LOG TEST ERROR")
+//        v("LOG IAMPORT VERBOSE")
+//        d("LOG IAMPORT DEBUG")
+//        i("LOG IAMPORT INFO")
+//        w("LOG IAMPORT WANRING")
+//        e("LOG IAMPORT ERROR")
     }
+
 
     // ============================================
 
@@ -210,17 +172,14 @@ object Iamport {
      * @param componentActivity : Host Activity
      */
     fun init(componentActivity: ComponentActivity) {
-        if (!isSDKCreate()) {
-            create(componentActivity.application)
-//            init(componentActivity)
-//            return
+        if (!isLogFormatBuild) {
+            buildLogFormat()
         }
 
         d("INITIALIZE IAMPORT SDK from activity")
-//        close()
-        iamportSdk?.initClose()
 
         preventOverlapRun.init()
+        iamportSdk?.initClose()
         iamportSdk = null
 
         webViewActivityLauncher = componentActivity.registerForActivityResult(webViewActivityContract) {
@@ -236,19 +195,14 @@ object Iamport {
      * @param fragment : Host Fragment
      */
     fun init(fragment: Fragment) {
-        if (!isSDKCreate()) {
-            fragment.activity?.let {
-                create(it.application)
-            }
-//            init(fragment)
-//            return
+        if (!isLogFormatBuild) {
+            buildLogFormat()
         }
 
         d("INITIALIZE IAMPORT SDK from fragment")
-//        close()
-        iamportSdk?.initClose()
 
         preventOverlapRun.init()
+        iamportSdk?.initClose()
         iamportSdk = null
 
         webViewActivityLauncher = fragment.registerForActivityResult(webViewActivityContract) {

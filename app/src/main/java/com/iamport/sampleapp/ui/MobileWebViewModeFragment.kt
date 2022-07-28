@@ -10,7 +10,6 @@ import com.iamport.sampleapp.MyWebViewChromeClient
 import com.iamport.sampleapp.MyWebViewClient
 import com.iamport.sampleapp.databinding.WebViewModeFragmentBinding
 import com.iamport.sdk.domain.core.Iamport
-import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.EventObserver
 import java.util.*
 

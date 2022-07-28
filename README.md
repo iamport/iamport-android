@@ -18,11 +18,19 @@
 
 - [아임포트 블로그][2]
 
+- [아임포트 소식][3333]
+  
 - [아임포트 docs][3]
+
+- [아임포트 manual][3334]
+
+(docs와 manual 를 상호 참조 하시면 좋습니다.)
 
 [1]: https://www.iamport.kr/
 [2]: http://blog.iamport.kr/
 [3]: https://docs.iamport.kr/?lang=ko
+[3333]: https://notice.iamport.kr/d1e16239-0889-4e69-b29e-277d2833d747
+[3334]: https://github.com/iamport/iamport-manual
 
 ## :fire: 사용방법
 
@@ -45,34 +53,6 @@
 ### KOTLIN usage
 
 > 필수구현 사항
-```kotlin
-
-// 일반적인 경우
-// 사용하시는 안드로이드 Application 클래스에 추가하세요
-class BaseApplication : Application() {
-    override fun onCreate() {
-        ..
-        Iamport.create(this)
-    }
-}
-
-// DI 로 koin 을 사용하시는 경우 
-// 생성된 koinApplication 을 파라미터로 넘겨주셔야 합니다
-// 참고 : 코틀린 1.5.0 이상 및 Koin 2.2.2 를 사용하시는 분들은 2.2.3 으로 업데이트 하시기 바랍니다.
-// 참고 : v1.2.0 부터 koin 3.1.2 를 사용합니다.
-class BaseApplication : Application() {
-    override fun onCreate() {
-        ..
-        val koinApp = startKoin { .. }
-        Iamport.createWithKoin(this, koinApp)
-    }
-
-    // KoinApplication 이 필요한 경우
-    Iamport.getKoinApplition()
-}
-
-```
-
 
 ```kotlin
 
@@ -93,19 +73,22 @@ Iamport.close()
 // SDK 에 결제 요청할 데이터 구성
 val request = IamPortRequest(
     pg = "chai",                                 // PG 사
-    pay_method = PayMethod.trans.name,          // 결제수단
-    name = "여기주문이요",                         // 주문명
-    merchant_uid = "mid_123456",               // 주문번호
-    amount = "3000",                           // 결제금액
+    pay_method = PayMethod.trans.name,           // 결제수단
+    name = "여기주문이요",                          // 주문명
+    merchant_uid = "mid_123456",                 // 주문번호
+    amount = "3000",                             // 결제금액
     buyer_name = "홍길동"
 )
 
 
 // 결제요청
-Iamport.payment("imp123456", request,
+val userCode = "고객님의 아임포트 가맹점 식별코드(ex imp123456)"
+Iamport.payment(userCode, request,
     approveCallback = { /* (Optional) CHAI 최종 결제전 콜백 함수. */ },
     paymentResultCallback = { /* 최종 결제결과 콜백 함수. */ })
 
+
+// 참고 : SDK 버전 > 1.2.0 부터 기존의 Application class 에서 사용하던 Iamport.create(this) 과 Iamport.createWithKoin(this, koinApp) 가 DEPRECATED 되었습니다.
 
 ```
 
@@ -162,6 +145,29 @@ Iamport.payment("imp123456", request,
 
 ---
 
+### Optional 구현사항 : 본인인증
+<details>
+<summary>펼쳐보기</summary>
+
+아임포트에서는 다양한 본인인증 기능을 제공하고 있습니다.
+[휴대폰 본인인증](https://docs.iamport.kr/tech/mobile-authentication)
+[신용카드 본인인증](https://docs.iamport.kr/tech/card-authentication)
+[통합인증](https://docs.iamport.kr/tech/unified-authentication)
+
+결제연동과 대동소이 하며 기존 [필수구현 사항][7] 과 같이 iamport-sdk 세팅을 하고,
+IamPortCertification 를 구성해서 Iamport.certification 함수를 호출해주시면 됩니다. 
+
+```kotlin
+    val userCode = "고객님의 아임포트 가맹점 식별코드"
+    val certification = IamPortCertification(
+        merchant_uid = merchant_uid,
+        ..
+    )
+    
+    Iamport.certification(userCode, iamPortCertification = certification) { /* callback */ }
+```
+
+</details>
 
 ### Optional 구현사항 : WebView Mode 와 MobileWeb Mode
 <details>
@@ -279,20 +285,20 @@ class MobileWebViewModeFragment : Fragment() {
 <summary>펼쳐보기</summary>  
 
 안드로이드 시스템상 새로 앱을 띄우고 종료가 되면 자동으로 호출했던 앱으로 돌아오게 되어 있기에   
-***기본적으로 app_scheme 파라미터는 사용하실 필요가 없습니다.*** (iOS 의 경우 해당 기능이 없기에 필수입니다.)
+***기본적으로 app_scheme 파라미터는 사용하실 필요가 없습니다.*** (iOS 의 경우 app_scheme 을 통해 내 앱으로 복귀하기에 필수입니다.)
 
 > 그럼에도 사용을 원하신다면, 결제 요청시 구성하는 IamPortRequest class 에 app_scheme 파라미터를 추가하여야 합니다.  
 이 데이터는 서드파티 결제 앱(페이북, 뱅크페이, toss 등)에서 결제인증이 완료된 후, 호출한 나의 앱을 실행시키는 역할을 합니다.
 
 > 본 SDK 의 WebView Mode / MobileWeb Mode 에서만 사용이 가능하며,  
-activity 의 launchMode 를 singleInstance 로 구성하시고,  
+manifest 에서 activity launchMode 를 singleTask (또는 singleInstance) 로 구성하시고,  
 아래 코드와 같이 manifest 에서 intent-filter scheme 을 설정하시기 바랍니다.   
-(PG 이니시스의 경우 scheme 에 . 를 포함하면 결제 실패 처리되므로 주의하시기 바랍니다.)
+(주의 : PG 이니시스의 경우 scheme 에 . 를 포함하면 결제 실패 처리되므로 주의하시기 바랍니다.)
 
 
 ```xml
   <activity
-      android:launchMode="singleInstance"
+      android:launchMode="singleTask"
       ..
 ```  
 ```xml
@@ -334,32 +340,6 @@ val request = IamPortRequest(
 [7]:https://github.com/iamport/iamport-android#kotlin-usage
 
 ```java
-  // 일반적인 경우
-  // 사용하시는 안드로이드 어플리케이션 클래스에 추가하세요
-  public class BaseApplication extends Application {
-      @Override
-      public void onCreate() {
-          ..
-          Iamport.INSTANCE.create(this, null);
-      }
-  }
-
-   // DI 로 koin 을 사용하시는 경우 
-   // 생성된 koinApplication 을 파라미터로 넘겨주셔야 합니다
-   // 참고 : 코틀린 1.5.0 이상 및 Koin 2.2.2 를 사용하시는 분들은 2.2.3 으로 업데이트 하시기 바랍니다.
-    public class BaseApplication extends Application {
-        @Override
-        public void onCreate() {
-            ..
-            KoinApplication koinApp = ..
-            Iamport.INSTANCE.createWithKoin(this, koinApp);
-        }
-    }
-
-```
-
-
-```java
 
   @Override
   public void onCreate() {
@@ -382,8 +362,9 @@ val request = IamPortRequest(
           .amount("3000")
           .buyer_name("홍길동").build();
 
-
-  Iamport.INSTANCE.payment("imp123456", request, 
+  
+  String userCode = "고객님의 아임포트 가맹점 식별코드(ex imp123456)"
+  Iamport.INSTANCE.payment(userCode, request, 
     iamPortApprove -> {
       // (Optional) CHAI 최종 결제전 콜백 함수.
       return Unit.INSTANCE;
@@ -391,6 +372,9 @@ val request = IamPortRequest(
       // 최종 결제결과 콜백 함수.
       return Unit.INSTANCE;
   });
+  
+  // 참고 : SDK 버전 > 1.2.0 부터 기존의 Application class 에서 사용하던 Iamport.INSTANCE.create(this) 과 Iamport.INSTANCE.createWithKoin(this, koinApp) 가 DEPRECATED 되었습니다.
+
 ```
 
 
@@ -446,24 +430,6 @@ val request = IamPortRequest(
 
 ---
 
-[BaseApplication.kt (SDK 생성)](./app/src/main/java/com/iamport/sampleapp/BaseApplication.kt)
-
-```kotlin
-    override fun onCreate() {
-        super.onCreate()
-        Iamport.create(this)
-
-        /**
-         * DI 로 KOIN 사용시 아래와 같이 사용
-        val koinApp = startKoin {
-            logger(AndroidLogger())
-            androidContext(this@BaseApplication)
-        }
-        Iamport.create(this, koinApp)
-         */
-    }
-```
-
 [MainActivity.kt](./app/src/main/java/com/iamport/sampleapp/ui/MainActivity.kt)
 
 ```kotlin
@@ -507,7 +473,7 @@ private fun onClickPayment() {
 }
 
 
-// 차이 결제전 콜백 및 최종 결제 요청 처리
+// PG 차이(CHAI) 이용시, 결제전 콜백 및 최종 결제 요청 처리
 private fun approveCallback(iamPortApprove: IamPortApprove) {
     val secUnit = 1000L
     val sec = 1

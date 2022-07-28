@@ -8,6 +8,7 @@ import androidx.annotation.RequiresApi
 import com.google.gson.Gson
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.domain.di.ModuleProvider
 import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.WebViewLiveDataEventBus
@@ -16,8 +17,8 @@ import com.orhanobut.logger.Logger.d
 
 open class BaseWebViewStrategy : WebViewClient(), IStrategy {
 
-    protected val gson: Gson by lazy { Gson() }
-    protected val bus: WebViewLiveDataEventBus by lazy { WebViewLiveDataEventBus }
+    protected val gson: Gson = ModuleProvider.gson
+    protected val bus: WebViewLiveDataEventBus = ModuleProvider.webViewLiveDataEventBus
 
     lateinit var payment: Payment
 

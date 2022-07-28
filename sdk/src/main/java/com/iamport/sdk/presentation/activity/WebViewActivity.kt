@@ -6,27 +6,27 @@ import android.net.Uri
 import android.view.View
 import android.webkit.WebView
 import android.widget.ProgressBar
+import androidx.lifecycle.ViewModelProvider
 import com.google.gson.GsonBuilder
 import com.iamport.sdk.R
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.data.sdk.ProvidePgPkg
 import com.iamport.sdk.domain.IamportWebChromeClient
-import com.iamport.sdk.domain.JsNativeInterface
-import com.iamport.sdk.domain.di.IamportKoinComponent
+import com.iamport.sdk.domain.di.ModuleProvider
 import com.iamport.sdk.domain.utils.*
 import com.iamport.sdk.presentation.viewmodel.WebViewModel
+import com.iamport.sdk.presentation.viewmodel.WebViewModelFactory
 import com.orhanobut.logger.Logger.*
 import kotlinx.coroutines.*
-import org.koin.android.ext.android.get
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.qualifier.named
 
 
-class WebViewActivity : BaseActivity<WebViewModel>(), IamportKoinComponent {
+class WebViewActivity : BaseActivity<WebViewModel>() {
 
     override val layoutResourceId: Int = R.layout.webview_activity
-    override val viewModel: WebViewModel by viewModel()
+    override val viewModel by lazy {
+        ViewModelProvider(this, WebViewModelFactory(ModuleProvider.webViewLiveDataEventBus, ModuleProvider.strategyRepository)).get(WebViewModel::class.java)
+    }
 
     private lateinit var loading: ProgressBar
     private lateinit var webview: WebView
@@ -249,7 +249,7 @@ class WebViewActivity : BaseActivity<WebViewModel>(), IamportKoinComponent {
             setLayerType(View.LAYER_TYPE_HARDWARE, null)
             clearCache(true)
             addJavascriptInterface(
-                JsNativeInterface(payment, get(named("${CONST.KOIN_KEY}Gson")), evaluateJS),
+                ModuleProvider.apiModule.provideJsNativeInterface(payment, evaluateJS),
                 CONST.PAYMENT_WEBVIEW_JS_INTERFACE_NAME
             )
             webViewClient = viewModel.getWebViewClient()

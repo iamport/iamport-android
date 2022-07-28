@@ -4,10 +4,8 @@ import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 
-object WebViewLiveDataEventBus {
+class WebViewLiveDataEventBus {
 
     // 웹뷰 열기
     val openWebView = MutableLiveData<Event<Payment>>()

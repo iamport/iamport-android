@@ -8,13 +8,11 @@ import com.iamport.sdk.data.sdk.IamPortRequest
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.data.sdk.Payment.STATUS.*
-import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.WebViewLiveDataEventBus
 import com.orhanobut.logger.Logger
 
-class JsNativeInterface(val payment: Payment, val gson: Gson, val evaluateJS: ((String) -> Unit)) : IamportKoinComponent {
-    private val bus: WebViewLiveDataEventBus by lazy { WebViewLiveDataEventBus }
+class JsNativeInterface(val payment: Payment, val gson: Gson, val bus: WebViewLiveDataEventBus, val evaluateJS: ((String) -> Unit)) {
 
     /**
      * 아임포트 JS SDK 에서 콜백 호출시에 해당 함수 동작
