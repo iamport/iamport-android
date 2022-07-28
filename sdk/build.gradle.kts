@@ -125,7 +125,6 @@ dependencies {
     testImplementation(Libs.koin_test)
     implementation(Libs.koin_android)
     implementation(Libs.koin_android_compat)
-    implementation(Libs.koin_android_workmanager)
     implementation(Libs.koin_android_compose)
 
     // Retorofit
