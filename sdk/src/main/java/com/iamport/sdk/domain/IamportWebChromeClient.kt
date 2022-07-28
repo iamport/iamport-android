@@ -23,6 +23,11 @@ open class IamportWebChromeClient : WebChromeClient() {
             .setNegativeButton( // 취소버튼 눌렀을때
                 R.string.cancel
             ) { _, _ -> result.cancel() }
+            .setOnCancelListener {
+                result.cancel()
+                it.dismiss()
+            }
+            .setCancelable(true)
             .create()
             .show()
         return true
