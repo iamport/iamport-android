@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/webview_mode_fragment"
+    android:id="@+id/mobile_webview_mode_fragment"
     tools:context=".ui.WebViewModeFragment">
 
     <WebView
@@ -14,7 +14,7 @@
         android:visibility="visible"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@id/webview_mode_fragment"/>
+        app:layout_constraintTop_toTopOf="@id/mobile_webview_mode_fragment"/>
 
     <Button
         android:id="@+id/normalmode_button"

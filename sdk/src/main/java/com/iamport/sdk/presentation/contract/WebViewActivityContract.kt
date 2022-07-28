@@ -9,11 +9,12 @@ import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.presentation.activity.WebViewActivity
+import com.orhanobut.logger.Logger
 
 /**
  * WebView 앱 요청 및 응답 데이터 규약
  */
-class WebViewActivityContract : ActivityResultContract<Payment, IamPortResponse>() {
+class WebViewActivityContract : ActivityResultContract<Payment, IamPortResponse?>() {
 
     override fun createIntent(context: Context, input: Payment): Intent {
         return Intent(context, WebViewActivity::class.java).apply {
@@ -26,7 +27,10 @@ class WebViewActivityContract : ActivityResultContract<Payment, IamPortResponse>
     override fun parseResult(resultCode: Int, intent: Intent?): IamPortResponse? {
         return when (resultCode) {
             Activity.RESULT_OK -> intent?.getParcelableExtra(CONST.CONTRACT_OUTPUT)
-            else -> null
+            else -> {
+                Logger.w("WebViewActivityContract RESULT IS NOT OK :: ${resultCode}")
+                null
+            }
         }
     }
 }

@@ -40,20 +40,7 @@
 ```gradle
   implementation 'com.github.iamport:iamport-android:vX.Y.Z'
 ```
->
-[Set DataBinding][6]
-```gradle
-  android {
-    ...
-    buildFeatures {
-        ...
-        dataBinding true
-    }
-  }
-```
-
 [5]: https://github.com/iamport/iamport-android/releases
-[6]: https://developer.android.com/jetpack/androidx/releases/databinding
 
 ### KOTLIN usage
 
@@ -72,6 +59,7 @@ class BaseApplication : Application() {
 // DI 로 koin 을 사용하시는 경우 
 // 생성된 koinApplication 을 파라미터로 넘겨주셔야 합니다
 // 참고 : 코틀린 1.5.0 이상 및 Koin 2.2.2 를 사용하시는 분들은 2.2.3 으로 업데이트 하시기 바랍니다.
+// 참고 : v1.2.0 부터 koin 3.1.2 를 사용합니다.
 class BaseApplication : Application() {
     override fun onCreate() {
         ..

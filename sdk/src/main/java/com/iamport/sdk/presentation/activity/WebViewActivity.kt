@@ -4,13 +4,13 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.view.View
+import android.webkit.WebView
 import android.widget.ProgressBar
 import com.google.gson.GsonBuilder
 import com.iamport.sdk.R
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 import com.iamport.sdk.data.sdk.ProvidePgPkg
-import com.iamport.sdk.databinding.WebviewActivityBinding
 import com.iamport.sdk.domain.IamportWebChromeClient
 import com.iamport.sdk.domain.JsNativeInterface
 import com.iamport.sdk.domain.di.IamportKoinComponent
@@ -23,24 +23,14 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.qualifier.named
 
 
-class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), IamportKoinComponent {
+class WebViewActivity : BaseActivity<WebViewModel>(), IamportKoinComponent {
 
     override val layoutResourceId: Int = R.layout.webview_activity
     override val viewModel: WebViewModel by viewModel()
 
     private lateinit var loading: ProgressBar
+    private lateinit var webview: WebView
     private var payment: Payment? = null
-
-    /**
-     * 뱅크페이 앱 열기 위한 런처
-     */
-//    private var launcherBankPay =
-//        registerForActivityResult(BankPayContract()) { res: Pair<String, String>? ->
-//            res?.let {
-//                loadingVisible(true)
-//                viewModel.processBankPayPayment(res)
-//            } ?: e("NICE TRANS result is NULL")
-//        }
 
     override fun onDestroy() {
         runCatching {
@@ -53,6 +43,9 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
 
     override fun initStart() {
         i("HELLO I'MPORT WebView SDK!")
+
+        loading = findViewById(R.id.loading)
+        webview = findViewById(R.id.webview)
 
         initLoading()
 
@@ -75,20 +68,19 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
      * 로딩 UI 초기화
      */
     private fun initLoading() {
-        loading = viewDataBinding.loading as ProgressBar
         if (payment != null) {
             loadingVisible(true)
         }
     }
 
 
-    /**
-     * 액티비티 알파값 조정
-     */
-    private fun updateAlpha(isWebViewPG: Boolean) {
-        val alpha = if (isWebViewPG) 1.0F else 0.0F
-        viewDataBinding.webviewActivity.alpha = alpha
-    }
+//    /**
+//     * 액티비티 알파값 조정
+//     */
+//    private fun updateAlpha(isWebViewPG: Boolean) {
+//        val alpha = if (isWebViewPG) 1.0F else 0.0F
+//        viewDataBinding.webviewActivity.alpha = alpha
+//    }
 
     /**
      * 관찰할 LiveData 옵저빙
@@ -147,7 +139,7 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
             d("WebViewActivity close")
             removeObservers()
 
-            viewDataBinding.webview.run {
+            webview.run {
                 removeJavascriptInterface(CONST.PAYMENT_WEBVIEW_JS_INTERFACE_NAME)
                 clearHistory()
                 loadUrl("about:blank")
@@ -241,17 +233,17 @@ class WebViewActivity : BaseActivity<WebviewActivityBinding, WebViewModel>(), Ia
             val js = "javascript:$jsMethod"
             d("evaluateJS => $js")
             launch {
-                viewDataBinding.webview.run {
+                webview.run {
                     this.loadUrl(js)
                 }
             }
         }
 
         setTheme(R.style.Theme_AppCompat_Transparent_NoActionBar)
-        updateAlpha(true)
+//        updateAlpha(true)
         loadingVisible(true)
 
-        viewDataBinding.webview.run {
+        webview.run {
             fitsSystemWindows = true
             settingsWebView(this)
             setLayerType(View.LAYER_TYPE_HARDWARE, null)
