@@ -7,20 +7,17 @@ import com.iamport.sdk.data.remote.IamportApi
 import com.iamport.sdk.data.remote.ResultWrapper
 import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.data.sdk.Payment
-import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.utils.CONST
 import com.orhanobut.logger.Logger
 import kotlinx.coroutines.Dispatchers
-import org.koin.core.component.inject
 
-class JudgeStrategy : BaseStrategy(), IamportKoinComponent {
+class JudgeStrategy(private val iamportApi: IamportApi) : BaseStrategy() {
 
     // 유저 정보 판단 결과 타입
     enum class JudgeKinds {
         CHAI, WEB, CERT, ERROR
     }
 
-    private val iamportApi: IamportApi by inject() // 아임포트 서버 API
     private var ignoreNative = false
 
     // #1 API imp uid 에 따른 유저정보 가져오기

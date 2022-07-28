@@ -4,7 +4,7 @@ object Versions {
     const val versionName = "1.3.5"  // https://www.notion.so/chaifinance/QA-Process-d1a4be396337493b81c6e85fff2d5cd6
 
     const val gradle_versions_plugin = "0.39.0"
-    const val gradle_version = "4.1.1"
+//    const val gradle_version = "4.1.1"
 
     const val multidex = "2.0.1"
     const val kotlin_stdlib_jdk = "1.6.0"
@@ -30,7 +30,6 @@ object Versions {
     const val activity_ktx = "1.3.0"
     const val fragment_ktx = "1.3.6"
 
-    const val koin_version = "3.1.6"
     const val retrofit_version = "2.9.0"
     const val logging_interceptor = "4.9.0"
 
@@ -39,11 +38,6 @@ object Versions {
 
     // Logger
     const val logger = "2.2.0"
-
-    // Rx
-    const val rxjava = "2.2.21"
-    const val rxandroid = "2.1.1"
-    const val rxjava2_debug = "1.4.0"
 
     // loading animation
     const val spinKit = "1.4.0"
@@ -65,7 +59,6 @@ object Libs {
     const val mokito_inline = "org.mockito:mockito-inline:${Versions.mokito}"
     const val mokito_android = "org.mockito:mockito-android:${Versions.mokito}"
     const val mokito_kotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:${Versions.mokito_kotlin}"
-
 
     const val junit = "junit:junit:${Versions.junit}"
     const val testJunit = "androidx.test.ext:junit:${Versions.testJunit}"
@@ -90,18 +83,6 @@ object Libs {
     const val activity_ktx = "androidx.activity:activity-ktx:${Versions.activity_ktx}"
     const val fragment_ktx = "androidx.fragment:fragment-ktx:${Versions.fragment_ktx}"
 
-    // Koin main features for Android (Scope,ViewModel ...)
-    const val koin_android = "io.insert-koin:koin-android:${Versions.koin_version}"
-
-    const val koin_core = "io.insert-koin:koin-core:${Versions.koin_version}"
-    const val koin_test = "io.insert-koin:koin-test:${Versions.koin_version}"
-
-    // Koin Java Compatibility
-    const val koin_android_compat = "io.insert-koin:koin-android-compat:${Versions.koin_version}"
-    // Koin for Jetpack Compose
-    const val koin_android_compose = "io.insert-koin:koin-androidx-compose:${Versions.koin_version}"
-
-
     // Retorofit
     const val retrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit_version}"
     const val converter_gson = "com.squareup.retrofit2:converter-gson:${Versions.retrofit_version}"
@@ -113,18 +94,10 @@ object Libs {
     // Logger
     const val logger = "com.orhanobut:logger:${Versions.logger}"
 
-    // Rx
-    const val rxjava = "io.reactivex.rxjava2:rxjava:${Versions.rxjava}"
-    const val rxandroid = "io.reactivex.rxjava2:rxandroid:${Versions.rxandroid}"
-    const val rxjava2_debug = "com.akaita.java:rxjava2-debug:${Versions.rxjava2_debug}"
-
     // loading animation
     const val spinKit = "com.github.ybq:Android-SpinKit:${Versions.spinKit}"
 
     const val serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.serialization}"
-
-//    const val chuck = "com.readystatesoftware.chuck:library:${Versions.chuck}"
-//    const val releaseChuck = "com.readystatesoftware.chuck:library-no-op:${Versions.chuck}"
 
 }
 

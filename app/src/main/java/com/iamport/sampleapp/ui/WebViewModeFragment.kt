@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -15,13 +14,9 @@ import com.iamport.sampleapp.ViewModel
 import com.iamport.sampleapp.databinding.WebViewModeFragmentBinding
 import com.iamport.sdk.data.sdk.IamPortRequest
 import com.iamport.sdk.data.sdk.IamPortResponse
-import com.iamport.sdk.data.sdk.PG
-import com.iamport.sdk.data.sdk.PayMethod
 import com.iamport.sdk.domain.core.ICallbackPaymentResult
 import com.iamport.sdk.domain.core.Iamport
-import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.Event
-import com.iamport.sdk.domain.utils.Util
 import java.util.*
 
 /**
@@ -60,10 +55,10 @@ class WebViewModeFragment : Fragment() {
 
                 Log.d("WebViewMode", "iamport sdk webview mode? ${Iamport.isWebViewMode()}")
                 // 아임포트에 결제 요청하기
-                Iamport.payment(userCode, webviewMode = it, iamPortRequest = request, paymentResultCallback = { it ->
+                Iamport.payment(userCode, webviewMode = it, iamPortRequest = request, paymentResultCallback = { response ->
                     // 결제 완료 후 결과 콜백을 토스트 메시지로 보여줌
 //                Toast.makeText(this.context, "결제결과 => $it", Toast.LENGTH_LONG).show()
-                    callBackListener.result(it)
+                    callBackListener.result(response)
                 })
 
                 this.request = null // reload 방지

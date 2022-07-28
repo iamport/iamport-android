@@ -75,6 +75,7 @@
             android:name=".domain.service.ChaiService"
             android:enabled="true" />
 
+        <!-- android:launchMode="singleTask" 테스트 필요-->
         <activity
             android:name=".presentation.activity.WebViewActivity"
             android:hardwareAccelerated="true"

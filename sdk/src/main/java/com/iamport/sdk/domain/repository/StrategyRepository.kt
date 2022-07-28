@@ -4,25 +4,21 @@ import android.webkit.WebViewClient
 import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.data.sdk.PayMethod
 import com.iamport.sdk.data.sdk.Payment
-import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.strategy.base.IStrategy
 import com.iamport.sdk.domain.strategy.base.JudgeStrategy
 import com.iamport.sdk.domain.strategy.chai.ChaiStrategy
 import com.iamport.sdk.domain.strategy.webview.IamPortMobileModeWebViewClient
 import com.iamport.sdk.domain.strategy.webview.WebViewStrategy
 import com.orhanobut.logger.Logger
-import org.koin.core.component.inject
 
-class StrategyRepository : IamportKoinComponent {
+class StrategyRepository(
+    val judgeStrategy: JudgeStrategy,
+    val chaiStrategy: ChaiStrategy,
+    private val webViewStrategy: WebViewStrategy,
+    private val iamPortMobileModeWebViewClient: IamPortMobileModeWebViewClient
+) {
 
-    val judgeStrategy: JudgeStrategy by inject()
-    val chaiStrategy: ChaiStrategy by inject() // 결제 중 BG 폴링하는 차이 전략
-    var mobileWebModeStrategy: IamPortMobileModeWebViewClient? = null
-
-
-    private val webViewStrategy: WebViewStrategy by inject() // webview 사용하는 pg
-
-//    private val niceTransWebViewStrategy: NiceTransWebViewStrategy by inject()
+    private var mobileWebModeStrategy: IamPortMobileModeWebViewClient? = null
 
     /**
      * 실제로 앱 띄울 결제 타입
@@ -32,7 +28,6 @@ class StrategyRepository : IamportKoinComponent {
     }
 
     fun init() {
-//        chaiStrategy.init()
         mobileWebModeStrategy = null
     }
 
@@ -80,19 +75,11 @@ class StrategyRepository : IamportKoinComponent {
     // for 결제요청
     fun getWebViewStrategy(): IStrategy {
         return webViewStrategy
-//        return when (getPaymentKinds(payment)) {
-//            PaymentKinds.NICE -> niceTransWebViewStrategy
-//            else -> webViewStrategy
-//        }
     }
 
     // for webview mode inject
     fun getWebViewClient(): WebViewClient {
         return webViewStrategy
-//        return when (getPaymentKinds(payment)) {
-//            PaymentKinds.NICE -> niceTransWebViewStrategy
-//            else -> webViewStrategy
-//        }
     }
 
 //    fun getNiceTransWebViewClient(): NiceTransWebViewStrategy {
@@ -100,10 +87,8 @@ class StrategyRepository : IamportKoinComponent {
 //    }
 
     fun getMobileWebModeClient(): IamPortMobileModeWebViewClient {
-        return mobileWebModeStrategy ?: run {
-            mobileWebModeStrategy = IamPortMobileModeWebViewClient()
-            mobileWebModeStrategy as IamPortMobileModeWebViewClient
-        }
+        mobileWebModeStrategy = mobileWebModeStrategy ?: iamPortMobileModeWebViewClient
+        return mobileWebModeStrategy as IamPortMobileModeWebViewClient
     }
 
     fun updateMobileWebModeClient(client: IamPortMobileModeWebViewClient) {

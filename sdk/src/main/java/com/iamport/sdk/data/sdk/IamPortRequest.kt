@@ -58,6 +58,15 @@ data class IamPortRequest(
     private var m_redirect_url: String? = Platform.native.redirectUrl // 콜백
     private val niceMobileV2: Boolean = true
 
+//    @SerializedName("custom_data")
+//    private var _customData: LinkedTreeMap<*, *>? = null
+
+//    init {
+//        if (!custom_data.isNullOrBlank()) {
+//            _customData = Gson().fromJson(custom_data, LinkedTreeMap::class.java)
+//        }
+//    }
+
     /**
      * string pg 으로 enum PG 가져옴
      */
