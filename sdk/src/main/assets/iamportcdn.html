@@ -34,7 +34,7 @@
 
             function requestPay(impRequest) {
                 dLog("requestPay :: " + impRequest)
-                IMP.request_pay(JSON.parse(impRequest), callback);
+                internalRequestPay(JSON.parse(impRequest));
             }
 
 
@@ -51,9 +51,15 @@
                 data.custom_data = decodeCustom
             }
 
-            IMP.request_pay(data, callback);
+            internalRequestPay(data);
         }
 
+
+            function internalRequestPay(reqData) {
+                reqData.tax_free = {값}
+                reqData.vat_amount = {값}
+                IMP.request_pay(reqData, callback);
+            }
 
             function certification(impCertification) {
                 dLog("certification :: " + impCertification)
