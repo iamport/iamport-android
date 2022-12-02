@@ -21,7 +21,7 @@
 - [아임포트 docs][3]
 
 [1]: https://www.iamport.kr/
-[2]: http://blog.iamport.kr/
+[2]: https://blog.iamport.kr/
 [3]: https://docs.iamport.kr/?lang=ko
 
 ## :fire: 사용방법
