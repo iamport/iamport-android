@@ -52,6 +52,7 @@ data class IamPortRequest(
 
     val confirm_url: String? = null, // 컨펌프로세스
     val card: Card? = null, // 카드사 다이렉트 호출
+    val period: Period? = null, // 이니시스 정기결제 제공기간
 
 ) : Parcelable {
 
@@ -131,6 +132,8 @@ data class IamPortRequest(
             var naverInterface: NaverInterface? = null
 
             var confirm_url: String? = null
+            var card: Card? = null
+            var period: Period? = null
 
             fun pg(pg: String) = apply {
                 this.pg = pg
@@ -264,6 +267,14 @@ data class IamPortRequest(
                 this.confirm_url = confirm_url
             }
 
+            fun card(card: Card) = apply {
+                this.card = card
+            }
+
+            fun period(period: Period) = apply {
+                this.period = period
+            }
+
 
             fun build() = IamPortRequest(
                 pg = pg,
@@ -297,7 +308,9 @@ data class IamPortRequest(
                 naverActionType = naverActionType,
                 cultureBenefit = cultureBenefit,
                 naverInterface = naverInterface,
-                confirm_url = confirm_url
+                confirm_url = confirm_url,
+                card = card,
+                period = period
             )
         }
     }
