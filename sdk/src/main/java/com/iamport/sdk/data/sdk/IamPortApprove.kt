@@ -6,7 +6,7 @@ import com.iamport.sdk.data.chai.response.PrepareData
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class IamPortApprove(
+data class IamportApprove(
     val userCode: String,
     val merchantUid: String,
     val customerUid: String?,
@@ -20,11 +20,11 @@ data class IamPortApprove(
 ) : Parcelable {
 
     companion object {
-        fun make(payment: Payment, data: PrepareData, status: ChaiPaymentStatus): IamPortApprove {
-            return IamPortApprove(
-                userCode = payment.userCode,
-                merchantUid = payment.getMerchantUid(),
-                customerUid = payment.getCustomerUid(),
+        fun make(request: IamportRequest, data: PrepareData, status: ChaiPaymentStatus): IamportApprove {
+            return IamportApprove(
+                userCode = request.userCode,
+                merchantUid = request.getMerchantUid(),
+                customerUid = request.getCustomerUid(),
                 paymentId = data.paymentId,
                 subscriptionId = data.subscriptionId,
                 impUid = data.impUid,

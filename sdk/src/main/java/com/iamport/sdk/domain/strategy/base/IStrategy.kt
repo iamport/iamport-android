@@ -1,34 +1,34 @@
 package com.iamport.sdk.domain.strategy.base
 
 import com.iamport.sdk.data.chai.response.PrepareData
-import com.iamport.sdk.data.sdk.IamPortResponse
-import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.data.sdk.IamportResponse
+import com.iamport.sdk.data.sdk.IamportRequest
 import com.orhanobut.logger.Logger
 
 interface IStrategy {
     fun init()
-    suspend fun doWork(payment: Payment) {
+    suspend fun doWork(request: IamportRequest) {
         init()
     }
 
-    fun sdkFinish(response: IamPortResponse?)
-    fun successFinish(payment: Payment, prepareData: PrepareData? = null, msg: String) {
+    fun sdkFinish(response: IamportResponse?)
+    fun successFinish(request: IamportRequest, prepareData: PrepareData? = null, msg: String) {
         Logger.d(msg)
-        IamPortResponse.makeSuccess(payment, prepareData?.impUid, msg).run {
+        IamportResponse.makeSuccess(request, prepareData?.impUid, msg).run {
             sdkFinish(this)
         }
     }
 
-    fun failureFinish(payment: Payment, prepareData: PrepareData? = null, msg: String) {
+    fun failureFinish(request: IamportRequest, prepareData: PrepareData? = null, msg: String) {
         Logger.d(msg)
-        IamPortResponse.makeFail(payment, prepareData?.impUid, msg).run {
+        IamportResponse.makeFail(request, prepareData?.impUid, msg).run {
             sdkFinish(this)
         }
     }
 
     fun successFinish(merchantUid: String, impUid: String, msg: String) {
         Logger.d(msg)
-        IamPortResponse.makeSuccess(merchantUid, impUid, msg).run {
+        IamportResponse.makeSuccess(merchantUid, impUid, msg).run {
             sdkFinish(this)
         }
     }
@@ -36,7 +36,7 @@ interface IStrategy {
     fun failureFinish(merchantUid: String, impUid: String, msg: String) {
         Logger.d(msg)
 
-        IamPortResponse.makeFail(merchantUid, impUid, msg).run {
+        IamportResponse.makeFail(merchantUid, impUid, msg).run {
             sdkFinish(this)
         }
     }

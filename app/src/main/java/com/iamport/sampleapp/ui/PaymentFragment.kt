@@ -20,13 +20,13 @@ import com.iamport.sampleapp.PaymentResultData.result
 import com.iamport.sampleapp.R
 import com.iamport.sampleapp.ViewModel
 import com.iamport.sampleapp.databinding.PaymentFragmentBinding
-import com.iamport.sdk.data.sdk.IamPortApprove
-import com.iamport.sdk.data.sdk.IamPortCertification
-import com.iamport.sdk.data.sdk.IamPortResponse
+import com.iamport.sdk.data.sdk.IamportApprove
+import com.iamport.sdk.data.sdk.IamportCertification
+import com.iamport.sdk.data.sdk.IamportResponse
 import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.domain.core.ICallbackPaymentResult
 import com.iamport.sdk.domain.core.Iamport
-import com.iamport.sdk.domain.utils.CONST
+import com.iamport.sdk.domain.utils.Constant
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.EventObserver
 import com.iamport.sdk.domain.utils.Util
@@ -72,8 +72,8 @@ class PaymentFragment: Fragment() {
 
         // 포그라운드 서비스 및 포그라운드 서비스 중지 버튼 클릭시 전달받는 broadcast 리시버
         context.registerReceiver(receiver, IntentFilter().apply {
-            addAction(CONST.BROADCAST_FOREGROUND_SERVICE)
-            addAction(CONST.BROADCAST_FOREGROUND_SERVICE_STOP)
+            addAction(Constant.BROADCAST_FOREGROUND_SERVICE)
+            addAction(Constant.BROADCAST_FOREGROUND_SERVICE_STOP)
         })
 
     }
@@ -161,7 +161,7 @@ class PaymentFragment: Fragment() {
 
     fun onClickCertification() {
         val userCode = "iamport"
-        val certification = IamPortCertification(
+        val certification = IamportCertification(
             merchant_uid = getRandomMerchantUid(),
             company = "유어포트",
         )
@@ -208,15 +208,15 @@ class PaymentFragment: Fragment() {
 //        Iamport.payment(userCode, iamPortRequest = request, approveCallback = { approveCallback(it) }) { callBackListener.result(it) }
 
 //        Iamport.webViewCacheMode = WebSettings.LOAD_DEFAULT // 필요시 추가 default WebSettings.LOAD_NO_CACHE (ex: PG 세틀뱅크 이용시, 뒤로가기 때 LOAD_DEFAULT 설정)
-        Iamport.payment(userCode, iamPortRequest = request) { callBackListener.result(it) }
+        Iamport.payment(userCode, iamportPayment = request) { callBackListener.result(it) }
     }
 
     /**
      *  TODO: CHAI 결제시 재고확인 등 최종결제를 위한 처리를 해주세요
-     *  CONST.CHAI_FINAL_PAYMENT_TIME_OUT_SEC 만큼 타임아웃 후 결제 데이터가
+     *  Constant.CHAI_FINAL_PAYMENT_TIME_OUT_SEC 만큼 타임아웃 후 결제 데이터가
      *  초기화 되기 때문에 타임아웃 시간 안에 Iamport.chaiPayment 함수를 호출해주셔야 합니다.
      */
-    private fun approveCallback(iamPortApprove: IamPortApprove) {
+    private fun approveCallback(iamPortApprove: IamportApprove) {
         val secUnit = 1000L
         val sec = 2
         GlobalScope.launch {
@@ -227,7 +227,7 @@ class PaymentFragment: Fragment() {
     }
 
     private val callBackListener = object : ICallbackPaymentResult {
-        override fun result(iamPortResponse: IamPortResponse?) {
+        override fun result(iamPortResponse: IamportResponse?) {
             val resJson = GsonBuilder().setPrettyPrinting().create().toJson(iamPortResponse)
             Log.i("SAMPLE", "결제 결과 콜백\n$resJson")
             result = iamPortResponse

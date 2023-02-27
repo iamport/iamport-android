@@ -10,7 +10,7 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.*
 import com.google.gson.Gson
 import com.iamport.sdk.BuildConfig
-import com.iamport.sdk.data.sdk.IamPortResponse
+import com.iamport.sdk.data.sdk.IamportResponse
 import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.data.sdk.PG.*
 import com.iamport.sdk.data.sdk.PayMethod
@@ -136,21 +136,21 @@ object Util {
      * uri 쿼리 파싱해서 IamPortResponse 가져오기
      */
     @RequiresApi(Build.VERSION_CODES.KITKAT)
-    fun getQueryStringToImpResponse(uri: Uri, gson: Gson): IamPortResponse {
+    fun getQueryStringToImpResponse(uri: Uri, gson: Gson): IamportResponse {
         val uriStr = URLDecoder.decode(uri.toString(), StandardCharsets.UTF_8.toString())
         val sanitizer = UrlQuerySanitizer(uriStr)
         val queryMap = HashMap<String, String>()
         sanitizer.parameterList.forEach {
             queryMap[it.mParameter] = uri.getQueryParameter(it.mParameter).toString()
         }
-        return gson.fromJson(gson.toJson(queryMap), IamPortResponse::class.java)
+        return gson.fromJson(gson.toJson(queryMap), IamportResponse::class.java)
     }
 
     /**
      * 플레이 스토어 이동 주소
      */
     fun getMarketId(pkg: String): String {
-        return "${CONST.PAYMENT_PLAY_STORE_URL}$pkg"
+        return "${Constant.PAYMENT_PLAY_STORE_URL}$pkg"
     }
 
 
@@ -196,7 +196,7 @@ object Util {
     }
 
     fun getOrEmpty(value: String?): String {
-        return value ?: CONST.EMPTY_STR
+        return value ?: Constant.EMPTY_STR
     }
 
     // LiveData 백그라운드 옵저빙
@@ -217,7 +217,7 @@ object Util {
 //    fun versionName(context: Context?, name: String? = null): String {
 //        return context?.run {
 //            packageManager.getPackageInfo(name ?: packageName, 0)?.versionName
-//        } ?: kotlin.run { CONST.EMPTY_STR }
+//        } ?: kotlin.run { Constant.EMPTY_STR }
 //    }
 
     fun versionCode(context: Context?, name: String? = null): Number {
@@ -234,7 +234,7 @@ object Util {
     }
 
     fun getRedirectUrl(str: String): String {
-        return "${CONST.IAMPORT_DETECT_SCHEME}${CONST.IAMPORT_DETECT_ADDRESS}/${str}"
+        return "${Constant.IAMPORT_DETECT_SCHEME}${Constant.IAMPORT_DETECT_ADDRESS}/${str}"
     }
 
 }

@@ -1,6 +1,6 @@
 package com.iamport.sdk.data.sdk
 
-import com.iamport.sdk.domain.utils.CONST
+import com.iamport.sdk.domain.utils.Constant
 
 //html5_inicis(이니시스웹표준)
 //inicis(이니시스ActiveX결제창)
@@ -38,7 +38,7 @@ enum class PG(val korName: String) {
     bluewalnut("bluewalnut"), tosspay("간편결제 - 토스"), smartro("스마트로"); /*, inicis("이니시스ActiveX결제창"), syrup("시럽페이");*/
 
     fun makePgRawName(pgId: String? = null): String {
-        return "${this.name}${if (!pgId.isNullOrBlank()) ".${pgId}" else CONST.EMPTY_STR}"
+        return "${this.name}${if (!pgId.isNullOrBlank()) ".${pgId}" else Constant.EMPTY_STR}"
     }
 
     companion object {

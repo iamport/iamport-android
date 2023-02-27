@@ -5,15 +5,15 @@ import android.content.*
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
-import com.iamport.sdk.data.sdk.IamPortApprove
-import com.iamport.sdk.data.sdk.IamPortResponse
-import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.data.sdk.IamportApprove
+import com.iamport.sdk.data.sdk.IamportResponse
+import com.iamport.sdk.data.sdk.IamportRequest
 import com.iamport.sdk.domain.core.IamportReceiver
 import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.repository.StrategyRepository
 import com.iamport.sdk.domain.service.ChaiService
 import com.iamport.sdk.domain.strategy.base.JudgeStrategy
-import com.iamport.sdk.domain.utils.CONST
+import com.iamport.sdk.domain.utils.Constant
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.NativeLiveDataEventBus
 import com.orhanobut.logger.Logger
@@ -27,7 +27,7 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
     // AndroidViewModel 이기에 사용가능
     val app = getApplication<Application>()
 
-    var payment: Payment? = null
+    var request: IamportRequest? = null
     var approved: Status = Status.None
 
     sealed class Status {
@@ -53,18 +53,18 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
     }
 
     fun failSdkFinish() {
-        payment?.let {
+        request?.let {
             repository.failSdkFinish(it)
         } ?: run {
-            Logger.w("Payment 데이터가 없어서 실패처리하지 않음 [$payment]")
+            Logger.w("Payment 데이터가 없어서 실패처리하지 않음 [$request]")
         }
     }
 
     /**
      * 결제 데이터
      */
-    fun webViewActivityPayment(): LiveData<Event<Payment>> {
-        return bus.webViewActivityPayment
+    fun webViewActivityPayment(): LiveData<Event<IamportRequest>> {
+        return bus.webViewActivityIamportRequest
     }
 
     /**
@@ -78,7 +78,7 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
     /**
      * 차이 결제 상태 approve
      */
-    fun chaiApprove(): LiveData<Event<IamPortApprove>> {
+    fun chaiApprove(): LiveData<Event<IamportApprove>> {
         return bus.chaiApprove
     }
 
@@ -86,7 +86,7 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
     /**
      * 결제 결과 콜백 및 종료
      */
-    fun impResponse(): LiveData<Event<IamPortResponse?>> {
+    fun impResponse(): LiveData<Event<IamportResponse?>> {
         return bus.impResponse
     }
 
@@ -102,13 +102,13 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
     /**
      * 결제 요청
      */
-    fun judgePayment(payment: Payment, ignoreNative: Boolean = false) {
+    fun judgePayment(request: IamportRequest, ignoreNative: Boolean = false) {
         viewModelScope.launch(job) {
-            repository.judgeStrategy.judge(payment, ignoreNative = ignoreNative).run {
+            repository.judgeStrategy.judge(request, ignoreNative = ignoreNative).run {
 
-                Payment.validator(third).run {
+                IamportRequest.validator(third).run {
                     if (!first) {
-                        bus.impResponse.postValue(Event(second?.let { IamPortResponse.makeFail(payment, msg = it) }))
+                        bus.impResponse.postValue(Event(second?.let { IamportResponse.makeFail(request, msg = it) }))
                         return@launch
                     }
                 }
@@ -121,7 +121,7 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
                         }
                     }
                     JudgeStrategy.JudgeKinds.WEB,
-                    JudgeStrategy.JudgeKinds.CERT -> bus.webViewActivityPayment.postValue(Event(third))
+                    JudgeStrategy.JudgeKinds.CERT -> bus.webViewActivityIamportRequest.postValue(Event(third))
                     else -> Logger.e("판단불가 $third")
                 }
             }
@@ -147,7 +147,7 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
     /**
      * 차이 최종 결제 요청
      */
-    fun requestApprovePayments(approve: IamPortApprove) {
+    fun requestApprovePayments(approve: IamportApprove) {
         viewModelScope.launch(job) {
             i("차이 최종 결제 요청")
             repository.chaiStrategy.requestApprovePayments(approve)
@@ -164,8 +164,8 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
 
     fun registerIamportReceiver(iamportReceiver: IamportReceiver, screenBrReceiver: BroadcastReceiver) {
         IntentFilter().let {
-            it.addAction(CONST.BROADCAST_FOREGROUND_SERVICE)
-            it.addAction(CONST.BROADCAST_FOREGROUND_SERVICE_STOP)
+            it.addAction(Constant.BROADCAST_FOREGROUND_SERVICE)
+            it.addAction(Constant.BROADCAST_FOREGROUND_SERVICE_STOP)
             app.applicationContext?.registerReceiver(screenBrReceiver, screenBrFilter)
             app.registerReceiver(iamportReceiver, it)
         }

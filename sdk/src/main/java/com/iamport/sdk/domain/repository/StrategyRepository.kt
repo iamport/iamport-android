@@ -3,7 +3,7 @@ package com.iamport.sdk.domain.repository
 import android.webkit.WebViewClient
 import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.data.sdk.PayMethod
-import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.data.sdk.IamportRequest
 import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.strategy.base.IStrategy
 import com.iamport.sdk.domain.strategy.base.JudgeStrategy
@@ -36,8 +36,8 @@ class StrategyRepository : IamportKoinComponent {
         mobileWebModeStrategy = null
     }
 
-    fun failSdkFinish(payment: Payment) {
-        when (getPaymentKinds(payment)) {
+    fun failSdkFinish(request: IamportRequest) {
+        when (getPaymentKinds(request)) {
             PaymentKinds.CHAI -> {
 //                chaiStrategy.failFinish("사용자가 결제확인 서비스를 종료하셨습니다")
                 Logger.i("사용자가 결제확인 서비스를 종료하셨습니다")
@@ -45,7 +45,7 @@ class StrategyRepository : IamportKoinComponent {
             }
             else -> {
                 // 사실상 호출될 일이 없겠지만 추가
-                webViewStrategy.failureFinish(payment, null, "사용자가 결제확인 서비스를 종료하셨습니다 payment [$payment]")
+                webViewStrategy.failureFinish(request, null, "사용자가 결제확인 서비스를 종료하셨습니다 payment [$request]")
             }
         }
     }
@@ -54,7 +54,7 @@ class StrategyRepository : IamportKoinComponent {
      * PG 와 PayMethod 로 결제 타입하여 가져옴
      * @return PaymenyKinds
      */
-    private fun getPaymentKinds(payment: Payment): PaymentKinds {
+    private fun getPaymentKinds(request: IamportRequest): PaymentKinds {
 
         fun isChaiPayment(pgPair: Pair<PG, PayMethod>): Boolean {
             return pgPair.first == PG.chai
@@ -64,7 +64,7 @@ class StrategyRepository : IamportKoinComponent {
             return pgPair.first == PG.nice && pgPair.second == PayMethod.trans
         }
 
-        payment.iamPortRequest?.let { request ->
+        request.iamportPayment?.let { request ->
             request.pgEnum?.let {
                 Pair(it, PayMethod.from(request.pay_method)).let { pair: Pair<PG, PayMethod> ->
                     return when {

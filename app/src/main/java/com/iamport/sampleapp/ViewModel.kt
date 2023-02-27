@@ -17,7 +17,7 @@ class ViewModel : ViewModel() {
     var amount: String = ""
     var cardDirectCode: String = ""
 
-    val resultCallback = MutableLiveData<Event<IamPortResponse>>()
+    val resultCallback = MutableLiveData<Event<IamportResponse>>()
     override fun onCleared() {
         Iamport.close()
         super.onCleared()
@@ -26,10 +26,10 @@ class ViewModel : ViewModel() {
     /**
      * SDK 에 결제 요청할 데이터 구성
      */
-    fun createIamPortRequest(): IamPortRequest {
+    fun createIamPortRequest(): IamportPayment {
         val card = if (cardDirectCode.isNotEmpty()) Card(Direct(code = cardDirectCode)) else null
 
-        return IamPortRequest(
+        return IamportPayment(
             pg = pg.makePgRawName(pgId = ""),           // PG 사
             pay_method = payMethod.name,                // 결제수단
             name = paymentName,                         // 주문명

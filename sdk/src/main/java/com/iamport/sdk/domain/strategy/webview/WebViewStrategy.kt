@@ -6,9 +6,9 @@ import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import androidx.annotation.RequiresApi
-import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.data.sdk.IamportRequest
 import com.iamport.sdk.domain.strategy.base.BaseWebViewStrategy
-import com.iamport.sdk.domain.utils.CONST
+import com.iamport.sdk.domain.utils.Constant
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.Util
 import com.orhanobut.logger.Logger.d
@@ -16,10 +16,10 @@ import com.orhanobut.logger.Logger.d
 
 open class WebViewStrategy : BaseWebViewStrategy() {
 
-    override suspend fun doWork(payment: Payment) {
-        super.doWork(payment)
+    override suspend fun doWork(request: IamportRequest) {
+        super.doWork(request)
         // 오픈 웹뷰!
-        bus.openWebView.postValue(Event(payment))
+        bus.openWebView.postValue(Event(request))
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -41,7 +41,7 @@ open class WebViewStrategy : BaseWebViewStrategy() {
         request?.url?.let {
             d(it)
 
-            if (it.scheme == CONST.ABOUT_BLANK_SCHEME) {
+            if (it.scheme == Constant.ABOUT_BLANK_SCHEME) {
                 return true // 이동하지 않음
             }
 

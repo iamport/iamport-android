@@ -4,8 +4,8 @@ import android.net.Uri
 import android.webkit.WebViewClient
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
-import com.iamport.sdk.data.sdk.IamPortResponse
-import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.data.sdk.IamportResponse
+import com.iamport.sdk.data.sdk.IamportRequest
 import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.repository.StrategyRepository
 import com.iamport.sdk.domain.strategy.webview.IamPortMobileModeWebViewClient
@@ -27,16 +27,9 @@ class WebViewModel(private val repository: StrategyRepository) : BaseViewModel()
     /**
      * 오픈 웹뷰
      */
-    fun openWebView(): LiveData<Event<Payment>> {
+    fun openWebView(): LiveData<Event<IamportRequest>> {
         return bus.openWebView
     }
-
-    /**
-     * 뱅크페이 외부앱 열기
-     */
-//    fun niceTransRequestParam(): LiveData<Event<String>> {
-//        return bus.niceTransRequestParam
-//    }
 
     /**
      * 외부앱 열기
@@ -48,7 +41,7 @@ class WebViewModel(private val repository: StrategyRepository) : BaseViewModel()
     /**
      * 결제 결과 콜백 및 종료
      */
-    fun impResponse(): LiveData<Event<IamPortResponse?>> {
+    fun impResponse(): LiveData<Event<IamportResponse?>> {
         return bus.impResponse
     }
 
@@ -76,20 +69,6 @@ class WebViewModel(private val repository: StrategyRepository) : BaseViewModel()
     }
 
     /**
-     * 뱅크페이 결과 처리
-     */
-//    fun processBankPayPayment(resPair: Pair<String, String>) {
-//        repository.getNiceTransWebViewClient().processBankPayPayment(resPair)
-//    }
-
-    /**
-     * MobileWebMode 뱅크페이 결과 처리
-     */
-//    fun mobileModeProcessBankPayPayment(resPair: Pair<String, String>) {
-//        getMobileWebModeClient().processBankPayPayment(resPair)
-//    }
-
-    /**
      * MobileWebMode WebViewClient
      */
     fun getMobileWebModeClient(): IamPortMobileModeWebViewClient {
@@ -106,9 +85,9 @@ class WebViewModel(private val repository: StrategyRepository) : BaseViewModel()
     /**
      * 결제 요청
      */
-    fun requestPayment(payment: Payment) {
+    fun requestPayment(request: IamportRequest) {
         viewModelScope.launch {
-            repository.getWebViewStrategy().doWork(payment)
+            repository.getWebViewStrategy().doWork(request)
         }
     }
 }

@@ -1,17 +1,15 @@
 package com.iamport.sdk.data.sdk
 
 import android.os.Parcelable
-import com.iamport.sdk.domain.utils.CONST
 import com.iamport.sdk.domain.utils.Util
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
-import kotlinx.serialization.Serializable
 
 /**
  * https://docs.iamport.kr/tech/mobile-authentication
  */
 @Parcelize
-data class IamPortCertification(
+data class IamportCertification(
     val merchant_uid: String,
     val min_age: Int? = null,
     val name: String? = null,

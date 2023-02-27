@@ -1,7 +1,7 @@
 package com.iamport.sampleapp
 
-import com.iamport.sdk.data.sdk.IamPortResponse
+import com.iamport.sdk.data.sdk.IamportResponse
 
 object PaymentResultData {
-    var result: IamPortResponse? = null
+    var result: IamportResponse? = null
 }

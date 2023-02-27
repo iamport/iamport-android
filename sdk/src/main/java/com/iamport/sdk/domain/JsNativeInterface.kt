@@ -3,17 +3,17 @@ package com.iamport.sdk.domain
 import android.util.Base64
 import android.webkit.JavascriptInterface
 import com.google.gson.Gson
-import com.iamport.sdk.data.sdk.IamPortCertification
-import com.iamport.sdk.data.sdk.IamPortRequest
-import com.iamport.sdk.data.sdk.IamPortResponse
-import com.iamport.sdk.data.sdk.Payment
-import com.iamport.sdk.data.sdk.Payment.STATUS.*
+import com.iamport.sdk.data.sdk.IamportCertification
+import com.iamport.sdk.data.sdk.IamportPayment
+import com.iamport.sdk.data.sdk.IamportResponse
+import com.iamport.sdk.data.sdk.IamportRequest
+import com.iamport.sdk.data.sdk.IamportRequest.STATUS.*
 import com.iamport.sdk.domain.di.IamportKoinComponent
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.WebViewLiveDataEventBus
 import com.orhanobut.logger.Logger
 
-class JsNativeInterface(val payment: Payment, val gson: Gson, val evaluateJS: ((String) -> Unit)) : IamportKoinComponent {
+class JsNativeInterface(val request: IamportRequest, val gson: Gson, val evaluateJS: ((String) -> Unit)) : IamportKoinComponent {
     private val bus: WebViewLiveDataEventBus by lazy { WebViewLiveDataEventBus }
 
     /**
@@ -23,7 +23,7 @@ class JsNativeInterface(val payment: Payment, val gson: Gson, val evaluateJS: ((
     fun customCallback(response: String) {
         Logger.d("customCallback response :: $response")
         runCatching {
-            val impRes = gson.fromJson(response, IamPortResponse::class.java)
+            val impRes = gson.fromJson(response, IamportResponse::class.java)
             Logger.d("customCallback paymentover :: $impRes")
             bus.impResponse.postValue(Event(impRes))
         }
@@ -46,17 +46,17 @@ class JsNativeInterface(val payment: Payment, val gson: Gson, val evaluateJS: ((
     fun startWorkingSdk() {
         Logger.d("JS SDK 통한 결제 시작 요청")
 
-        initSDK(payment.userCode, payment.tierCode)
+        initSDK(request.userCode, request.tierCode)
 
-        when (payment.getStatus()) {
-            PAYMENT -> payment.iamPortRequest?.let {
+        when (request.getStatus()) {
+            PAYMENT -> request.iamportPayment?.let {
                 requestPay(it)
             }
-            CERT -> payment.iamPortCertification?.let {
+            CERT -> request.iamPortCertification?.let {
                 certification(it)
             }
             ERROR -> {
-                IamPortResponse.makeFail(payment, msg = "payment status ERROR").let {
+                IamportResponse.makeFail(request, msg = "payment status ERROR").let {
                     bus.impResponse.postValue(Event(it))
                 }
             }
@@ -76,7 +76,7 @@ class JsNativeInterface(val payment: Payment, val gson: Gson, val evaluateJS: ((
         evaluateJS(jsInitMethod)
     }
 
-    private fun requestPay(request: IamPortRequest) {
+    private fun requestPay(request: IamportPayment) {
         if (request.custom_data.isNullOrEmpty()) {
             requestPayNormal(request)
         } else {
@@ -84,19 +84,19 @@ class JsNativeInterface(val payment: Payment, val gson: Gson, val evaluateJS: ((
         }
     }
 
-    private fun requestPayNormal(request: IamPortRequest) {
+    private fun requestPayNormal(request: IamportPayment) {
         Logger.d(request)
         evaluateJS("requestPay('${gson.toJson(request)}');")
     }
 
-    private fun requestPayWithCustomData(request: IamPortRequest, customData: String) {
+    private fun requestPayWithCustomData(request: IamportPayment, customData: String) {
         Logger.d(request)
 
         val encodedString: String = Base64.encodeToString(customData.toByteArray(), Base64.NO_WRAP)
         evaluateJS("requestPayWithCustomData('${gson.toJson(request)}', '${encodedString}');")
     }
 
-    private fun certification(certification: IamPortCertification) {
+    private fun certification(certification: IamportCertification) {
         Logger.d(certification)
         evaluateJS("certification('${gson.toJson(certification)}');")
     }

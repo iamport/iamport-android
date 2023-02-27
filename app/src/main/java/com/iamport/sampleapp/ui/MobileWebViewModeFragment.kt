@@ -10,7 +10,7 @@ import com.iamport.sampleapp.MyWebViewChromeClient
 import com.iamport.sampleapp.MyWebViewClient
 import com.iamport.sampleapp.databinding.WebViewModeFragmentBinding
 import com.iamport.sdk.domain.core.Iamport
-import com.iamport.sdk.domain.utils.CONST
+import com.iamport.sdk.domain.utils.Constant
 import com.iamport.sdk.domain.utils.EventObserver
 import java.util.*
 
@@ -52,7 +52,7 @@ class MobileWebViewModeFragment : Fragment() {
             })
 
             // 모바일 웹 단독 모드
-//            it.loadUrl(CONST.PAYMENT_MOBILE_WEB_FILE_URL)
+//            it.loadUrl(Constant.PAYMENT_MOBILE_WEB_FILE_URL)
             it.loadUrl("https://pay-demo.iamport.kr") // 아임포트 데모 페이지
             Iamport.pluginMobileWebSupporter(it) // 로컬 데모 페이지
             createdView = false

@@ -6,7 +6,7 @@ import com.iamport.sdk.BuildConfig
 import com.iamport.sdk.data.remote.ChaiApi
 import com.iamport.sdk.data.remote.IamportApi
 import com.iamport.sdk.data.remote.NiceApi
-import com.iamport.sdk.domain.utils.CONST
+import com.iamport.sdk.domain.utils.Constant
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.core.qualifier.named
@@ -35,8 +35,8 @@ fun provideOkHttpClient(context: Context?): OkHttpClient? {
 fun provideIamportApi(gson : Gson, client: OkHttpClient?): IamportApi {
 
     return Retrofit.Builder()
-        .baseUrl(CONST.IAMPORT_PROD_URL)
-//        .baseUrl(CONST.IAMPORT_TEST_URL)
+        .baseUrl(Constant.IAMPORT_PROD_URL)
+//        .baseUrl(Constant.IAMPORT_TEST_URL)
         .addConverterFactory(GsonConverterFactory.create(gson)).apply {
             client?.let { client(it) }
         }
@@ -46,7 +46,7 @@ fun provideIamportApi(gson : Gson, client: OkHttpClient?): IamportApi {
 
 fun provideNiceApi(gson : Gson, client: OkHttpClient?): NiceApi {
     return Retrofit.Builder()
-        .baseUrl("${CONST.IAMPORT_DETECT_URL}/")
+        .baseUrl("${Constant.IAMPORT_DETECT_URL}/")
         .addConverterFactory(GsonConverterFactory.create(gson)).apply {
             client?.let { client(it) }
         }
@@ -65,11 +65,11 @@ fun provideChaiApi(url: String, gson : Gson, client: OkHttpClient?): ChaiApi {
 }
 
 val httpClientModule = module {
-    single(named("${CONST.KOIN_KEY}provideOkHttpClient")) { provideOkHttpClient(get()) }
+    single(named("${Constant.KOIN_KEY}provideOkHttpClient")) { provideOkHttpClient(get()) }
 }
 
 val apiModule = module {
-    single { provideIamportApi(get(named("${CONST.KOIN_KEY}Gson")), get(named("${CONST.KOIN_KEY}provideOkHttpClient")),) }
+    single { provideIamportApi(get(named("${Constant.KOIN_KEY}Gson")), get(named("${Constant.KOIN_KEY}provideOkHttpClient")),) }
 //    single { provideChaiApi(false, get(), get()) }
-    single { provideNiceApi(get(named("${CONST.KOIN_KEY}Gson")), get(named("${CONST.KOIN_KEY}provideOkHttpClient")),) }
+    single { provideNiceApi(get(named("${Constant.KOIN_KEY}Gson")), get(named("${Constant.KOIN_KEY}provideOkHttpClient")),) }
 }

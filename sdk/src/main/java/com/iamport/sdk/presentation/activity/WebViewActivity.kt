@@ -8,8 +8,8 @@ import android.webkit.WebView
 import android.widget.ProgressBar
 import com.google.gson.GsonBuilder
 import com.iamport.sdk.R
-import com.iamport.sdk.data.sdk.IamPortResponse
-import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.data.sdk.IamportResponse
+import com.iamport.sdk.data.sdk.IamportRequest
 import com.iamport.sdk.data.sdk.ProvidePgPkg
 import com.iamport.sdk.domain.IamportWebChromeClient
 import com.iamport.sdk.domain.JsNativeInterface
@@ -30,7 +30,7 @@ class WebViewActivity : BaseActivity<WebViewModel>(), IamportKoinComponent {
 
     private lateinit var loading: ProgressBar
     private lateinit var webview: WebView
-    private var payment: Payment? = null
+    private var request: IamportRequest? = null
 
     override fun onDestroy() {
         runCatching {
@@ -50,10 +50,10 @@ class WebViewActivity : BaseActivity<WebViewModel>(), IamportKoinComponent {
         initLoading()
 
         // intent 로 부터 전달받은 Payment 객체
-        val bundle = intent.getBundleExtra(CONST.CONTRACT_INPUT)
-        payment = bundle?.getParcelable(CONST.BUNDLE_PAYMENT)
+        val bundle = intent.getBundleExtra(Constant.CONTRACT_INPUT)
+        request = bundle?.getParcelable(Constant.BUNDLE_PAYMENT)
 
-        observeViewModel(payment) // 관찰할 LiveData
+        observeViewModel(request) // 관찰할 LiveData
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -68,7 +68,7 @@ class WebViewActivity : BaseActivity<WebViewModel>(), IamportKoinComponent {
      * 로딩 UI 초기화
      */
     private fun initLoading() {
-        if (payment != null) {
+        if (request != null) {
             loadingVisible(true)
         }
     }
@@ -85,9 +85,9 @@ class WebViewActivity : BaseActivity<WebViewModel>(), IamportKoinComponent {
     /**
      * 관찰할 LiveData 옵저빙
      */
-    override fun observeViewModel(payment: Payment?) {
-        d(GsonBuilder().setPrettyPrinting().create().toJson(payment))
-        payment?.let { pay: Payment ->
+    override fun observeViewModel(request: IamportRequest?) {
+        d(GsonBuilder().setPrettyPrinting().create().toJson(request))
+        request?.let { pay: IamportRequest ->
 
             viewModel.loading().observe(this, EventObserver(this::loadingVisible))
 
@@ -112,10 +112,10 @@ class WebViewActivity : BaseActivity<WebViewModel>(), IamportKoinComponent {
     /**
      * 결제 요청 실행
      */
-    override fun requestPayment(it: Payment) {
+    override fun requestPayment(it: IamportRequest) {
         loadingVisible(true)
         if (!Util.isInternetAvailable(this)) {
-            sdkFinish(IamPortResponse.makeFail(it, msg = "네트워크 연결 안됨"))
+            sdkFinish(IamportResponse.makeFail(it, msg = "네트워크 연결 안됨"))
             return
         }
         viewModel.requestPayment(it)
@@ -140,7 +140,7 @@ class WebViewActivity : BaseActivity<WebViewModel>(), IamportKoinComponent {
             removeObservers()
 
             webview.run {
-                removeJavascriptInterface(CONST.PAYMENT_WEBVIEW_JS_INTERFACE_NAME)
+                removeJavascriptInterface(Constant.PAYMENT_WEBVIEW_JS_INTERFACE_NAME)
                 clearHistory()
                 loadUrl("about:blank")
                 removeAllViews()
@@ -154,13 +154,13 @@ class WebViewActivity : BaseActivity<WebViewModel>(), IamportKoinComponent {
     /**
      * 모든 결과 처리 및 SDK 종료
      */
-    override fun sdkFinish(iamPortResponse: IamPortResponse?) {
+    override fun sdkFinish(iamPortResponse: IamportResponse?) {
         i("call sdkFinish")
         d("sdkFinish => ${iamPortResponse.toString()}")
 
         close()
         loadingVisible(false)
-        setResult(Activity.RESULT_OK, Intent().apply { putExtra(CONST.CONTRACT_OUTPUT, iamPortResponse) })
+        setResult(Activity.RESULT_OK, Intent().apply { putExtra(Constant.CONTRACT_OUTPUT, iamPortResponse) })
 //        Iamport.callback(iamPortResponse)
 
         this.finish()
@@ -226,7 +226,7 @@ class WebViewActivity : BaseActivity<WebViewModel>(), IamportKoinComponent {
     /**
      * 웹뷰 오픈
      */
-    override fun openWebView(payment: Payment) {
+    override fun openWebView(request: IamportRequest) {
         d("오픈! 웹뷰")
 
         val evaluateJS = fun(jsMethod: String) {
@@ -249,13 +249,13 @@ class WebViewActivity : BaseActivity<WebViewModel>(), IamportKoinComponent {
             setLayerType(View.LAYER_TYPE_HARDWARE, null)
             clearCache(true)
             addJavascriptInterface(
-                JsNativeInterface(payment, get(named("${CONST.KOIN_KEY}Gson")), evaluateJS),
-                CONST.PAYMENT_WEBVIEW_JS_INTERFACE_NAME
+                JsNativeInterface(request, get(named("${Constant.KOIN_KEY}Gson")), evaluateJS),
+                Constant.PAYMENT_WEBVIEW_JS_INTERFACE_NAME
             )
             webViewClient = viewModel.getWebViewClient()
             visibility = View.VISIBLE
 
-            loadUrl(CONST.PAYMENT_FILE_URL) // load WebView
+            loadUrl(Constant.PAYMENT_FILE_URL) // load WebView
             webChromeClient = IamportWebChromeClient()
         }
     }

@@ -1,10 +1,10 @@
 package com.iamport.sdk.data.sdk
 
-import com.iamport.sdk.domain.utils.CONST
+import com.iamport.sdk.domain.utils.Constant
 import com.iamport.sdk.domain.utils.Util
 
 enum class Platform(val redirectUrl: String) {
-    native(CONST.IAMPORT_DETECT_URL),
+    native(Constant.IAMPORT_DETECT_URL),
     reactnative(Util.getRedirectUrl("rn")),
     flutter(Util.getRedirectUrl("flu")),
     cordova(Util.getRedirectUrl("cor")),

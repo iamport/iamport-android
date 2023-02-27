@@ -3,17 +3,17 @@ package com.iamport.sdk.data.chai.request
 import com.iamport.sdk.data.chai.CHAI
 import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.data.sdk.PayMethod
-import com.iamport.sdk.data.sdk.Payment
-import com.iamport.sdk.domain.utils.CONST
+import com.iamport.sdk.data.sdk.IamportRequest
+import com.iamport.sdk.domain.utils.Constant
 import com.iamport.sdk.domain.utils.Util
 import com.orhanobut.logger.Logger
 
 // * method : POST
-//* content-type : application/json
-//* URL : https://service.iamport.kr/chai_payments/prepare
+// * content-type : application/json
+// * URL : https://service.iamport.kr/chai_payments/prepare
 
 data class PrepareRequest(
-    val channel: String = CHAI.CHANNEL,//fixed
+    val channel: String = CHAI.CHANNEL, //fixed
     val provider: PG = PG.chai, //fixed
     val pay_method: String = PayMethod.trans.name,//fixed
     val escrow: Boolean?, // true or false
@@ -41,9 +41,9 @@ data class PrepareRequest(
         /**
          * 차이 앱에 요청하기 위한 리퀘스트 객체 생성
          */
-        fun make(chaiId: String, payment: Payment): PrepareRequest? {
-            val empty = CONST.EMPTY_STR
-            return payment.iamPortRequest?.run {
+        fun make(chaiId: String, request: IamportRequest): PrepareRequest? {
+            val empty = Constant.EMPTY_STR
+            return request.iamportPayment?.run {
                 PrepareRequest(
                     escrow = false,
                     amount = amount,
@@ -51,7 +51,7 @@ data class PrepareRequest(
                     name = Util.getOrEmpty(name),
                     merchant_uid = merchant_uid,
                     customer_uid = customer_uid,
-                    user_code = payment.userCode,
+                    user_code = request.userCode,
                     tier_code = empty,
                     pg_id = chaiId,
                     buyer_name = buyer_name,

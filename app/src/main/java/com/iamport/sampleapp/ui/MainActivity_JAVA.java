@@ -7,7 +7,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.iamport.sampleapp.R;
-import com.iamport.sdk.data.sdk.IamPortRequest;
+import com.iamport.sdk.data.sdk.IamportPayment;
 import com.iamport.sdk.data.sdk.PG;
 import com.iamport.sdk.data.sdk.PayMethod;
 import com.iamport.sdk.domain.core.Iamport;
@@ -31,7 +31,7 @@ public class MainActivity_JAVA extends AppCompatActivity {
 
         Iamport.INSTANCE.init(this);
 
-        IamPortRequest request = IamPortRequest.builder()
+        IamportPayment request = IamportPayment.builder()
                 .pg(PG.kcp.makePgRawName(""))
                 .pay_method(PayMethod.card.name())
                 .name("JAVA칩 프라푸치노 주문이요")

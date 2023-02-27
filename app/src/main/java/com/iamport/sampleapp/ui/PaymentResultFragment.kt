@@ -10,7 +10,7 @@ import com.google.gson.GsonBuilder
 import com.iamport.sampleapp.PaymentResultData
 import com.iamport.sampleapp.R
 import com.iamport.sampleapp.databinding.ResultFragmentBinding
-import com.iamport.sdk.data.sdk.IamPortResponse
+import com.iamport.sdk.data.sdk.IamportResponse
 
 class PaymentResultFragment : Fragment() {
 
@@ -34,10 +34,10 @@ class PaymentResultFragment : Fragment() {
         tv.text = "$resultText\n${GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create().toJson(impResponse)}"
     }
 
-    private fun isSuccess(iamPortResponse: IamPortResponse?): Boolean {
-        if (iamPortResponse == null) {
+    private fun isSuccess(response: IamportResponse?): Boolean {
+        if (response == null) {
             return false
         }
-        return iamPortResponse.success == true || iamPortResponse.imp_success == true
+        return response.success == true || response.imp_success == true
     }
 }

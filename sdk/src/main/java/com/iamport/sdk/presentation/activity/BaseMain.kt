@@ -7,18 +7,18 @@ import android.webkit.CookieManager
 import android.webkit.WebSettings
 import android.webkit.WebView
 import com.iamport.sdk.BuildConfig
-import com.iamport.sdk.data.sdk.IamPortResponse
-import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.data.sdk.IamportResponse
+import com.iamport.sdk.data.sdk.IamportRequest
 import com.iamport.sdk.domain.core.Iamport
 
 interface BaseMain {
-    fun openWebView(payment: Payment)
+    fun openWebView(request: IamportRequest)
     fun openThirdPartyApp(it: Uri)
 
     //    fun openNiceTransApp(it: String)
-    fun observeViewModel(payment: Payment?)
-    fun requestPayment(it: Payment)
-    fun sdkFinish(iamPortResponse: IamPortResponse?)
+    fun observeViewModel(request: IamportRequest?)
+    fun requestPayment(it: IamportRequest)
+    fun sdkFinish(iamPortResponse: IamportResponse?)
     fun movePlayStore(intent: Intent)
 
     /**

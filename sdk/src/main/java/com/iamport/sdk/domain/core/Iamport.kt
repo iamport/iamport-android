@@ -19,7 +19,7 @@ import com.iamport.sdk.domain.di.apiModule
 import com.iamport.sdk.domain.di.appModule
 import com.iamport.sdk.domain.di.httpClientModule
 import com.iamport.sdk.domain.service.ChaiService
-import com.iamport.sdk.domain.utils.CONST
+import com.iamport.sdk.domain.utils.Constant
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.PreventOverlapRun
 import com.iamport.sdk.presentation.activity.IamportSdk
@@ -49,11 +49,11 @@ object Iamport {
     private var iamportSdk: IamportSdk? = null // FIXME : 안에 웹뷰를 포함하여 나오는 워닝
 
     // 콜백
-    private var impCallbackFunction: ((IamPortResponse?) -> Unit)? = null // 결제결과 callbck type 함수 호출
-    private var approveCallback: ((IamPortApprove) -> Unit)? = null // 차이 결제 상태 approve 콜백
+    private var impCallbackFunction: ((IamportResponse?) -> Unit)? = null // 결제결과 callbck type 함수 호출
+    private var approveCallback: ((IamportApprove) -> Unit)? = null // 차이 결제 상태 approve 콜백
 
     // 웹뷰 액티비티 런처
-    private var webViewActivityLauncher: ActivityResultLauncher<Payment>? = null
+    private var webViewActivityLauncher: ActivityResultLauncher<IamportRequest>? = null
     private val webViewActivityContract = WebViewActivityContract()
 
     // 중복호출 방지 Utils
@@ -65,23 +65,23 @@ object Iamport {
     // default WebSettings.LOAD_NO_CACHE 이나, 세틀뱅크 뒤로가기시 오동작하여(캐시가 필요) 가맹점에서 선택할 수 있게 수정
     var webViewCacheMode: Int = WebSettings.LOAD_NO_CACHE
 
-    var response: IamPortResponse? = null // 내부의 imp_uid로 종료 콜백 중복호출 방지
+    var response: IamportResponse? = null // 내부의 imp_uid로 종료 콜백 중복호출 방지
 
     // ===========================================
     // Application class 에서 생성 했는지 확인
     private fun isSDKCreate(): Boolean {
         if (!isCreated) {
-            Log.i(CONST.IAMPORT_LOG, "IAMPORT SDK was not created yet.")
+            Log.i(Constant.IAMPORT_LOG, "IAMPORT SDK was not created yet.")
         }
         return isCreated
     }
 
     // Activity or Fragment 레벨에서 생성 했는지 확인
-    private fun isSDKInit(payment: Payment): Boolean {
+    private fun isSDKInit(request: IamportRequest): Boolean {
         if (iamportSdk == null) {
             val errMsg = "IAMPORT SDK was not Init. Please call Iamport.init() in your start code(ex: onAttach() or onCreate() or etc.. )"
-            Log.e(CONST.IAMPORT_LOG, errMsg)
-            callback(IamPortResponse.makeFail(payment, msg = errMsg))
+            Log.e(Constant.IAMPORT_LOG, errMsg)
+            callback(IamportResponse.makeFail(request, msg = errMsg))
             return false
         }
         return true
@@ -124,7 +124,7 @@ object Iamport {
 
 
         val formatStrategy = PrettyFormatStrategy.newBuilder().apply {
-            tag(CONST.IAMPORT_LOG)
+            tag(Constant.IAMPORT_LOG)
             if (DEBUG) {
                 methodCount(3)
             } else {
@@ -174,7 +174,7 @@ object Iamport {
     /**
      * 전달받은 결제결과 콜백
      */
-    val callback = fun(iamPortResponse: IamPortResponse?) {
+    val callback = fun(iamPortResponse: IamportResponse?) {
 
         if (iamPortResponse == null) {
             i("iamPortResponse 없이 결제 종료")
@@ -267,13 +267,13 @@ object Iamport {
         userCode: String,
         tierCode: String? = null,
         webviewMode: WebView? = null,
-        iamPortRequest: IamPortRequest,
-        approveCallback: ((IamPortApprove) -> Unit)? = null,
-        paymentResultCallback: (IamPortResponse?) -> Unit
+        iamportPayment: IamportPayment,
+        approveCallback: ((IamportApprove) -> Unit)? = null,
+        paymentResultCallback: (IamportResponse?) -> Unit
     ) {
 
-        val payment = Payment(userCode, tierCode = tierCode, iamPortRequest = iamPortRequest)
-        if (!isSDKInit(payment)) {
+        val request = IamportRequest(userCode, tierCode = tierCode, iamportPayment = iamportPayment)
+        if (!isSDKInit(request)) {
             return
         }
 
@@ -283,7 +283,7 @@ object Iamport {
         }
 
         preventOverlapRun.launch {
-            corePayment(payment, approveCallback, paymentResultCallback)
+            corePayment(request, approveCallback, paymentResultCallback)
         }
     }
 
@@ -296,11 +296,11 @@ object Iamport {
         userCode: String,
         tierCode: String? = null,
         webviewMode: WebView? = null,
-        iamPortCertification: IamPortCertification,
-        resultCallback: (IamPortResponse?) -> Unit
+        iamPortCertification: IamportCertification,
+        resultCallback: (IamportResponse?) -> Unit
     ) {
-        val payment = Payment(userCode, tierCode = tierCode, iamPortCertification = iamPortCertification)
-        if (!isSDKInit(payment)) {
+        val request = IamportRequest(userCode, tierCode = tierCode, iamPortCertification = iamPortCertification)
+        if (!isSDKInit(request)) {
             return
         }
 
@@ -310,26 +310,26 @@ object Iamport {
         }
 
         preventOverlapRun.launch {
-            coreCertification(payment, resultCallback)
+            coreCertification(request, resultCallback)
         }
     }
 
     internal fun coreCertification(
-        payment: Payment,
-        paymentResultCallback: ((IamPortResponse?) -> Unit)?
+        request: IamportRequest,
+        paymentResultCallback: ((IamportResponse?) -> Unit)?
     ) {
         impCallbackFunction = paymentResultCallback
-        iamportSdk?.initStart(payment, paymentResultCallback)
+        iamportSdk?.initStart(request, paymentResultCallback)
     }
 
     internal fun corePayment(
-        payment: Payment,
-        approveCallback: ((IamPortApprove) -> Unit)?,
-        paymentResultCallback: ((IamPortResponse?) -> Unit)?
+        request: IamportRequest,
+        approveCallback: ((IamportApprove) -> Unit)?,
+        paymentResultCallback: ((IamportResponse?) -> Unit)?
     ) {
         this.approveCallback = approveCallback
         impCallbackFunction = paymentResultCallback
-        iamportSdk?.initStart(payment, approveCallback, paymentResultCallback)
+        iamportSdk?.initStart(request, approveCallback, paymentResultCallback)
     }
 
     // ======================================================
@@ -388,7 +388,7 @@ object Iamport {
     /**
      * 외부에서 차이 최종결제 요청
      */
-    fun approvePayment(approve: IamPortApprove) {
+    fun approvePayment(approve: IamportApprove) {
         iamportSdk?.requestApprovePayments(approve)
     }
     // ======================================================

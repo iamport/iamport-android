@@ -7,7 +7,7 @@ import android.graphics.drawable.Icon
 import android.os.Build
 import android.os.IBinder
 import com.iamport.sdk.R
-import com.iamport.sdk.domain.utils.CONST
+import com.iamport.sdk.domain.utils.Constant
 import com.orhanobut.logger.Logger
 
 
@@ -68,8 +68,8 @@ open class ChaiService : Service() {
         val stopTitle = "결제를 중지하시려면 아래로 당겨주세요"
         val stopBtnName = "중지"
 
-        val broadcastIntent = Intent(CONST.BROADCAST_FOREGROUND_SERVICE)
-        val stopIntent = Intent(CONST.BROADCAST_FOREGROUND_SERVICE_STOP)
+        val broadcastIntent = Intent(Constant.BROADCAST_FOREGROUND_SERVICE)
+        val stopIntent = Intent(Constant.BROADCAST_FOREGROUND_SERVICE_STOP)
 
         // Android 12 대응 (참고: https://developer.android.com/guide/components/intents-filters#DeclareMutabilityPendingIntent)
         val pendingIntent =
@@ -87,7 +87,7 @@ open class ChaiService : Service() {
         }
 
         val notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val action = Notification.Action.Builder(Icon.createWithResource(CONST.EMPTY_STR, stopIcon), stopBtnName, pendingStopIntent).build()
+            val action = Notification.Action.Builder(Icon.createWithResource(Constant.EMPTY_STR, stopIcon), stopBtnName, pendingStopIntent).build()
             Notification.Builder(this, channelId)
                 .setSmallIcon(icon)  // 아이콘 셋팅
                 .setContentTitle(title)

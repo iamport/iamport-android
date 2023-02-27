@@ -116,7 +116,7 @@ Iamport.payment("imp123456", request,
 
 > - 차이 결제에서 approveCallback 이 있을 때 (최종 결제전 재고 확인 등이 필요할 때)  
     콜백 전달 받은 후에 chaiPayment 함수 호출  
-    (타임아웃 : CONST.CHAI_FINAL_PAYMENT_TIME_OUT_SEC)
+    (타임아웃 : Constant.CHAI_FINAL_PAYMENT_TIME_OUT_SEC)
 ```kotlin
   Iamport.chaiPayment(iamPortApprove) // 재고 등 확인 후, 차이 최종 결제 요청 실행.
 ```

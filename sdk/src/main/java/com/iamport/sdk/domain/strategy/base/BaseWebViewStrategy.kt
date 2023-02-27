@@ -6,9 +6,9 @@ import android.os.Build
 import android.webkit.*
 import androidx.annotation.RequiresApi
 import com.google.gson.Gson
-import com.iamport.sdk.data.sdk.IamPortResponse
-import com.iamport.sdk.data.sdk.Payment
-import com.iamport.sdk.domain.utils.CONST
+import com.iamport.sdk.data.sdk.IamportResponse
+import com.iamport.sdk.data.sdk.IamportRequest
+import com.iamport.sdk.domain.utils.Constant
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.WebViewLiveDataEventBus
 import com.orhanobut.logger.Logger
@@ -19,20 +19,20 @@ open class BaseWebViewStrategy : WebViewClient(), IStrategy {
     protected val gson: Gson by lazy { Gson() }
     protected val bus: WebViewLiveDataEventBus by lazy { WebViewLiveDataEventBus }
 
-    lateinit var payment: Payment
+    lateinit var request: IamportRequest
 
     override fun init() {}
 
-    override suspend fun doWork(payment: Payment) {
-        super.doWork(payment)
-        d("doWork! $payment")
-        this.payment = payment
+    override suspend fun doWork(request: IamportRequest) {
+        super.doWork(request)
+        d("doWork! $request")
+        this.request = request
     }
 
     /**
      * SDK 종료
      */
-    override fun sdkFinish(response: IamPortResponse?) {
+    override fun sdkFinish(response: IamportResponse?) {
         bus.impResponse.postValue(Event(response))
     }
 
@@ -41,7 +41,7 @@ open class BaseWebViewStrategy : WebViewClient(), IStrategy {
 
     override fun onPageFinished(view: WebView, url: String) {
         d(url)
-//        if (url != CONST.PAYMENT_FILE_URL) {
+//        if (url != Constant.PAYMENT_FILE_URL) {
         bus.loading.postValue(Event(false))
 //        }
     }
@@ -68,8 +68,8 @@ open class BaseWebViewStrategy : WebViewClient(), IStrategy {
     /**
      * 성공해서 SDK 종료
      */
-    protected fun successFinish(payment: Payment) {
-        successFinish(payment, msg = CONST.EMPTY_STR)
+    protected fun successFinish(request: IamportRequest) {
+        successFinish(request, msg = Constant.EMPTY_STR)
     }
 
     /**
@@ -77,7 +77,7 @@ open class BaseWebViewStrategy : WebViewClient(), IStrategy {
      */
     protected fun isAppUrl(uri: Uri): Boolean {
         return uri.scheme.let {
-            it != CONST.HTTP_SCHEME && it != CONST.HTTPS_SCHEME && it != CONST.ABOUT_BLANK_SCHEME
+            it != Constant.HTTP_SCHEME && it != Constant.HTTPS_SCHEME && it != Constant.ABOUT_BLANK_SCHEME
         }
     }
 
@@ -85,7 +85,7 @@ open class BaseWebViewStrategy : WebViewClient(), IStrategy {
      * 결제 끝났는지 여부
      */
     protected fun isPaymentOver(uri: Uri): Boolean {
-        return uri.toString().contains(CONST.IAMPORT_DETECT_URL)
+        return uri.toString().contains(Constant.IAMPORT_DETECT_URL)
     }
 
 }

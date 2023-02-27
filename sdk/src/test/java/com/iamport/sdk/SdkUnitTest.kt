@@ -5,13 +5,13 @@ import com.iamport.sdk.data.remote.ApiHelper
 import com.iamport.sdk.data.remote.ChaiApi
 import com.iamport.sdk.data.remote.IamportApi
 import com.iamport.sdk.data.remote.ResultWrapper
-import com.iamport.sdk.data.sdk.IamPortRequest
+import com.iamport.sdk.data.sdk.IamportPayment
 import com.iamport.sdk.data.sdk.PG
 import com.iamport.sdk.data.sdk.PayMethod
-import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.data.sdk.IamportRequest
 import com.iamport.sdk.domain.repository.StrategyRepository
 import com.iamport.sdk.domain.strategy.base.JudgeStrategy
-import com.iamport.sdk.domain.utils.CONST
+import com.iamport.sdk.domain.utils.Constant
 import com.iamport.sdk.domain.utils.Util
 import com.iamport.sdk.presentation.viewmodel.MainViewModel
 import com.orhanobut.logger.Logger.i
@@ -53,9 +53,9 @@ class SdkUnitTest : AbstractKoinTest() {
         }
     }
 
-    private fun getDefaultPayment(): Payment {
+    private fun getDefaultPayment(): IamportRequest {
         val userCode = "12345"
-        val request = IamPortRequest(
+        val request = IamportPayment(
             pg = PG.kcp.makePgRawName(),
             pay_method = PayMethod.card.name,
             name = "주문명001",
@@ -64,7 +64,7 @@ class SdkUnitTest : AbstractKoinTest() {
             buyer_name = "남궁안녕"
         )
 
-        return Payment(userCode, iamPortRequest = request)
+        return IamportRequest(userCode, iamportPayment = request)
     }
 
 
@@ -92,7 +92,7 @@ class SdkUnitTest : AbstractKoinTest() {
         val chaiPayment = getDefaultPayment().run {
             copy(
                 userCode = Util.SampleUserCode.imp37739582.name,
-                iamPortRequest = iamPortRequest?.copy(
+                iamportPayment = iamportPayment?.copy(
                     pg = PG.chai.makePgRawName(),
                     pay_method = PayMethod.trans.name,
                 )
@@ -110,7 +110,7 @@ class SdkUnitTest : AbstractKoinTest() {
         val chaiPayment = getDefaultPayment().run {
             copy(
                 userCode = Util.SampleUserCode.imp37739582.name,
-                iamPortRequest = iamPortRequest?.copy(
+                iamportPayment = iamportPayment?.copy(
                     pg = PG.chai.makePgRawName(),
                     pay_method = PayMethod.trans.name,
                 )
@@ -133,7 +133,7 @@ class SdkUnitTest : AbstractKoinTest() {
     fun `가상계좌 유효성 실패 검증`() = runBlocking {
         val payment = getDefaultPayment().run {
             copy(
-                iamPortRequest = iamPortRequest?.copy(
+                iamportPayment = iamportPayment?.copy(
                     pg = PG.kcp.makePgRawName(),
                     pay_method = PayMethod.vbank.name,
                 )
@@ -141,10 +141,10 @@ class SdkUnitTest : AbstractKoinTest() {
         }
         i("$payment")
 
-        Payment.validator(payment).run {
+        IamportRequest.validator(payment).run {
             i("$second")
             assertThat(first, `is`(false))
-            assertThat(second, `is`(CONST.ERR_PAYMENT_VALIDATOR_VBANK))
+            assertThat(second, `is`(Constant.ERR_PAYMENT_VALIDATOR_VBANK))
         }
     }
 
@@ -153,7 +153,7 @@ class SdkUnitTest : AbstractKoinTest() {
 
         val payment = getDefaultPayment().run {
             copy(
-                iamPortRequest = iamPortRequest?.copy(
+                iamportPayment = iamportPayment?.copy(
                     pg = PG.kcp.makePgRawName(),
                     pay_method = PayMethod.vbank.name,
                     vbank_due = "2020121211302",
@@ -162,7 +162,7 @@ class SdkUnitTest : AbstractKoinTest() {
         }
         i("$payment")
 
-        Payment.validator(payment).run {
+        IamportRequest.validator(payment).run {
             i("$second")
             assertThat(first, `is`(true))
         }
@@ -173,7 +173,7 @@ class SdkUnitTest : AbstractKoinTest() {
 
         val payment = getDefaultPayment().run {
             copy(
-                iamPortRequest = iamPortRequest?.copy(
+                iamportPayment = iamportPayment?.copy(
                     pg = PG.kcp.makePgRawName(),
                     pay_method = PayMethod.phone.name,
                 )
@@ -181,10 +181,10 @@ class SdkUnitTest : AbstractKoinTest() {
         }
         i("$payment")
 
-        Payment.validator(payment).run {
+        IamportRequest.validator(payment).run {
             i("$second")
             assertThat(first, `is`(false))
-            assertThat(second, `is`(CONST.ERR_PAYMENT_VALIDATOR_PHONE))
+            assertThat(second, `is`(Constant.ERR_PAYMENT_VALIDATOR_PHONE))
         }
     }
 
@@ -193,7 +193,7 @@ class SdkUnitTest : AbstractKoinTest() {
 
         val payment = getDefaultPayment().run {
             copy(
-                iamPortRequest = iamPortRequest?.copy(
+                iamportPayment = iamportPayment?.copy(
                     pg = PG.kcp.makePgRawName(),
                     pay_method = PayMethod.phone.name,
                     digital = true,
@@ -202,7 +202,7 @@ class SdkUnitTest : AbstractKoinTest() {
         }
         i("$payment")
 
-        Payment.validator(payment).run {
+        IamportRequest.validator(payment).run {
             i("$second")
             assertThat(first, `is`(true))
         }
@@ -213,7 +213,7 @@ class SdkUnitTest : AbstractKoinTest() {
 
         val payment = getDefaultPayment().run {
             copy(
-                iamPortRequest = iamPortRequest?.copy(
+                iamportPayment = iamportPayment?.copy(
                     pg = PG.danal_tpay.makePgRawName(),
                     pay_method = PayMethod.vbank.name,
                     vbank_due = "2020121211302",
@@ -222,10 +222,10 @@ class SdkUnitTest : AbstractKoinTest() {
         }
         i("$payment")
 
-        Payment.validator(payment).run {
+        IamportRequest.validator(payment).run {
             i("$second")
             assertThat(first, `is`(false))
-            assertThat(second, `is`(CONST.ERR_PAYMENT_VALIDATOR_DANAL_VBANK))
+            assertThat(second, `is`(Constant.ERR_PAYMENT_VALIDATOR_DANAL_VBANK))
         }
     }
 
@@ -234,7 +234,7 @@ class SdkUnitTest : AbstractKoinTest() {
 
         val payment = getDefaultPayment().run {
             copy(
-                iamPortRequest = iamPortRequest?.copy(
+                iamportPayment = iamportPayment?.copy(
                     pg = PG.danal_tpay.makePgRawName(),
                     pay_method = PayMethod.vbank.name,
                     vbank_due = "2020121211302",
@@ -244,7 +244,7 @@ class SdkUnitTest : AbstractKoinTest() {
         }
         i("$payment")
 
-        Payment.validator(payment).run {
+        IamportRequest.validator(payment).run {
             i("$second")
             assertThat(first, `is`(true))
         }
@@ -266,7 +266,7 @@ class SdkUnitTest : AbstractKoinTest() {
 //        Payment.validator(payment).run {
 //            i("$second")
 //            assertThat(first, `is`(false))
-//            assertThat(second, `is`(CONST.ERR_PAYMENT_VALIDATOR_PAYPAL))
+//            assertThat(second, `is`(Constant.ERR_PAYMENT_VALIDATOR_PAYPAL))
 //        }
 //    }
 
@@ -275,16 +275,16 @@ class SdkUnitTest : AbstractKoinTest() {
 
         val payment = getDefaultPayment().run {
             copy(
-                iamPortRequest = iamPortRequest?.copy(
+                iamportPayment = iamportPayment?.copy(
                     pg = PG.paypal.makePgRawName(),
                     pay_method = PayMethod.card.name,
-                    m_redirect_url = CONST.IAMPORT_PROD_URL,
+                    m_redirect_url = Constant.IAMPORT_PROD_URL,
                 )
             )
         }
         i("$payment")
 
-        Payment.validator(payment).run {
+        IamportRequest.validator(payment).run {
             i("$second")
             assertThat(first, `is`(true))
         }

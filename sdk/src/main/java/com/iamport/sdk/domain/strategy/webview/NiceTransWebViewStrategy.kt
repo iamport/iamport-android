@@ -9,7 +9,6 @@ import com.iamport.sdk.data.nice.BankPayResultCode
 import com.iamport.sdk.data.nice.BankPayResultCode.*
 import com.iamport.sdk.data.nice.NiceBankpay
 import com.iamport.sdk.data.sdk.ProvidePgPkg
-import com.iamport.sdk.domain.utils.Event
 import com.orhanobut.logger.Logger.*
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
@@ -62,7 +61,7 @@ open class NiceTransWebViewStrategy : WebViewStrategy() {
             CANCEL, FAIL_SIGN, FAIL_OTP,
             TIME_OUT, FAIL_CERT_MODULE_INIT -> {
                 w(BankPayResultCode.desc(code))
-                failureFinish(payment, msg = BankPayResultCode.desc(code))
+                failureFinish(request, msg = BankPayResultCode.desc(code))
             }
             else -> e("알 수 없는 에러 code : ${resPair.first}")
         }

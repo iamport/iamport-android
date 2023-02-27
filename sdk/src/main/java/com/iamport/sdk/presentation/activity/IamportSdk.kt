@@ -11,9 +11,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import com.google.gson.GsonBuilder
 import com.iamport.sdk.data.chai.CHAI
-import com.iamport.sdk.data.sdk.IamPortApprove
-import com.iamport.sdk.data.sdk.IamPortResponse
-import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.data.sdk.IamportApprove
+import com.iamport.sdk.data.sdk.IamportResponse
+import com.iamport.sdk.data.sdk.IamportRequest
 import com.iamport.sdk.data.sdk.ProvidePgPkg
 import com.iamport.sdk.domain.core.IamportReceiver
 import com.iamport.sdk.domain.di.IamportKoinComponent
@@ -26,7 +26,6 @@ import com.orhanobut.logger.Logger.*
 import org.koin.core.component.get
 import org.koin.core.component.inject
 import java.lang.ref.WeakReference
-import java.util.*
 
 
 /**
@@ -35,7 +34,7 @@ import java.util.*
 internal class IamportSdk(
     val activity: WeakReference<ComponentActivity>? = null,
     val fragment: WeakReference<Fragment>? = null,
-    val webViewActivityLauncher: ActivityResultLauncher<Payment>?,
+    val webViewActivityLauncher: ActivityResultLauncher<IamportRequest>?,
 ) : IamportKoinComponent {
 
     private val hostHelper: HostHelper = HostHelper(activity, fragment)
@@ -48,26 +47,21 @@ internal class IamportSdk(
     }
 
     // 전달받은 결제 결과 콜백
-    private var paymentResultCallBack: ((IamPortResponse?) -> Unit)? = null // 콜백함수
+    private var paymentResultCallBack: ((IamportResponse?) -> Unit)? = null // 콜백함수
 
     // 웹뷰 모드의 웹뷰
     private var modeWebViewRef: WeakReference<WebView>? = null
 
     // 웹뷰모드 & 모바일 웹 모드를 동작할 클래스
-    private var iamPortWebViewMode: IamPortWebViewMode? = null
-    private var iamPortMobileWebMode: IamPortMobileWebMode? = null
-    // ---------------------------------------------
-
-    // 뱅크페이 앱 런처s
-//    private var bankPayLauncher: ActivityResultLauncher<String>? = null // 뱅크페이 앱 런처(for webview & mobile web mode)
-//    private val bankPayContract by lazy { BankPayContract() }
+    private var iamportWebViewMode: IamportWebViewMode? = null
+    private var iamportMobileWebMode: IamportMobileWebMode? = null
 
     // 차이 앱 런처
     private var launcherChai: ActivityResultLauncher<Pair<String, String>>? = null // 차이앱 런처
     private val chaiContract by lazy { ChaiContract() }
 
     // 차이결제 최종 확인 전 콜백
-    private var chaiApproveCallBack: ((IamPortApprove) -> Unit)? = null // 콜백함수
+    private var chaiApproveCallBack: ((IamportApprove) -> Unit)? = null // 콜백함수
 
     // 차이앱 폴링여부
     private val isPolling = MutableLiveData<Event<Boolean>>()
@@ -87,30 +81,17 @@ internal class IamportSdk(
         }
     }
 
-
-    // =============================================
-
     init {
 
         when (hostHelper.mode) {
             MODE.ACTIVITY -> {
                 hostHelper.getActivityRef()?.run {
                     launcherChai = registerForActivityResult(chaiContract) { resultCallback() }
-//                    bankPayLauncher = registerForActivityResult(bankPayContract) {
-//                        if (it != null) {
-//                            resultBankPayAppCallback(it)
-//                        }
-//                    }
                 }
             }
             MODE.FRAGMENT -> {
                 hostHelper.getFragmentRef()?.run {
                     launcherChai = registerForActivityResult(chaiContract) { resultCallback() }
-//                    bankPayLauncher = registerForActivityResult(bankPayContract) {
-//                        if (it != null) {
-//                            resultBankPayAppCallback(it)
-//                        }
-//                    }
                 }
             }
             MODE.NONE -> {
@@ -122,7 +103,6 @@ internal class IamportSdk(
             ScreenChecker.init(it.app)
         }
 
-//        initClearData() // 만들어질떄
         updatePolling(false) // 차이 폴링 외부 인터페이스 초기화
         mainViewModel?.controlForegroundService(false) // 차이 포그라운드 서비스 초기화
         mainViewModel?.unregisterIamportReceiver(iamportReceiver, screenBrReceiver)
@@ -151,42 +131,16 @@ internal class IamportSdk(
 
         hostHelper.getActivityRef()?.let {
             webviewRef.get()?.let { webview ->
-                iamPortMobileWebMode = IamPortMobileWebMode()
-                iamPortMobileWebMode?.initStart(it, webview) // webview only 모드
+                iamportMobileWebMode = IamportMobileWebMode()
+                iamportMobileWebMode?.initStart(it, webview) // webview only 모드
             }
         }
     }
-    // =============================================
-
-    // 머천트 앱의 생명주기를 따라감
-//    private val lifecycleObserver = object : LifecycleObserver {
-//
-//        @OnLifecycleEvent(Lifecycle.Event.ON_START)
-//        fun onStart() {
-//            d("onStart")
-//            mainViewModel?.checkChaiStatus()
-//        }
-//
-//        @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-//        fun onStop() {
-//            d("onStop")
-//            mainViewModel?.pollingChaiStatus() // 백그라운드 진입시 차이 폴링 시작, (webview 이용시에는 폴링하지 않음)
-//        }
-//
-//        @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-//        fun onDestroy() {
-////            d("onDestroy")
-////            initClearData()// FIXME : 이부분 체크, 다른걸로 종료해야 할 듯
-//        }
-//    }
-
-    // =============================================
-
 
     /**
      * 모든 결과 처리 및 SDK 종료
      */
-    private fun sdkFinish(iamPortResponse: IamPortResponse?) {
+    private fun sdkFinish(iamPortResponse: IamportResponse?) {
         i("SDK Finish")
         d(iamPortResponse.toString())
 
@@ -216,11 +170,11 @@ internal class IamportSdk(
     }
 
     private fun closeDeleteWebViewMode() {
-        iamPortWebViewMode?.close()
-        iamPortMobileWebMode?.close()
+        iamportWebViewMode?.close()
+        iamportMobileWebMode?.close()
 
-        iamPortWebViewMode = null
-        iamPortMobileWebMode = null
+        iamportWebViewMode = null
+        iamportMobileWebMode = null
     }
 
     // 외부 종료
@@ -251,7 +205,7 @@ internal class IamportSdk(
     /**
      * 본인인증 요청시 실행
      */
-    fun initStart(payment: Payment, paymentResultCallBack: ((IamPortResponse?) -> Unit)?) {
+    fun initStart(request: IamportRequest, paymentResultCallBack: ((IamportResponse?) -> Unit)?) {
         i("HELLO I'MPORT SDK! for cert")
 
         closeDeleteWebViewMode() // 결제 시작할 때
@@ -261,13 +215,13 @@ internal class IamportSdk(
 //        hostHelper.getLifecycle()?.addObserver(lifecycleObserver)
 
         this.paymentResultCallBack = paymentResultCallBack
-        observeCertification(payment) // 관찰할 LiveData
+        observeCertification(request) // 관찰할 LiveData
     }
 
     /**
      * 결제 요청시 실행
      */
-    fun initStart(payment: Payment, approveCallback: ((IamPortApprove) -> Unit)?, paymentResultCallBack: ((IamPortResponse?) -> Unit)?) {
+    fun initStart(request: IamportRequest, approveCallback: ((IamportApprove) -> Unit)?, paymentResultCallBack: ((IamportResponse?) -> Unit)?) {
         i("HELLO I'MPORT SDK! for payment")
 
         closeDeleteWebViewMode() // 결제 시작할 때
@@ -278,17 +232,17 @@ internal class IamportSdk(
 
         this.chaiApproveCallBack = approveCallback
         this.paymentResultCallBack = paymentResultCallBack
-        observeViewModel(payment) // 관찰할 LiveData
+        observeViewModel(request) // 관찰할 LiveData
     }
 
     /**
      * 관찰할 LiveData 옵저빙
      */
-    private fun observeViewModel(payment: Payment) {
+    private fun observeViewModel(request: IamportRequest) {
 
-        mainViewModel?.payment = payment
+        mainViewModel?.request = request
 
-        d(GsonBuilder().setPrettyPrinting().create().toJson(payment))
+        d(GsonBuilder().setPrettyPrinting().create().toJson(request))
         hostHelper.getLifecycleOwner()?.let { owner: LifecycleOwner ->
 
             mainViewModel?.let {
@@ -315,12 +269,12 @@ internal class IamportSdk(
         }
 
         // 결제 시작
-        preventOverlapRun.launch { requestPayment(payment) }
+        preventOverlapRun.launch { requestPayment(request) }
     }
 
 
-    private fun observeCertification(payment: Payment) {
-        d(GsonBuilder().setPrettyPrinting().create().toJson(payment))
+    private fun observeCertification(request: IamportRequest) {
+        d(GsonBuilder().setPrettyPrinting().create().toJson(request))
         hostHelper.getLifecycleOwner()?.let { owner: LifecycleOwner ->
 
             mainViewModel?.let {
@@ -333,11 +287,11 @@ internal class IamportSdk(
         }
 
         // 본인인증 요청
-        preventOverlapRun.launch { requestCertification(payment) }
+        preventOverlapRun.launch { requestCertification(request) }
     }
 
     fun mobileWebModeShouldOverrideUrlLoading(): LiveData<Event<Uri>>? {
-        return iamPortMobileWebMode?.detectShouldOverrideUrlLoading()
+        return iamportMobileWebMode?.detectShouldOverrideUrlLoading()
     }
 
     fun isPolling(): LiveData<Event<Boolean>> {
@@ -349,7 +303,7 @@ internal class IamportSdk(
     }
 
 
-    private fun askApproveFromChai(approve: IamPortApprove) {
+    private fun askApproveFromChai(approve: IamportApprove) {
         when (mainViewModel?.approved) {
             MainViewModel.Status.Waiting, null -> {
                 // 아무 동작하지 않음
@@ -366,7 +320,7 @@ internal class IamportSdk(
     }
 
     // 차이 최종 결제 요청
-    fun requestApprovePayments(approve: IamPortApprove) {
+    fun requestApprovePayments(approve: IamportApprove) {
         mainViewModel?.requestApprovePayments(approve)
     }
 
@@ -395,60 +349,60 @@ internal class IamportSdk(
     /**
      * 결제 요청 실행
      */
-    private fun requestPayment(payment: Payment, ignoreNative: Boolean = false) {
-        Payment.validator(payment).run {
+    private fun requestPayment(request: IamportRequest, ignoreNative: Boolean = false) {
+        IamportRequest.validator(request).run {
             if (!first) {
-                sdkFinish(second?.let { IamPortResponse.makeFail(payment, msg = it) })
+                sdkFinish(second?.let { IamportResponse.makeFail(request, msg = it) })
                 return
             }
         }
 
         // 네트워크 연결 상태 체크
         if (!Util.isInternetAvailable(mainViewModel?.app)) {
-            sdkFinish(IamPortResponse.makeFail(payment, msg = "네트워크 연결 안됨"))
+            sdkFinish(IamportResponse.makeFail(request, msg = "네트워크 연결 안됨"))
             return
         }
 
         // webview mode 라면 네이티브 연동 사용하지 않음
         // 동작의 문제는 없으나 UI 에서 표현하기 애매함
         if (modeWebViewRef?.get() != null) {
-            mainViewModel?.judgePayment(payment, ignoreNative = true)
+            mainViewModel?.judgePayment(request, ignoreNative = true)
             return
         }
 
-        mainViewModel?.judgePayment(payment, ignoreNative) // 뷰모델에 데이터 판단 요청(native or webview pg)
+        mainViewModel?.judgePayment(request, ignoreNative) // 뷰모델에 데이터 판단 요청(native or webview pg)
     }
 
     /**
      * 결제 요청 실행
      */
-    private fun requestCertification(payment: Payment) {
+    private fun requestCertification(request: IamportRequest) {
         // 네트워크 연결 상태 체크
         if (!Util.isInternetAvailable(mainViewModel?.app)) {
-            sdkFinish(IamPortResponse.makeFail(payment, msg = "네트워크 연결 안됨"))
+            sdkFinish(IamportResponse.makeFail(request, msg = "네트워크 연결 안됨"))
             return
         }
 
-        mainViewModel?.judgePayment(payment) // 뷰모델에 데이터 판단 요청(native or webview pg)
+        mainViewModel?.judgePayment(request) // 뷰모델에 데이터 판단 요청(native or webview pg)
     }
 
 
     /**
      * 웹뷰 결제 요청 실행
      */
-    private fun requestWebViewActivityPayment(payment: Payment) {
-        d("request WebViewActivity Payment $payment")
+    private fun requestWebViewActivityPayment(request: IamportRequest) {
+        d("request WebViewActivity Payment $request")
         clearMainViewModel()
         modeWebViewRef?.get()?.let { webView ->
             hostHelper.getActivityRef()?.let { activity ->
-                iamPortWebViewMode = IamPortWebViewMode()
-                iamPortWebViewMode?.initStart(activity, webView, payment, paymentResultCallBack) // webview only 모드
+                iamportWebViewMode = IamportWebViewMode()
+                iamportWebViewMode?.initStart(activity, webView, request, paymentResultCallBack) // webview only 모드
             } ?: run {
                 w("Cannot found activity, So running activity mode")
-                webViewActivityLauncher?.launch(payment) // new activity 모드
+                webViewActivityLauncher?.launch(request) // new activity 모드
             }
         } ?: run {
-            webViewActivityLauncher?.launch(payment) // new activity 모드
+            webViewActivityLauncher?.launch(request) // new activity 모드
         }
     }
 
@@ -472,7 +426,7 @@ internal class IamportSdk(
 
         // 차이 WebStrategy 로 동작
         if (!chaiClearVersion) {
-            mainViewModel?.payment?.let {
+            mainViewModel?.request?.let {
                 clearMainViewModel() // WebStrategy 로 결제 재요청 전, 초기화
                 requestPayment(it, true)
                 return

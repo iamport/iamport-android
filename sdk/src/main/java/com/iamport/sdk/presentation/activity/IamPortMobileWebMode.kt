@@ -6,15 +6,15 @@ import android.view.View
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.LiveData
-import com.iamport.sdk.data.sdk.IamPortResponse
-import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.data.sdk.IamportResponse
+import com.iamport.sdk.data.sdk.IamportRequest
 import com.iamport.sdk.domain.IamportWebChromeClient
 import com.iamport.sdk.domain.strategy.webview.IamPortMobileModeWebViewClient
 import com.iamport.sdk.domain.utils.Event
 import com.iamport.sdk.domain.utils.EventObserver
 import com.orhanobut.logger.Logger
 
-open class IamPortMobileWebMode() : IamPortWebViewMode() {
+open class IamportMobileWebMode() : IamportWebViewMode() {
 
     fun initStart(activity: ComponentActivity, webview: WebView) {
         Logger.i("HELLO I'MPORT Mobile Web Mode SDK!")
@@ -34,12 +34,12 @@ open class IamPortMobileWebMode() : IamPortWebViewMode() {
     /**
      * 관찰할 LiveData 옵저빙
      */
-    override fun observeViewModel(payment: Payment?) {
+    override fun observeViewModel(request: IamportRequest?) {
         activity?.run {
 
 //            viewModel.niceTransRequestParam().observe(this, EventObserver(this@IamPortMobileWebMode::openNiceTransApp))
-            viewModel.thirdPartyUri().observe(this, EventObserver(this@IamPortMobileWebMode::openThirdPartyApp))
-            viewModel.impResponse().observe(this, EventObserver(this@IamPortMobileWebMode::sdkFinish))
+            viewModel.thirdPartyUri().observe(this, EventObserver(this@IamportMobileWebMode::openThirdPartyApp))
+            viewModel.impResponse().observe(this, EventObserver(this@IamportMobileWebMode::sdkFinish))
 
             openWebView()
         }
@@ -50,7 +50,7 @@ open class IamPortMobileWebMode() : IamPortWebViewMode() {
         return viewModel.changeUrl()
     }
 
-    override fun sdkFinish(iamPortResponse: IamPortResponse?) {
+    override fun sdkFinish(iamPortResponse: IamportResponse?) {
         // ignore
         Logger.d("sdkFinish MobileWebMode => $iamPortResponse")
     }

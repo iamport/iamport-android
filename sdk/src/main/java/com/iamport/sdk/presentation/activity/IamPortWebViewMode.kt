@@ -6,8 +6,8 @@ import android.view.View
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import com.google.gson.GsonBuilder
-import com.iamport.sdk.data.sdk.IamPortResponse
-import com.iamport.sdk.data.sdk.Payment
+import com.iamport.sdk.data.sdk.IamportResponse
+import com.iamport.sdk.data.sdk.IamportRequest
 import com.iamport.sdk.data.sdk.ProvidePgPkg
 import com.iamport.sdk.domain.IamportWebChromeClient
 import com.iamport.sdk.domain.JsNativeInterface
@@ -20,7 +20,7 @@ import org.koin.core.component.get
 import org.koin.core.qualifier.named
 
 
-open class IamPortWebViewMode @JvmOverloads constructor(
+open class IamportWebViewMode @JvmOverloads constructor(
     scope: BaseCoroutineScope = UICoroutineScope()
 ) : IamportKoinComponent, BaseMain, BaseCoroutineScope by scope {
 
@@ -28,35 +28,30 @@ open class IamPortWebViewMode @JvmOverloads constructor(
 
     var activity: ComponentActivity? = null
     var webview: WebView? = null
-    var paymentResultCallBack: ((IamPortResponse?) -> Unit)? = null
+    var paymentResultCallBack: ((IamportResponse?) -> Unit)? = null
 
     /**
      * BaseActivity 에서 onCreate 시 호출
      */
-    fun initStart(activity: ComponentActivity, webview: WebView, payment: Payment, paymentResultCallBack: ((IamPortResponse?) -> Unit)?) {
+    fun initStart(activity: ComponentActivity, webview: WebView, request: IamportRequest, paymentResultCallBack: ((IamportResponse?) -> Unit)?) {
         i("HELLO I'MPORT WebView MODE SDK!")
         this.activity = activity
         this.webview = webview
         this.paymentResultCallBack = paymentResultCallBack
-        observeViewModel(payment) // 관찰할 LiveData
+        observeViewModel(request) // 관찰할 LiveData
     }
-
-//    open fun processBankPayPayment(resPair: Pair<String, String>) {
-//        viewModel.processBankPayPayment(resPair)
-//    }
 
     /**
      * 관찰할 LiveData 옵저빙
      */
-    override fun observeViewModel(payment: Payment?) {
-        d(GsonBuilder().setPrettyPrinting().create().toJson(payment))
-        payment?.let { pay: Payment ->
+    override fun observeViewModel(request: IamportRequest?) {
+        d(GsonBuilder().setPrettyPrinting().create().toJson(request))
+        request?.let { pay: IamportRequest ->
             activity?.let {
                 viewModel.run {
-                    openWebView().observe(it, EventObserver(this@IamPortWebViewMode::openWebView))
-//                    niceTransRequestParam().observe(it, EventObserver(this@IamPortWebViewMode::openNiceTransApp))
-                    thirdPartyUri().observe(it, EventObserver(this@IamPortWebViewMode::openThirdPartyApp))
-                    impResponse().observe(it, EventObserver(this@IamPortWebViewMode::sdkFinish))
+                    openWebView().observe(it, EventObserver(this@IamportWebViewMode::openWebView))
+                    thirdPartyUri().observe(it, EventObserver(this@IamportWebViewMode::openThirdPartyApp))
+                    impResponse().observe(it, EventObserver(this@IamportWebViewMode::sdkFinish))
 
                     requestPayment(pay)
                 }
@@ -67,11 +62,11 @@ open class IamPortWebViewMode @JvmOverloads constructor(
     /**
      * 결제 요청 실행
      */
-    override fun requestPayment(it: Payment) {
+    override fun requestPayment(it: IamportRequest) {
         d("나왔니??")
         activity?.run {
             if (!Util.isInternetAvailable(this)) {
-                sdkFinish(IamPortResponse.makeFail(it, msg = "네트워크 연결 안됨"))
+                sdkFinish(IamportResponse.makeFail(it, msg = "네트워크 연결 안됨"))
                 return
             }
         }
@@ -97,7 +92,7 @@ open class IamPortWebViewMode @JvmOverloads constructor(
         d("close WebViewMode")
         removeObservers()
         webview?.run {
-            removeJavascriptInterface(CONST.PAYMENT_WEBVIEW_JS_INTERFACE_NAME)
+            removeJavascriptInterface(Constant.PAYMENT_WEBVIEW_JS_INTERFACE_NAME)
             loadUrl("about:blank")
             removeAllViews()
             destroy()
@@ -111,25 +106,12 @@ open class IamPortWebViewMode @JvmOverloads constructor(
      * 모든 결과 처리 및 SDK 종료
      * IamportSdk 안건너고, 바로 콜백 호출하여 종료.
      */
-    override fun sdkFinish(iamPortResponse: IamPortResponse?) {
+    override fun sdkFinish(iamPortResponse: IamportResponse?) {
         i("call sdkFinish")
         d("sdkFinish => ${iamPortResponse.toString()}")
         removeObservers()
         paymentResultCallBack?.invoke(iamPortResponse)
     }
-
-    /**
-     * 뱅크페이 외부앱 열기 for nice PG + 실시간계좌이체(trans)
-     */
-//    override fun openNiceTransApp(it: String) {
-//        d("openNiceTransApp $it")
-//        runCatching {
-//            bankPayLauncher?.launch(it)
-//        }.onFailure {
-////             뱅크페이 앱 패키지는 하드코딩
-//            activity?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Util.getMarketId(ProvidePgPkg.BANKPAY.pkg))))
-//        }
-//    }
 
     /**
      * 외부앱 열기
@@ -174,8 +156,8 @@ open class IamPortWebViewMode @JvmOverloads constructor(
     /**
      * 웹뷰 오픈
      */
-    override fun openWebView(payment: Payment) {
-        d("오픈! 웹뷰 $payment")
+    override fun openWebView(request: IamportRequest) {
+        d("오픈! 웹뷰 $request")
 
         val evaluateJS = fun(jsMethod: String) {
             val js = "javascript:$jsMethod"
@@ -193,13 +175,13 @@ open class IamPortWebViewMode @JvmOverloads constructor(
             setLayerType(View.LAYER_TYPE_HARDWARE, null)
             clearCache(true)
             addJavascriptInterface(
-                JsNativeInterface(payment, get(named("${CONST.KOIN_KEY}Gson")), evaluateJS),
-                CONST.PAYMENT_WEBVIEW_JS_INTERFACE_NAME
+                JsNativeInterface(request, get(named("${Constant.KOIN_KEY}Gson")), evaluateJS),
+                Constant.PAYMENT_WEBVIEW_JS_INTERFACE_NAME
             )
             webViewClient = viewModel.getWebViewClient()
             visibility = View.VISIBLE
 
-            loadUrl(CONST.PAYMENT_FILE_URL) // load WebView
+            loadUrl(Constant.PAYMENT_FILE_URL) // load WebView
             webChromeClient = IamportWebChromeClient()
         } ?: run {
             e("웹뷰가 없엉..")

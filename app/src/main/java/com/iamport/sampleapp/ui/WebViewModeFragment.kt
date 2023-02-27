@@ -12,8 +12,8 @@ import com.google.gson.GsonBuilder
 import com.iamport.sampleapp.PaymentResultData
 import com.iamport.sampleapp.ViewModel
 import com.iamport.sampleapp.databinding.WebViewModeFragmentBinding
-import com.iamport.sdk.data.sdk.IamPortRequest
-import com.iamport.sdk.data.sdk.IamPortResponse
+import com.iamport.sdk.data.sdk.IamportPayment
+import com.iamport.sdk.data.sdk.IamportResponse
 import com.iamport.sdk.domain.core.ICallbackPaymentResult
 import com.iamport.sdk.domain.core.Iamport
 import com.iamport.sdk.domain.utils.Event
@@ -28,7 +28,7 @@ class WebViewModeFragment : Fragment() {
 
     private var binding: WebViewModeFragmentBinding? = null
     private val viewModel: ViewModel by activityViewModels()
-    private var request: IamPortRequest? = null
+    private var request: IamportPayment? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -54,7 +54,7 @@ class WebViewModeFragment : Fragment() {
 
                 Log.d("WebViewMode", "iamport sdk webview mode? ${Iamport.isWebViewMode()}")
                 // 아임포트에 결제 요청하기
-                Iamport.payment(userCode, webviewMode = it, iamPortRequest = request, paymentResultCallback = { it ->
+                Iamport.payment(userCode, webviewMode = it, iamportPayment = request, paymentResultCallback = { it ->
                     // 결제 완료 후 결과 콜백을 토스트 메시지로 보여줌
 //                Toast.makeText(this.context, "결제결과 => $it", Toast.LENGTH_LONG).show()
                     callBackListener.result(it)
@@ -72,15 +72,15 @@ class WebViewModeFragment : Fragment() {
 
 
     private val callBackListener = object : ICallbackPaymentResult {
-        override fun result(iamPortResponse: IamPortResponse?) {
-            val resJson = GsonBuilder().setPrettyPrinting().create().toJson(iamPortResponse)
+        override fun result(response: IamportResponse?) {
+            val resJson = GsonBuilder().setPrettyPrinting().create().toJson(response)
             Log.i("SAMPLE", "결제 결과 콜백\n$resJson")
-            PaymentResultData.result = iamPortResponse
+            PaymentResultData.result = response
 
             popBackStack()
-            if (iamPortResponse != null) {
+            if (response != null) {
 //                (activity as MainActivity).replaceFragment(PaymentResultFragment())
-                viewModel.resultCallback.postValue(Event(iamPortResponse))
+                viewModel.resultCallback.postValue(Event(response))
             }
         }
     }
