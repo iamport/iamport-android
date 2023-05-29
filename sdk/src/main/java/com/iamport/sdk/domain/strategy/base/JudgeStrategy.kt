@@ -74,8 +74,14 @@ class JudgeStrategy : BaseStrategy(), IamportKoinComponent {
 
                 return Triple(JudgeKinds.CERT, defCertUser, payment)
             }
+
             Payment.STATUS.ERROR -> {
                 failureFinish(payment = payment, msg = "judge :: payment status ERROR")
+                return Triple(JudgeKinds.ERROR, null, payment)
+            }
+
+            Payment.STATUS.PAYMENT -> {
+                failureFinish(payment = payment, msg = "judge :: payment status is PAYMENT; will return error")
                 return Triple(JudgeKinds.ERROR, null, payment)
             }
         }

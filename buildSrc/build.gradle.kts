@@ -1,4 +1,3 @@
-
 import Build_gradle.PluginVersion.GRADLE
 import Build_gradle.PluginVersion.GRADLE_VERSIONS_PLUGIN
 import Build_gradle.PluginVersion.KOTLIN
@@ -14,9 +13,9 @@ repositories {
 }
 
 object PluginVersion {
-    const val GRADLE = "7.0.4"
-    const val KOTLIN = "1.6.10"
-    const val GRADLE_VERSIONS_PLUGIN = "0.41.0"
+    const val GRADLE = "8.0.2"
+    const val KOTLIN = "1.8.21"
+    const val GRADLE_VERSIONS_PLUGIN = "0.46.0"
 }
 
 dependencies {

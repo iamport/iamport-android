@@ -101,12 +101,12 @@ class PaymentFragment: Fragment() {
         }
 
         val userCodeAdapter = ArrayAdapter(
-            requireContext(), R.layout.support_simple_spinner_dropdown_item,
+            requireContext(), androidx.constraintlayout.widget.R.layout.support_simple_spinner_dropdown_item,
             Util.getUserCodeList()
         )
 
         val pgAdapter = ArrayAdapter(
-            requireContext(), R.layout.support_simple_spinner_dropdown_item,
+            requireContext(), androidx.constraintlayout.widget.R.layout.support_simple_spinner_dropdown_item,
             PG.getPGNames()
         )
 
@@ -242,7 +242,7 @@ class PaymentFragment: Fragment() {
         override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
             viewModel.pg = PG.values()[position]
             binding.pgMethod.adapter = ArrayAdapter(
-                requireContext(), R.layout.support_simple_spinner_dropdown_item,
+                requireContext(), androidx.constraintlayout.widget.R.layout.support_simple_spinner_dropdown_item,
                 Util.convertPayMethodNames(PG.values()[position])
             )
 

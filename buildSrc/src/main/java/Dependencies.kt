@@ -1,34 +1,34 @@
 // 디펜던시 업데이트 확인 ./gradlew dependencyUpdates
 
 object Versions {
-    const val versionCode = 220420001 // yymmdd000
-    const val versionName = "1.3.5"  // https://www.notion.so/chaifinance/QA-Process-d1a4be396337493b81c6e85fff2d5cd6
+    const val versionCode = 230528000 // yymmdd000
+    const val versionName = "1.4.0"  // https://www.notion.so/chaifinance/QA-Process-d1a4be396337493b81c6e85fff2d5cd6
 
     const val multidex = "2.0.1"
-    const val kotlin_stdlib_jdk = "1.6.10"
-    const val core_ktx = "1.7.0"
-    const val appcompat = "1.4.1"
+    const val kotlin_stdlib_jdk = "1.8.21"
+    const val core_ktx = "1.9.0"
+    const val appcompat = "1.6.1"
 
-    const val mokito = "4.3.1"
+    const val mokito = "5.2.0"
     const val mokito_kotlin = "2.2.0"
 
-    const val junit = "4.13.1"
-    const val testJunit = "1.1.3"
-    const val espresso_core = "3.4.0"
+    const val junit = "4.13.2"
+    const val testJunit = "1.1.5"
+    const val espresso_core = "3.5.1"
 
-    const val androidx_test_core = "1.4.0"
+    const val androidx_test_core = "1.5.0"
     const val androidx_test_runner = "1.1.0"
 
-    const val constraintlayout = "2.1.3"
+    const val constraintlayout = "2.1.4"
     const val lifecycle_extensions = "2.2.0"
-    const val lifecycle_common = "2.4.1"
+    const val lifecycle_common = "2.6.1"
 
-    const val material = "1.5.0"
+    const val material = "1.9.0"
 
-    const val activity_ktx = "1.4.0"
-    const val fragment_ktx = "1.4.1"
+    const val activity_ktx = "1.7.2"
+    const val fragment_ktx = "1.5.7"
 
-    const val koin_version = "3.1.6"
+    const val koin_version = "3.4.0"
     const val retrofit_version = "2.9.0"
     const val logging_interceptor = "4.9.3"
 
@@ -46,9 +46,9 @@ object Versions {
     // loading animation
     const val spinKit = "1.4.0"
 
-    const val robolectric = "4.7.3"
+    const val robolectric = "4.10.3"
 
-    const val serialization = "1.3.2"
+    const val serialization = "1.5.1"
 
     const val workRuntimeKtx = "2.7.1"
 }

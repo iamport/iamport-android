@@ -9,12 +9,12 @@ plugins {
 
 
 android {
-    compileSdk = 30
+    compileSdk = 33
     buildToolsVersion = "30.0.3"
 
     defaultConfig {
         minSdk = 21
-        targetSdk = 30
+        targetSdk = 33
 //        versionCode = Versions.versionCode // yymmdd000
 //        versionName = Versions.versionName // prod(x.y.z), dev(x.y.z-dev00), poc(x.y.z-poc00)
         multiDexEnabled = true
@@ -51,8 +51,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
 //    buildFeatures {
