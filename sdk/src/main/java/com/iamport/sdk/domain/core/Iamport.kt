@@ -65,6 +65,8 @@ object Iamport {
     // default WebSettings.LOAD_NO_CACHE 이나, 세틀뱅크 뒤로가기시 오동작하여(캐시가 필요) 가맹점에서 선택할 수 있게 수정
     var webViewCacheMode: Int = WebSettings.LOAD_NO_CACHE
 
+    var customUserAgent: String? = null // 웹뷰 user agent 조작
+
     var response: IamPortResponse? = null // 내부의 imp_uid로 종료 콜백 중복호출 방지
 
     // ===========================================
@@ -297,7 +299,8 @@ object Iamport {
         tierCode: String? = null,
         webviewMode: WebView? = null,
         iamPortCertification: IamPortCertification,
-        resultCallback: (IamPortResponse?) -> Unit
+        customUserAgent: String? = null,
+        resultCallback: (IamPortResponse?) -> Unit,
     ) {
         val payment = Payment(userCode, tierCode = tierCode, iamPortCertification = iamPortCertification)
         if (!isSDKInit(payment)) {
@@ -310,14 +313,16 @@ object Iamport {
         }
 
         preventOverlapRun.launch {
-            coreCertification(payment, resultCallback)
+            coreCertification(payment, customUserAgent, resultCallback)
         }
     }
 
     internal fun coreCertification(
         payment: Payment,
+        customUserAgent: String? = null,
         paymentResultCallback: ((IamPortResponse?) -> Unit)?
     ) {
+        if (customUserAgent != null) this.customUserAgent = customUserAgent
         impCallbackFunction = paymentResultCallback
         iamportSdk?.initStart(payment, paymentResultCallback)
     }

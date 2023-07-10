@@ -35,7 +35,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
 
-class PaymentFragment: Fragment() {
+class PaymentFragment : Fragment() {
 
     private lateinit var binding: PaymentFragmentBinding
 

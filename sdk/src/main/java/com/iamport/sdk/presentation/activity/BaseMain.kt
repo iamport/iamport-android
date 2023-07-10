@@ -36,6 +36,7 @@ interface BaseMain {
             }
 
             cacheMode = Iamport.webViewCacheMode // default WebSettings.LOAD_NO_CACHE
+            if (Iamport.customUserAgent != null) userAgentString = Iamport.customUserAgent
 
             blockNetworkImage = false
             loadsImagesAutomatically = true
