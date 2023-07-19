@@ -54,10 +54,10 @@ class WebViewModeFragment : Fragment() {
 
                 Log.d("WebViewMode", "iamport sdk webview mode? ${Iamport.isWebViewMode()}")
                 // 아임포트에 결제 요청하기
-                Iamport.payment(userCode, webviewMode = it, iamPortRequest = request, paymentResultCallback = { it ->
+                Iamport.payment(userCode, webviewMode = it, iamPortRequest = request, paymentResultCallback = { response ->
                     // 결제 완료 후 결과 콜백을 토스트 메시지로 보여줌
 //                Toast.makeText(this.context, "결제결과 => $it", Toast.LENGTH_LONG).show()
-                    callBackListener.result(it)
+                    callBackListener.result(response)
                 })
 
                 this.request = null // reload 방지

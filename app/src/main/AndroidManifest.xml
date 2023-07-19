@@ -16,6 +16,8 @@
 <!--        android:name=".BaseApplication"-->
 <!--android:resizeableActivity="false"-->
 
+
+        <!-- android:launchMode="singleTask" 테스트 필요 -->
         <activity
             android:name=".ui.MainActivity"
             android:screenOrientation="portrait"

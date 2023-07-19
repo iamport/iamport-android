@@ -19,7 +19,7 @@ class PaymentResultFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = ResultFragmentBinding.inflate(inflater, container, false)
         initStart()
-        return binding?.root
+        return binding.root
     }
 
     private fun initStart() {

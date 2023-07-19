@@ -121,12 +121,6 @@ dependencies {
     implementation(Libs.activity_ktx)
     implementation(Libs.fragment_ktx)
 
-    implementation(Libs.koin_core)
-    testImplementation(Libs.koin_test)
-    implementation(Libs.koin_android)
-    implementation(Libs.koin_android_compat)
-    implementation(Libs.koin_android_compose)
-
     // Retorofit
     implementation(Libs.retrofit)
     implementation(Libs.converter_gson)
@@ -138,15 +132,9 @@ dependencies {
     // Logger
     implementation(Libs.logger)
 
-    // Rx
-    implementation(Libs.rxjava)
-    implementation(Libs.rxandroid)
-    implementation(Libs.rxjava2_debug)
-
     // loading animation
     implementation(Libs.spinKit)
 
     implementation(Libs.serialization)
-    implementation(Libs.workRuntimeKtx)
 
 }

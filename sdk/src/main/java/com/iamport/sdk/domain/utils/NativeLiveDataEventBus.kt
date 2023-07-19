@@ -5,7 +5,7 @@ import com.iamport.sdk.data.sdk.IamPortApprove
 import com.iamport.sdk.data.sdk.IamPortResponse
 import com.iamport.sdk.data.sdk.Payment
 
-open class NativeLiveDataEventBus {
+class NativeLiveDataEventBus {
 
     // 결제 완료 콜백
     val impResponse = MutableLiveData<Event<IamPortResponse?>>()
