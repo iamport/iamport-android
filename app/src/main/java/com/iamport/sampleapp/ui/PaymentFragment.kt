@@ -3,6 +3,7 @@ package com.iamport.sampleapp.ui
 import android.app.AlertDialog.Builder
 import android.content.Context
 import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.activity.OnBackPressedCallback
+import androidx.annotation.RequiresApi
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -64,6 +66,7 @@ class PaymentFragment : Fragment() {
     // 차이 폴링중에 포그라운드 서비스 생성
     // (* 포그라운드 서비스 직접 구현시에는 enableService = false 로 설정하고,
     // Iamport.isPolling()?.observe 에서 true 전달 받을 시점에, 직접 포그라운드 서비스 만들어 띄우시면 됩니다.)
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun registForegroundServiceReceiver(context: Context) {
 
         // enableService = true 시, 폴링중 포그라운드 서비스를 보여줍니다.
@@ -74,7 +77,7 @@ class PaymentFragment : Fragment() {
         context.registerReceiver(receiver, IntentFilter().apply {
             addAction(CONST.BROADCAST_FOREGROUND_SERVICE)
             addAction(CONST.BROADCAST_FOREGROUND_SERVICE_STOP)
-        })
+        }, Context.RECEIVER_EXPORTED)
 
     }
 
@@ -101,12 +104,12 @@ class PaymentFragment : Fragment() {
         }
 
         val userCodeAdapter = ArrayAdapter(
-            requireContext(), R.layout.support_simple_spinner_dropdown_item,
+            requireContext(), android.R.layout.simple_spinner_dropdown_item,
             Util.getUserCodeList()
         )
 
         val pgAdapter = ArrayAdapter(
-            requireContext(), R.layout.support_simple_spinner_dropdown_item,
+            requireContext(), android.R.layout.simple_spinner_dropdown_item,
             PG.getPGNames()
         )
 
@@ -242,7 +245,7 @@ class PaymentFragment : Fragment() {
         override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
             viewModel.pg = PG.values()[position]
             binding.pgMethod.adapter = ArrayAdapter(
-                requireContext(), R.layout.support_simple_spinner_dropdown_item,
+                requireContext(), android.R.layout.simple_spinner_dropdown_item,
                 Util.convertPayMethodNames(PG.values()[position])
             )
 
