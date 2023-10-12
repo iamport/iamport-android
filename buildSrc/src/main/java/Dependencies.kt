@@ -1,39 +1,39 @@
 // 디펜던시 업데이트 확인 ./gradlew dependencyUpdates
 
 object Versions {
-    const val versionCode = 220420001 // yymmdd000
-    const val versionName = "1.3.5"  // https://www.notion.so/chaifinance/QA-Process-d1a4be396337493b81c6e85fff2d5cd6
+    const val versionCode = 231012000 // yymmdd000
+    const val versionName = "1.4.0"  // https://www.notion.so/chaifinance/QA-Process-d1a4be396337493b81c6e85fff2d5cd6
 
     const val multidex = "2.0.1"
-    const val kotlin_stdlib_jdk = "1.6.10"
-    const val core_ktx = "1.7.0"
-    const val appcompat = "1.4.1"
+    const val kotlin_stdlib_jdk = "1.9.10"
+    const val core_ktx = "1.12.0"
+    const val appcompat = "1.6.1"
 
-    const val mokito = "4.3.1"
-    const val mokito_kotlin = "2.2.0"
+    const val mokito = "5.6.0"
+    const val mokito_kotlin = "5.1.0"
 
     const val junit = "4.13.1"
-    const val testJunit = "1.1.3"
-    const val espresso_core = "3.4.0"
+    const val testJunit = "1.1.5"
+    const val espresso_core = "3.5.1"
 
-    const val androidx_test_core = "1.4.0"
-    const val androidx_test_runner = "1.1.0"
+    const val androidx_test_core = "1.5.0"
+    const val androidx_test_runner = "1.5.2"
 
-    const val constraintlayout = "2.1.3"
+    const val constraintlayout = "2.1.4"
     const val lifecycle_extensions = "2.2.0"
-    const val lifecycle_common = "2.4.1"
+    const val lifecycle_common = "2.6.2"
 
-    const val material = "1.5.0"
+    const val material = "1.10.0"
 
-    const val activity_ktx = "1.4.0"
-    const val fragment_ktx = "1.4.1"
+    const val activity_ktx = "1.8.0"
+    const val fragment_ktx = "1.6.1"
 
-    const val koin_version = "3.1.6"
+    const val koin_version = "3.5.0"
     const val retrofit_version = "2.9.0"
     const val logging_interceptor = "4.9.3"
 
     // Gson
-    const val gson = "2.9.0"
+    const val gson = "2.10.1"
 
     // Logger
     const val logger = "2.2.0"
@@ -48,14 +48,14 @@ object Versions {
 
     const val robolectric = "4.7.3"
 
-    const val serialization = "1.3.2"
+    const val serialization = "1.6.0"
 
-    const val workRuntimeKtx = "2.7.1"
+    const val workRuntimeKtx = "2.8.1"
 }
 
 object Libs {
     const val multidex = "androidx.multidex:multidex:${Versions.multidex}"
-    const val kotlin_stdlib_jdk = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin_stdlib_jdk}"
+    const val kotlin_stdlib_jdk = "org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlin_stdlib_jdk}"
     const val core_ktx = "androidx.core:core-ktx:${Versions.core_ktx}"
     const val appcompat = "androidx.appcompat:appcompat:${Versions.appcompat}"
 
@@ -63,7 +63,7 @@ object Libs {
     const val mokito_core = "org.mockito:mockito-core:${Versions.mokito}"
     const val mokito_inline = "org.mockito:mockito-inline:${Versions.mokito}"
     const val mokito_android = "org.mockito:mockito-android:${Versions.mokito}"
-    const val mokito_kotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:${Versions.mokito_kotlin}"
+    const val mokito_kotlin = "org.mockito.kotlin:mockito-kotlin:${Versions.mokito_kotlin}"
 
 
     const val junit = "junit:junit:${Versions.junit}"
@@ -81,7 +81,7 @@ object Libs {
     const val lifecycle_viewmodel_ktx = "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.lifecycle_extensions}"
     const val lifecycle_livedata_ktx = "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.lifecycle_extensions}"
 
-    const val lifecycle_common = "androidx.lifecycle:lifecycle-common-java8:${Versions.lifecycle_common}"
+    const val lifecycle_common = "androidx.lifecycle:lifecycle-common:${Versions.lifecycle_common}"
 
     const val material = "com.google.android.material:material:${Versions.material}"
 
@@ -97,6 +97,7 @@ object Libs {
 
     // Koin Java Compatibility
     const val koin_android_compat = "io.insert-koin:koin-android-compat:${Versions.koin_version}"
+
     // Koin for Jetpack Compose
     const val koin_android_compose = "io.insert-koin:koin-androidx-compose:${Versions.koin_version}"
 

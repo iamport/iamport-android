@@ -78,6 +78,7 @@ class JudgeStrategy : BaseStrategy(), IamportKoinComponent {
                 failureFinish(payment = payment, msg = "judge :: payment status ERROR")
                 return Triple(JudgeKinds.ERROR, null, payment)
             }
+            else -> {}
         }
 
         // 2. 결제요청의 경우 판단
