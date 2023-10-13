@@ -10,6 +10,7 @@ object Versions {
     const val appcompat = "1.6.1"
 
     const val mokito = "5.6.0"
+    const val mokito_inline = "5.2.0"
     const val mokito_kotlin = "5.1.0"
 
     const val junit = "4.13.1"
@@ -61,7 +62,7 @@ object Libs {
 
     const val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"
     const val mokito_core = "org.mockito:mockito-core:${Versions.mokito}"
-    const val mokito_inline = "org.mockito:mockito-inline:${Versions.mokito}"
+    const val mokito_inline = "org.mockito:mockito-inline:${Versions.mokito_inline}"
     const val mokito_android = "org.mockito:mockito-android:${Versions.mokito}"
     const val mokito_kotlin = "org.mockito.kotlin:mockito-kotlin:${Versions.mokito_kotlin}"
 
@@ -94,6 +95,7 @@ object Libs {
 
     const val koin_core = "io.insert-koin:koin-core:${Versions.koin_version}"
     const val koin_test = "io.insert-koin:koin-test:${Versions.koin_version}"
+    const val koin_test_junit4 = "io.insert-koin:koin-test-junit4:${Versions.koin_version}"
 
     // Koin Java Compatibility
     const val koin_android_compat = "io.insert-koin:koin-android-compat:${Versions.koin_version}"
