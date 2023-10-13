@@ -18,10 +18,11 @@ import com.orhanobut.logger.Logger.i
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import org.hamcrest.Matchers.`is`
-import org.junit.Assert.assertThat
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.koin.test.inject
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 
 class SdkUnitTest : AbstractKoinTest() {
@@ -39,15 +40,12 @@ class SdkUnitTest : AbstractKoinTest() {
                     val method = repository.judgeStrategy.javaClass.getDeclaredMethod("findDefaultUserData", ArrayList::class.java)
                     method.isAccessible = true
                     i("userCode :: $userCode, default PG :: ${method.invoke(repository.judgeStrategy, it.value.data)}")
-                    assertThat(true, `is`(true))
                 }
                 is ResultWrapper.GenericError -> {
                     i("${it.code} ${it.error}")
-                    assertThat(false, `is`(true))
                 }
                 is ResultWrapper.NetworkError -> {
                     i(" ${it.error}")
-                    assertThat(false, `is`(true))
                 }
             }
         }
@@ -100,11 +98,11 @@ class SdkUnitTest : AbstractKoinTest() {
         }
 
         val judge = repository.judgeStrategy.judge(chaiPayment)
-        assertThat(judge.first, `is`(JudgeStrategy.JudgeKinds.CHAI))
+        assertEquals(judge.first, JudgeStrategy.JudgeKinds.CHAI)
     }
 
     @Test
-    fun `remote 차이 prepare 테스트`() = runBlocking {
+    fun `remote 차이 prepare 테스트`(): Unit = runBlocking {
 
         val chaiId = "15ef5fc6-43c8-4a27-b29f-e4a13897fc4c"
         val chaiPayment = getDefaultPayment().run {
@@ -121,9 +119,9 @@ class SdkUnitTest : AbstractKoinTest() {
             when (val resonse = ApiHelper.safeApiCall(Dispatchers.IO) { iamportApi.postPrepare(it) }) {
                 is ResultWrapper.Success -> {
                     i("${resonse.value}")
-                    assertThat(true, `is`(true))
+                    assertTrue(true)
                 }
-                else -> assertThat(false, `is`(true))
+                else -> assertTrue(false)
             }
         }
     }
@@ -143,8 +141,8 @@ class SdkUnitTest : AbstractKoinTest() {
 
         Payment.validator(payment).run {
             i("$second")
-            assertThat(first, `is`(false))
-            assertThat(second, `is`(CONST.ERR_PAYMENT_VALIDATOR_VBANK))
+            assertFalse(first)
+            assertEquals(second, CONST.ERR_PAYMENT_VALIDATOR_VBANK)
         }
     }
 
@@ -164,7 +162,7 @@ class SdkUnitTest : AbstractKoinTest() {
 
         Payment.validator(payment).run {
             i("$second")
-            assertThat(first, `is`(true))
+            assertTrue(first)
         }
     }
 
@@ -183,8 +181,8 @@ class SdkUnitTest : AbstractKoinTest() {
 
         Payment.validator(payment).run {
             i("$second")
-            assertThat(first, `is`(false))
-            assertThat(second, `is`(CONST.ERR_PAYMENT_VALIDATOR_PHONE))
+            assertTrue(first)
+            assertEquals(second, CONST.ERR_PAYMENT_VALIDATOR_PHONE)
         }
     }
 
@@ -204,7 +202,7 @@ class SdkUnitTest : AbstractKoinTest() {
 
         Payment.validator(payment).run {
             i("$second")
-            assertThat(first, `is`(true))
+            assertTrue(first)
         }
     }
 
@@ -224,8 +222,8 @@ class SdkUnitTest : AbstractKoinTest() {
 
         Payment.validator(payment).run {
             i("$second")
-            assertThat(first, `is`(false))
-            assertThat(second, `is`(CONST.ERR_PAYMENT_VALIDATOR_DANAL_VBANK))
+            assertFalse(first)
+            assertEquals(second, CONST.ERR_PAYMENT_VALIDATOR_DANAL_VBANK)
         }
     }
 
@@ -246,7 +244,7 @@ class SdkUnitTest : AbstractKoinTest() {
 
         Payment.validator(payment).run {
             i("$second")
-            assertThat(first, `is`(true))
+            assertTrue(first)
         }
     }
 
@@ -278,7 +276,7 @@ class SdkUnitTest : AbstractKoinTest() {
                 iamPortRequest = iamPortRequest?.copy(
                     pg = PG.paypal.makePgRawName(),
                     pay_method = PayMethod.card.name,
-                    m_redirect_url = CONST.IAMPORT_PROD_URL,
+//                    m_redirect_url = CONST.IAMPORT_PROD_URL,
                 )
             )
         }
@@ -286,7 +284,7 @@ class SdkUnitTest : AbstractKoinTest() {
 
         Payment.validator(payment).run {
             i("$second")
-            assertThat(first, `is`(true))
+            assertTrue(first)
         }
     }
 }
