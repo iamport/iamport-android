@@ -2,6 +2,7 @@ package com.iamport.sdk.presentation.viewmodel
 
 import android.app.Application
 import android.content.*
+import android.os.Build
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
@@ -120,8 +121,10 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
                             repository.chaiStrategy.doWork(pgId, third)
                         }
                     }
+
                     JudgeStrategy.JudgeKinds.WEB,
                     JudgeStrategy.JudgeKinds.CERT -> bus.webViewActivityPayment.postValue(Event(third))
+
                     else -> Logger.e("판단불가 $third")
                 }
             }
@@ -167,7 +170,11 @@ class MainViewModel(private val bus: NativeLiveDataEventBus, private val reposit
             it.addAction(CONST.BROADCAST_FOREGROUND_SERVICE)
             it.addAction(CONST.BROADCAST_FOREGROUND_SERVICE_STOP)
             app.applicationContext?.registerReceiver(screenBrReceiver, screenBrFilter)
-            app.registerReceiver(iamportReceiver, it)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                app.registerReceiver(iamportReceiver, it, Context.RECEIVER_EXPORTED)
+            } else {
+                app.registerReceiver(iamportReceiver, it)
+            }
         }
     }
 
