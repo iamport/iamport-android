@@ -9,14 +9,13 @@ plugins {
 
 
 android {
-    compileSdk = 30
-    buildToolsVersion = "30.0.3"
+    namespace = "com.iamport.sdk"
+
+    compileSdk = 34
+    buildToolsVersion = "34.0.0"
 
     defaultConfig {
         minSdk = 21
-        targetSdk = 30
-//        versionCode = Versions.versionCode // yymmdd000
-//        versionName = Versions.versionName // prod(x.y.z), dev(x.y.z-dev00), poc(x.y.z-poc00)
         multiDexEnabled = true
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -51,16 +50,16 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
-//    buildFeatures {
-//        dataBinding = true
-//    }
+    buildFeatures {
+        dataBinding = true
+    }
 
     lint {
-        isAbortOnError = false
+        abortOnError = false
     }
 
     sourceSets {
