@@ -19,8 +19,7 @@ data class IamPortRequest(
     val customer_uid: String? = null, // 정기결제용
     val name: String? = null,
     val amount: String,
-    @Transient
-    val custom_data: String? = null,
+    @Transient val custom_data: String? = null,
     val tax_free: Float? = null,
     val currency: String? = null, // default KRW, 페이팔은 USD 이어야 함
     val language: String? = null, // default "ko", en, zh, jp => TODO validator 에 추가
@@ -46,6 +45,10 @@ data class IamPortRequest(
     val naverCultureBenefit: Boolean? = null,
     val naverProductCode: String? = null,
     val naverActionType: String? = null,
+    val naverPurchaserName: String? = null,
+    val naverPurchaserBirthday: String? = null,
+    val naverChainId: String? = null,
+    val naverMerchantUserKey: String? = null,
 
     val cultureBenefit: Boolean? = null,
     val naverInterface: NaverInterface? = null,
@@ -127,6 +130,10 @@ data class IamPortRequest(
             var naverCultureBenefit: Boolean? = null
             var naverProductCode: String? = null
             var naverActionType: String? = null
+            var naverPurchaserName: String? = null
+            var naverPurchaserBirthday: String? = null
+            var naverChainId: String? = null
+            var naverMerchantUserKey: String? = null
 
             var cultureBenefit: Boolean? = null
             var naverInterface: NaverInterface? = null
@@ -255,6 +262,22 @@ data class IamPortRequest(
                 this.naverActionType = naverActionType
             }
 
+            fun naverPurchaserName(naverPurchaserName: String) = apply {
+                this.naverPurchaserName = naverPurchaserName
+            }
+
+            fun naverPurchaserBirthday(naverPurchaserBirthday: String) = apply {
+                this.naverPurchaserBirthday = naverPurchaserBirthday
+            }
+
+            fun naverChainId(naverChainId: String) = apply {
+                this.naverChainId = naverChainId
+            }
+
+            fun naverMerchantUserKey(naverMerchantUserKey: String) = apply {
+                this.naverMerchantUserKey = naverMerchantUserKey
+            }
+
             fun cultureBenefit(cultureBenefit: Boolean) = apply {
                 this.cultureBenefit = cultureBenefit
             }
@@ -306,6 +329,10 @@ data class IamPortRequest(
                 naverCultureBenefit = naverCultureBenefit,
                 naverProductCode = naverProductCode,
                 naverActionType = naverActionType,
+                naverPurchaserName = naverPurchaserName,
+                naverPurchaserBirthday = naverPurchaserBirthday,
+                naverChainId = naverChainId,
+                naverMerchantUserKey = naverMerchantUserKey,
                 cultureBenefit = cultureBenefit,
                 naverInterface = naverInterface,
                 confirm_url = confirm_url,
