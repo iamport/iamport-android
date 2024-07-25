@@ -43,12 +43,6 @@ android {
         }
     }
 
-    repositories {
-        flatDir {
-            dirs("libs")
-        }
-    }
-
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -143,10 +137,8 @@ dependencies {
     implementation(Libs.rxandroid)
     implementation(Libs.rxjava2_debug)
 
-    // loading animation
-    implementation(Libs.spinKit)
-
     implementation(Libs.serialization)
     implementation(Libs.workRuntimeKtx)
 
+    implementation(Libs.lottie)
 }

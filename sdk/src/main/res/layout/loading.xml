@@ -1,8 +1,7 @@
-<com.github.ybq.android.spinkit.SpinKitView xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/spin_kit"
-    style="@style/SpinKitView.Large.FadingCircle"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    app:SpinKit_Color="#6066FF" />
+<com.airbnb.lottie.LottieAnimationView
+    id="@+id/animationView"
+    layout_width="match_parent"
+    layout_height="wrap_content"
+    lottie_rawRes="@raw/animation"
+    lottie_autoPlay="true"
+    lottie_loop="true"/>

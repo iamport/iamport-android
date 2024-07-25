@@ -1,8 +1,8 @@
 // 디펜던시 업데이트 확인 ./gradlew dependencyUpdates
 
 object Versions {
-    const val versionCode = 240215000 // yymmdd000
-    const val versionName = "1.4.4"  // https://www.notion.so/chaifinance/QA-Process-d1a4be396337493b81c6e85fff2d5cd6
+    const val versionCode = 240725000 // yymmdd000
+    const val versionName = "1.4.5"  // https://www.notion.so/chaifinance/QA-Process-d1a4be396337493b81c6e85fff2d5cd6
 
     const val multidex = "2.0.1"
     const val kotlin_stdlib_jdk = "1.9.10"
@@ -44,14 +44,13 @@ object Versions {
     const val rxandroid = "2.1.1"
     const val rxjava2_debug = "1.4.0"
 
-    // loading animation
-    const val spinKit = "1.4.0"
-
     const val robolectric = "4.7.3"
 
     const val serialization = "1.6.0"
 
     const val workRuntimeKtx = "2.8.1"
+
+    const val lottie = "6.4.1"
 }
 
 object Libs {
@@ -120,14 +119,12 @@ object Libs {
     const val rxandroid = "io.reactivex.rxjava2:rxandroid:${Versions.rxandroid}"
     const val rxjava2_debug = "com.akaita.java:rxjava2-debug:${Versions.rxjava2_debug}"
 
-    // loading animation
-    const val spinKit = "com.github.ybq:Android-SpinKit:${Versions.spinKit}"
-
     const val serialization = "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.serialization}"
 
     // target android 12 pending intent 처리를 위해 추가
     // Targeting S+ (version 31 and above) requires that one of FLAG_IMMUTABLE or FLAG_MUTABLE be specified when creating a PendingIntent.
     const val workRuntimeKtx = "androidx.work:work-runtime-ktx:${Versions.workRuntimeKtx}"
 
+    const val lottie = "com.airbnb.android:lottie:${Versions.lottie}"
 }
 

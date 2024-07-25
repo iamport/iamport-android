@@ -35,7 +35,7 @@ enum class PG(val korName: String) {
     payco("페이코"), eximbay("엑심베이"), settle("세틀뱅크"), settle_firm("세틀뱅크_펌"),
     /*naverco("네이버페이-주문형"),*/ naverpay("네이버페이-결제형"), smilepay("스마일페이"),
     payple("페이플"), alipay("알리페이"),
-    bluewalnut("bluewalnut"), tosspay("간편결제 - 토스"), smartro("스마트로"); /*, inicis("이니시스ActiveX결제창"), syrup("시럽페이");*/
+    bluewalnut("bluewalnut"), tosspay("간편결제 - 토스"), smartro("스마트로"), nice_v2("나이스페이 V2"); /*, inicis("이니시스ActiveX결제창"), syrup("시럽페이");*/
 
     fun makePgRawName(pgId: String? = null): String {
         return "${this.name}${if (!pgId.isNullOrBlank()) ".${pgId}" else CONST.EMPTY_STR}"
@@ -43,11 +43,11 @@ enum class PG(val korName: String) {
 
     companion object {
         fun convertPG(pgString: String): PG? {
-            return values().find { pgString == (it.name) }
+            return entries.find { pgString == (it.name) }
         }
 
         fun getPGNames(): List<String> {
-            return values().map { "${it.korName} (${it.name})" }.toList()
+            return entries.map { "${it.korName} (${it.name})" }.toList()
         }
     }
 }
