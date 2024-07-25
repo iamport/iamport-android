@@ -89,7 +89,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.10.1'
 
     implementation project(':sdk') // 가맹점은 이 코드가 아닌 아래와 같은 "버전"을 통한 implementation 으로 반영해주세요
-//    implementation 'com.github.iamport:iamport-android:1.3.4'
+//    implementation 'com.github.iamport:iamport-android:1.4.5'
 //    implementation 'com.github.iamport:iamport-android:fix~custom_data-SNAPSHOT'
 
 }
