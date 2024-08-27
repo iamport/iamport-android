@@ -99,10 +99,6 @@ object Libs {
     // Koin Java Compatibility
     const val koin_android_compat = "io.insert-koin:koin-android-compat:${Versions.koin_version}"
 
-    // Koin for Jetpack Compose
-    const val koin_android_compose = "io.insert-koin:koin-androidx-compose:${Versions.koin_version}"
-
-
     // Retorofit
     const val retrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit_version}"
     const val converter_gson = "com.squareup.retrofit2:converter-gson:${Versions.retrofit_version}"
