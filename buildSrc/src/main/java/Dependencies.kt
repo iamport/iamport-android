@@ -1,8 +1,8 @@
 // 디펜던시 업데이트 확인 ./gradlew dependencyUpdates
 
 object Versions {
-    const val versionCode = 240725000 // yymmdd000
-    const val versionName = "1.4.5"  // https://www.notion.so/chaifinance/QA-Process-d1a4be396337493b81c6e85fff2d5cd6
+    const val versionCode = 240827000 // yymmdd000
+    const val versionName = "1.4.6"  // https://www.notion.so/chaifinance/QA-Process-d1a4be396337493b81c6e85fff2d5cd6
 
     const val multidex = "2.0.1"
     const val kotlin_stdlib_jdk = "1.9.10"
