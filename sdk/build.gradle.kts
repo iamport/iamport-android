@@ -119,7 +119,6 @@ dependencies {
     testImplementation(Libs.koin_test_junit4)
     implementation(Libs.koin_android)
     implementation(Libs.koin_android_compat)
-    implementation(Libs.koin_android_compose)
 
     // Retorofit
     implementation(Libs.retrofit)
