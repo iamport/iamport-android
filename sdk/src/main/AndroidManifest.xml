@@ -42,6 +42,7 @@
         <package android:name="kr.co.citibank.citimobile" /> <!--씨티-->
         <package android:name="com.wooricard.smartapp" /> <!--우리WON카드-->
         <package android:name="com.wooribank.smart.npib" /> <!--우리WON뱅킹-->
+        <package android:name="com.kakaobank.channel" /> <!--카카오뱅크-->
         <!--백신-->
         <package android:name="com.TouchEn.mVaccine.webs" /> <!--TouchEn-->
         <package android:name="com.ahnlab.v3mobileplus" /> <!--V3-->
