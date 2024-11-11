@@ -6,9 +6,7 @@
 
 안드로이드 네이티브 앱에서 결제 개발을 간편하게 도와주는 아임포트 SDK 입니다.
 
-- CHAI 간편결제는 Native 연동되어 있습니다.
-
-- 그외 PG 들은 WebView 기반으로 연동되어 있습니다.
+- PG 들은 WebView 기반으로 연동되어 있습니다.
 
 - 추후 순차적으로 타 간편결제들도 네이티브 연동 예정입니다.
 
@@ -42,7 +40,7 @@
 ```
 [5]: https://github.com/iamport/iamport-android/releases
 
-### KOTLIN usage
+### Kotlin usage
 
 > 필수구현 사항
 ```kotlin
@@ -108,60 +106,6 @@ Iamport.payment("imp123456", request,
 
 
 ```
-
-
-### Optional 구현사항 : CHAI 결제
-<details>
-<summary>펼쳐보기</summary>
-
-> - 차이 결제에서 approveCallback 이 있을 때 (최종 결제전 재고 확인 등이 필요할 때)  
-    콜백 전달 받은 후에 chaiPayment 함수 호출  
-    (타임아웃 : CONST.CHAI_FINAL_PAYMENT_TIME_OUT_SEC)
-```kotlin
-  Iamport.chaiPayment(iamPortApprove) // 재고 등 확인 후, 차이 최종 결제 요청 실행.
-```
-
-
-> - 차이 결제 폴링 여부 확인
-```kotlin
-  // 차이 결제 상태체크 폴링 여부를 확인하실 수 있습니다.
-  Iamport.isPolling()?.observe(this, EventObserver {
-      i("차이 폴링? :: $it")
-  })
-
-  // 또는, 폴링 상태를 보고 싶을때 명시적으로 호출
-  i("isPolling? ${Iamport.isPollingValue()}")
-```
-
-
-
-> - 차이 결제 폴링 중에는 포그라운드 서비스가 알람에 뜨게 됩니다.  
-    enableService = true 라면, 폴링중 포그라운드 서비스를 보여줍니다.  
-    enableFailStopButton = true 라면, 포그라운드 서비스에서 중지 버튼 생성합니다.  
-    (해당 enableChaiPollingForegroundService(false, false) 를 Iamport.payment(결제 함수) 전에 호출해주시면 포그라운드 서비스를 등록하지 않습니다)
-
-```kotlin
-  Iamport.enableChaiPollingForegroundService(enableService = true, enableFailStopButton = true)
-```
-
-
-> - 포그라운드 서비스 알람 및 중지 버튼 클릭시 동작을   
-    아래 값의 브로드 캐스트 리시버를 통해 캐치할 수 있습니다.
-
-[샘플앱의 예시 MerchantReceiver.kt](./app/src/main/java/com/iamport/sampleapp/MerchantReceiver.kt)
-
-```kotlin
-  const val BROADCAST_FOREGROUND_SERVICE = "com.iamport.sdk.broadcast.fgservice"
-  const val BROADCAST_FOREGROUND_SERVICE_STOP = "com.iamport.sdk.broadcast.fgservice.stop"
-```
-
-- (포그라운드 서비스 직접 구현시에는 enableService = false 로 설정하고,  
-  Iamport.isPolling()?.observe 에서 true 전달 받을 시점에, 직접 포그라운드 서비스 만들어 띄우시면 됩니다.)
-
-</details>
-
----
-
 
 ### Optional 구현사항 : WebView Mode 와 MobileWeb Mode
 <details>
