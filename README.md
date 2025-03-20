@@ -250,7 +250,7 @@ activity 의 launchMode 를 singleInstance 로 구성하시고,
 
 ```kotlin
 val request = IamPortRequest(
-  app_scheme = "mycustomappscheme"
+  app_scheme = "mycustomappscheme://"
   ..
 ```
 
