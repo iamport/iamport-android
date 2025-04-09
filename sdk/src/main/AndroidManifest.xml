@@ -65,6 +65,7 @@
         <package android:name="com.lguplus.smartotp" /> <!--PASS-->
         <package android:name="com.kt.ktauth" /> <!--PASS-->
         <package android:name="kr.danal.app.damoum" /> <!--다날 다모음-->
+        <package android:name="com.shinhan.sbanking" /> <!-- 신한 SOL뱅크 -->
     </queries>
 
     <application
